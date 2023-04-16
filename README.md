@@ -1,5 +1,5 @@
 # C. elegans Intestine RNAseq
-RNAseq of hand dissected intestine sections from C. elegans
+RNAseq of hand dissected intestine sections
 
 ---
 
