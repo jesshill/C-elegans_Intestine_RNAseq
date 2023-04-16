@@ -8,3 +8,6 @@ RNAseq of hand dissected intestine sections
 - fastp.sbatch (need to convert into an array job!)
 - hisat2_array.sbatch
 - FeatureCounts_array.sbatch
+
+--- 
+
