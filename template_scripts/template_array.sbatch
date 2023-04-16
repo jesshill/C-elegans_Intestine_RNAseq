@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 #SBATCH --nodes=1
-#SBATCH --ntasks=1
+#SBATCH --ntasks=12
 #SBATCH --time=1:00:00
 #SBATCH --qos=normal
-#SBATCH --partition=shas
+#SBATCH --partition=amilan
 #SBATCH --job-name=array-job
 #SBATCH --output=%x.%A_%a.log  #like: array-job.ID_1.log
 
