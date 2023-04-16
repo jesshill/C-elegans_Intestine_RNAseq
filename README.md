@@ -1,5 +1,8 @@
 # C. elegans Intestine RNAseq
+
 RNAseq of hand dissected intestine sections
+
+Libraries were prepared with NEBNext Ultra II directional RNA library prep kit, using UMI adapters
 
 ---
 
