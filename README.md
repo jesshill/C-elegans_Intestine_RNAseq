@@ -11,3 +11,4 @@ RNAseq of hand dissected intestine sections
 
 --- 
 
+![](pipeline.png)
