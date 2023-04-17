@@ -35,6 +35,7 @@ The directionality of this library is:
   > Specify strand-specific read counting 
   > Use options: -s 2
   > -s specifies strand-specific read counting. 0 for unstranded reads, 1 for stranded reads and 2 for reversely stranded reads. This depends on the library used in the sequencing protocol.
+  
 
 --- 
 
