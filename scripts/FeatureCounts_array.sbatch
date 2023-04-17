@@ -4,7 +4,7 @@
 #SBATCH --time=1:00:00
 #SBATCH --qos=normal
 #SBATCH --partition=amilan
-#SBATCH --job-name=array-job
+#SBATCH --job-name=counts_array-job
 #SBATCH --output=%x.%A_%a.log   
 
 # command line:
