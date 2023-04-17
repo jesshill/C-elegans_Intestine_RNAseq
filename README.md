@@ -1,5 +1,8 @@
 # C. elegans Intestine RNAseq
 
+---
+### Experiment Background
+
 RNAseq of hand dissected intestine sections from L4 stage N2 worms.
 
 The NEBNext Ultra II directional RNA library prep kit (E7760S) was used in combination with the NEBNext Multiplex Oligos for illumina (UMI adaptors RNA set 1, NEB #E7416)
@@ -20,7 +23,9 @@ The directionality of this library is:
 
 ---
 
-### Scripts for RNAseq pipeline on Alpine
+### Scripts for RNAseq pipeline on Alpine 
+
+### (find in the scripts directory)
 
 - fastp.sbatch (need to convert into an array job!) 
   - Specify UMI in the read index
