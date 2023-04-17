@@ -6,6 +6,12 @@ The NEBNext Ultra II directional RNA library prep kit (E7760S) was used in combi
 
 This kit contains dUTP in the second strand synthesis buffer that allows labeling of the second strand cDNA and subsequent excision with USER Enzyme. Leaving behind only the first strand! 
 
+
+5' -------------> 3'  (read 2)
+
+3' <------------- 5'  (read 1)
+
+
 Paired end sequencing was performed.
 
 The directionality of this library is: 
