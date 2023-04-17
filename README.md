@@ -23,18 +23,22 @@ The directionality of this library is:
 ### Scripts for RNAseq pipeline on Alpine
 
 - fastp.sbatch (need to convert into an array job!) 
-  > Specify UMI in the read index
-  > Use options: -U --umi_loc=index1
+  - Specify UMI in the read index
+  - Use options: 
+    - -U 
+    - --umi_loc=index1
 
 - hisat2_array.sbatch 
-  > Specify the RNA strandedness
-  > Use options: --rna-strandedness RF
-  > For single-end reads, use F or R. For paired-end reads, use FR or RF. Where the firststrand corresponds to R and RF, and the secondstrand corresponds to F and FR.
+  - Specify the RNA strandedness
+  - Use options: 
+    - --rna-strandedness RF
+  - For single-end reads, use F or R. For paired-end reads, use FR or RF. Where the firststrand corresponds to R and RF, and the secondstrand corresponds to F and FR.
 
 - FeatureCounts_array.sbatch
-  > Specify strand-specific read counting 
-  > Use options: -s 2
-  > -s specifies strand-specific read counting. 0 for unstranded reads, 1 for stranded reads and 2 for reversely stranded reads. This depends on the library used in the sequencing protocol.
+  - Specify strand-specific read counting 
+  - Use options: 
+    - -s 2
+  - -s specifies strand-specific read counting. 0 for unstranded reads, 1 for stranded reads and 2 for reversely stranded reads. This depends on the library used in the sequencing protocol.
   
 
 --- 
