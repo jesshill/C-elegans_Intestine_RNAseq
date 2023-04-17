@@ -4,24 +4,31 @@ RNAseq of hand dissected intestine sections from L4 stage N2 worms.
 
 The NEBNext Ultra II directional RNA library prep kit (E7760S) was used in combination with the NEBNext Multiplex Oligos for illumina (UMI adaptors RNA set 1, NEB #E7416)
 
-This kit contains dUTP in the second strand synthesis buffer that allows labeling of the second strand cDNA and subsequent excision with USER Enzyme. Leaving behind only the first strand. 
+This kit contains dUTP in the second strand synthesis buffer that allows labeling of the second strand cDNA and subsequent excision with USER Enzyme. Leaving behind only the first strand! 
 
-Paired end sequencing was performed
-This kit produces
+Paired end sequencing was performed.
+
+The directionality of this library is: 
+  - read 1 is "reverse", so antisense 
+  - read 2 is "forward", so sense
 
 ---
 
 ### Scripts for RNAseq pipeline on Alpine
 
 - fastp.sbatch (need to convert into an array job!) 
-  > Specify UMI's in the index here
+  > Specify UMI in the read index
+  > Use options: -U --umi_loc=index1
 
 - hisat2_array.sbatch 
-  > Specify the RNA strandedness here using 
-  > ...
+  > Specify the RNA strandedness
+  > Use options: --rna-strandedness RF
+  > For single-end reads, use F or R. For paired-end reads, use FR or RF. Where the firststrand corresponds to R and RF, and the secondstrand corresponds to F and FR.
 
 - FeatureCounts_array.sbatch
-  > Specify 
+  > Specify strand-specific read counting 
+  > Use options: -s 2
+  > -s specifies strand-specific read counting. 0 for unstranded reads, 1 for stranded reads and 2 for reversely stranded reads. This depends on the library used in the sequencing protocol.
 
 --- 
 
