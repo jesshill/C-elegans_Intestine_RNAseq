@@ -32,7 +32,7 @@ cmd="featureCounts \
     -s 2 \                                                                                                                                                                                
     -T $SLURM_NTASKS \                                                                                                                                                                    
     -a ../ce11_IndexBuild/ce11_annotation_ensembl_to_ucsc.gtf \                                                                                                                           
-    -o ../03_output/counts/counts_$SLURM_ARRAY_TASK_ID.txt \                                                                                                                              
+    -o ../03_output/counts/counts.txt \                                                                                                                              
     $sam "                                                                                                                                                                                
                                                                                                                                                                                           
                                                                                                                                                                                           
