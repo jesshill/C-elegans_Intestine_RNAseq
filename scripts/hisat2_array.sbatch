@@ -45,6 +45,7 @@ trim_1=${args[ $SLURM_ARRAY_TASK_ID ]}
 cmd="hisat2 \
     --summary-file summary_$SLURM_ARRAY_TASK_ID.txt \
     --no-unal \
+    --rna-strandedness RF \
     -p ${SLURM_NTASKS} \
     -x ../ce11_IndexBuild/ce11 \
     -1 ${trim_1} \
