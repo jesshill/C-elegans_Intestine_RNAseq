@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #SBATCH --nodes=1
 #SBATCH --ntasks=12
-#SBATCH --time=2:00:00 #next time just request 30 min total
+#SBATCH --time=1:00:00
 #SBATCH --qos=normal
 #SBATCH --partition=amilan
 #SBATCH --job-name=hisat_array-job
