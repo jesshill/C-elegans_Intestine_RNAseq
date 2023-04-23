@@ -4,7 +4,7 @@
 #SBATCH --ntasks=24
 #SBATCH --time=06:00:00
 #SBATCH --partition=amilan
-#SBATCH --job-name=slurm
+#SBATCH --job-name=fastp
 #SBATCH --output=%x.%j.log
 
  
@@ -49,3 +49,12 @@ gzip ${root}_trim_2.fastq
 
 
 done
+
+
+######## VERSIONS #############
+echo -e "\n>>> VERSIONS:"
+echo -e "\n>>> FASTP VERSION:"
+fastp --version
+
+
+# final version used for analaysis is --> fastp 0.23.2
