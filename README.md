@@ -20,6 +20,8 @@ Paired end sequencing was performed.
 The directionality of this library is: 
   - read 1 is "reverse", so antisense 
   - read 2 is "forward", so sense
+  
+![](RNA_strandedness_scheme.png)
 
 ---
 
