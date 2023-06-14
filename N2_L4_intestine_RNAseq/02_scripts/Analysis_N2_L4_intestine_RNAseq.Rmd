@@ -476,7 +476,7 @@ class(changing_exposure)
 
 
 # save plot as a .png
-png("03_output/Heatmap - exposure.png")
+png("03_output/Heatmap - diet.png")
 # Reset parameters
 par(mfrow=c(1,1))
 # Draw a heat map
@@ -488,9 +488,18 @@ p.diet <- pheatmap(changing_diet,
          cluster_cols=TRUE, 
          clustering_distance_rows = "euclidean", 
          clustering_method = "complete",
+         Rowv = NA,
+         Colv = NA,
          show_rownames = FALSE)
+dev.off()
 
 
+# save plot as a .png
+png("03_output/Heatmap - exposure.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
 p.exposure <- pheatmap(changing_exposure, 
          scale="row", 
          color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
@@ -498,6 +507,8 @@ p.exposure <- pheatmap(changing_exposure,
          cluster_cols=TRUE, 
          clustering_distance_rows = "euclidean", 
          clustering_method = "complete",
+         Rowv = NA,
+         Colv = NA,
          show_rownames = FALSE)
 
 dev.off()
