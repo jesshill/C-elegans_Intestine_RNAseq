@@ -33,6 +33,8 @@ install.packages("corrplot")
 install.packages("pheatmap")
 install.packages("RColorBrewer")
 BiocManager::install("topGO")
+
+install.packages("calibrate")
 ```
 
 load packages
@@ -45,6 +47,7 @@ library(apeglm)
 library(dplyr)
 library(tidyverse)
 library(biomaRt)
+library(calibrate)
 ```
 
 read in the data
@@ -210,7 +213,7 @@ MA plot
 #res_exposure
 #resLFC_exposure
 #resLFC_exposure.intestine
-#resLFC_exposure.wholeworm
+
 
 # Plot the the default MA-plot and the shrunken MA-plot:
 # Save the plot
@@ -232,48 +235,6 @@ par(cex.lab=2)
 # to stop saving plots and display the plot on the screen 
 dev.off() 
 ```
-
-_________________
-not working yet
-```{r}
-install.packages("calibrate")
-library(calibrate)
-
-dds_intestine.yes
-dds_intestine.no
-dds_intestine.CeMbio
-dds_intestine.OP50
-
-res_diet
-res_exposure
-resLFC_exposure.intestine
-resLFC_diet.intestine
-
-
-
-WBgeneIDs <- rownames(resLFC_exposure.intestine)
-length(WBgeneIDs)
-resLFC_exposure.intestine_cpy <- data.frame(resLFC_exposure.intestine, rownames(WBgeneIDs))
-
-
-plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
-       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
-       xlab = "means of normalized counts")
-with(subset(resLFC_exposure.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=Gene, cex=.8))
-```
-```{r}
-# label specific genes
-counts
-
-#plotMA(res, ylim = c(-7,7))
-plotMA(resLFC_exposure.intestine, ylim = c(-7,7))
-with(subset(resLFC_exposure.intestine, symbol %in% grep(resLFC_exposure.intestine, "clec*")), {
-  points(baseMean, log2FoldChange, col = "dodgerblue", cex = 2, lwd = 2)
-  text(baseMean, log2FoldChange, c("clec*"), pos = 2, col = "dodgerblue")
-})
-```
-_________________
-
 
 correlation matrices
 ```{r}
@@ -918,3 +879,38 @@ plot_t <- UpSet(m1,
 
 plot_t
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+_________________need to keep working on 
+```{r}
+write.csv(resLFC_exposure.intestine, file = "03_output/resLFC_exposure.intestine.csv")
+resLFC_exposure.intestine.data <- read.csv("03_output/resLFC_exposure.intestine.csv")
+
+plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
+       xlab = "means of normalized counts")
+with(subset(resLFC_exposure.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=Gene, cex=.8))
+
+
+
+
+
+#plotMA(res, ylim = c(-7,7))
+plotMA(resLFC_exposure.intestine, ylim = c(-7,7))
+with(subset(resLFC_exposure.intestine, symbol %in% grep(resLFC_exposure.intestine, "clec*")), {
+  points(baseMean, log2FoldChange, col = "dodgerblue", cex = 2, lwd = 2)
+  text(baseMean, log2FoldChange, c("clec*"), pos = 2, col = "dodgerblue")
+})
+```
+_________________
