@@ -1,0 +1,2 @@
+Term,Expected,Observed,Enrichment Fold Change,P value,Q value,logQ
+mitotic sister chromatid separation GO:0051306,0.19126265316995206,2,10.45682451253482,0.00025711091888543113,0.0817612722055671,1.0874523595337378

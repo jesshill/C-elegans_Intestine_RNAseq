@@ -1,0 +1,920 @@
+---
+title: "Analysis_N2_L4_intestine_RNAseq"
+author: "Jessica Hill"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+requirements 
+# R (4.2.2)
+# DESeq2 (1.38.1)   
+# corrplot (0.92)
+# RColorBrewer (1.1-3)
+# pheatmap (1.0.12)
+# apeglm (1.20.0)
+
+install packages
+```{r}
+# If you don't have bioconductor, install it. This version works with R version 4.1. Use "3.11" for R version 4.0
+if (!require("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+BiocManager::install(version = "3.16")
+
+if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+
+BiocManager::install("DESeq2")
+BiocManager::install("apeglm")
+install.packages("corrplot")
+install.packages("pheatmap")
+install.packages("RColorBrewer")
+BiocManager::install("topGO")
+```
+
+load packages
+```{r load-packages, include=FALSE}
+library(DESeq2)
+library(corrplot)
+library(RColorBrewer)
+library(pheatmap)
+library(apeglm)
+library(dplyr)
+library(tidyverse)
+library(biomaRt)
+```
+
+read in the data
+```{r}
+data <- read.table(file = "01_input/all.counts.txt", header = TRUE)
+
+head(data)
+dim(data)
+class(data)
+```
+
+Prepare our input data for analysis.
+We read in a count matrix, which we will name counts, and the sample information table, which we will name coldata.
+Generate a table called "counts" out of the countsData table.
+```{r}
+colnames(data)
+
+counts <- as.matrix(data[,6:28]) # we should remove Rep3 OP50 whole worm because it is a shitty sample
+head(counts)
+dim(counts)
+```
+
+
+```{r}
+# what are the original column names?
+colnames(counts)
+
+# now reassign 
+colnames(counts) <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.CeMbio.to.PA14.wholeworm', 'Rep1.CeMbio.wholeworm', 'Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine', 'Rep1.OP50.to.PA14.wholeworm', 'Rep1.OP50.wholeworm', 'Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.CeMbio.to.PA14.wholeworm', 'Rep2.CeMbio.wholeworm', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine', 'Rep2.OP50.to.PA14.wholeworm', 'Rep2.OP50.wholeworm', 'Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.CeMbio.to.PA14.wholeworm', 'Rep3.CeMbio.wholeworm', 'Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine', 'Rep3.OP50.to.PA14.wholeworm')
+
+dim(counts)
+```
+
+Now make the sample information table, which we will name coldata.
+```{r}
+diet <- c('CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50', 'OP50', 'CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50', 'OP50', 'CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50')
+exposure <- c('no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes')
+rep <- c('rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3')
+sampleID <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.CeMbio.to.PA14.wholeworm', 'Rep1.CeMbio.wholeworm', 'Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine', 'Rep1.OP50.to.PA14.wholeworm', 'Rep1.OP50.wholeworm', 'Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.CeMbio.to.PA14.wholeworm', 'Rep2.CeMbio.wholeworm', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine', 'Rep2.OP50.to.PA14.wholeworm', 'Rep2.OP50.wholeworm', 'Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.CeMbio.to.PA14.wholeworm', 'Rep3.CeMbio.wholeworm', 'Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine', 'Rep3.OP50.to.PA14.wholeworm')
+  
+coldata <- data.frame(sampleID, diet, exposure, rep)
+coldata
+
+rownames(coldata)<- coldata$sampleID
+coldata
+```
+
+Create an ddsHTSeq object out of counts and coldata.
+This will set a base design for your experiment.
+Load the counts data and to attach it/them to the metadata.
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = counts,
+                              colData = coldata,
+                              design = ~ diet + exposure)
+
+#try design = ~ diet + exposure * exposure
+#try design = ~ diet + exposure * diet
+
+# how many genes do we have?
+dim(dds) # 20,447
+```
+
+pre-filtering (filter for present genes). 
+Not necessary, but helps keep things fast. 
+```{r}
+#Exclude all samples that have less than 10 reads:
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+
+#How many did we exclude?
+dim(dds) # now we have 18,265 genes
+```
+
+
+Visualize read count distribution
+```{r}
+raw_count_threshold <- 10
+hist(log10(rowSums(counts(dds))), breaks = 50)
+abline(v = log10(raw_count_threshold), col = "red", lty = 2)
+```
+
+
+Perform DESEQ2 analysis
+```{r}
+#Will transform dds into a specialized object
+dds <- DESeq(dds)
+
+class(dds)
+str(dds)
+dim(dds)
+plotDispEsts(dds)
+
+# Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
+dds$sizeFactor
+
+#Access the normalized counts using counts(x, normalized = TRUE)
+#Access the raw count info using counts(x, normalized = FALSE)
+head(counts(dds, normalized = TRUE))
+head(counts(dds, normalized = FALSE))
+```
+
+differential expression analysis 
+```{r}
+#calculate the statistically significant differences between CeMbio and OP50 diets
+res_diet <- results(dds,
+                            lfc = 0.5,
+                            contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet)
+
+
+res_exposure <- results(dds,
+                            lfc = 0.5,
+                            contrast=c("exposure", "yes", "no"))
+summary(res_exposure)
+```
+
+perform log fold change shrinkage for visualization
+```{r}
+# An input requirement of the lfcShrink function is a coef term. This is pulled from the resultsNames of dds:
+resultsNames(dds)
+```
+```{r}
+dds_intestine.only <- dds[, grep("intestine", colnames(dds))]
+#dds_wholeworm.only <- dds[, grep("wholeworm", colnames(dds))]
+
+dds_intestine.yes <- dds_intestine.only[, grep("PA14", colnames(dds_intestine.only))]
+
+dds_intestine.no <- dds_intestine.only[, -grep("PA14", colnames(dds_intestine.only))]
+
+dds_intestine.CeMbio <- dds_intestine.only[, grep("CeMbio", colnames(dds_intestine.only))]
+
+dds_intestine.OP50 <- dds_intestine.only[, grep("OP50", colnames(dds_intestine.only))]  
+```
+```{r}
+#resLFC_diet <- lfcShrink(dds, coef=2, type="apeglm")
+#summary(resLFC_diet)
+
+#resLFC_exposure <- lfcShrink(dds, coef=3, type="apeglm")
+#summary(resLFC_exposure)
+
+#resLFC_diet.intestine <- lfcShrink(dds_intestine.only, coef=2, type="apeglm")
+#resLFC_diet.wholeworm <- lfcShrink(dds_wholeworm.only, coef=2, type="apeglm")
+
+resLFC_diet.intestine.Yes <- lfcShrink(dds_intestine.yes, coef=2, type="apeglm")
+resLFC_diet.intestine.No <- lfcShrink(dds_intestine.no, coef=2, type="apeglm")
+
+#resLFC_exposure.intestine <- lfcShrink(dds_intestine.only, coef=3, type="apeglm")
+#resLFC_exposure.wholeworm <- lfcShrink(dds_wholeworm.only, coef=3, type="apeglm")
+
+resLFC_exposure.intestine.CeMbio <- lfcShrink(dds_intestine.CeMbio, coef=3, type="apeglm")
+resLFC_exposure.intestine.OP50 <- lfcShrink(dds_intestine.OP50, coef=3, type="apeglm")
+```
+
+
+Exploring and exporting results
+
+MA plot
+```{r}
+#res_diet
+#resLFC_diet
+#resLFC_diet.intestine
+#resLFC_diet.wholeworm
+#res_exposure
+#resLFC_exposure
+#resLFC_exposure.intestine
+#resLFC_exposure.wholeworm
+
+# Plot the the default MA-plot and the shrunken MA-plot:
+# Save the plot
+png("03_output/MA plot - exposure shrunken (int).png")
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+#check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
+
+#plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+#       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
+#       xlab = "means of normalized counts")
+
+plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+# to stop saving plots and display the plot on the screen 
+dev.off() 
+```
+
+_________________
+not working yet
+```{r}
+install.packages("calibrate")
+library(calibrate)
+
+dds_intestine.yes
+dds_intestine.no
+dds_intestine.CeMbio
+dds_intestine.OP50
+
+res_diet
+res_exposure
+resLFC_exposure.intestine
+resLFC_diet.intestine
+
+
+
+WBgeneIDs <- rownames(resLFC_exposure.intestine)
+length(WBgeneIDs)
+resLFC_exposure.intestine_cpy <- data.frame(resLFC_exposure.intestine, rownames(WBgeneIDs))
+
+
+plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
+       xlab = "means of normalized counts")
+with(subset(resLFC_exposure.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=Gene, cex=.8))
+```
+```{r}
+# label specific genes
+counts
+
+#plotMA(res, ylim = c(-7,7))
+plotMA(resLFC_exposure.intestine, ylim = c(-7,7))
+with(subset(resLFC_exposure.intestine, symbol %in% grep(resLFC_exposure.intestine, "clec*")), {
+  points(baseMean, log2FoldChange, col = "dodgerblue", cex = 2, lwd = 2)
+  text(baseMean, log2FoldChange, c("clec*"), pos = 2, col = "dodgerblue")
+})
+```
+_________________
+
+
+correlation matrices
+```{r}
+#Take r-stabilized log transformations of all the normalized count data. This will help with the problem that the data is noisy and it will help with the problem that the data is spread across a wide range of values.
+rld <- rlog(dds, blind=FALSE)
+new.rld <- assay(rld)
+
+rld.CeMbio <- new.rld[, grep("CeMbio", colnames(new.rld))]
+rld.OP50 <- new.rld[, grep("OP50", colnames(new.rld))]
+
+# Calculate the distances between each sample
+#sampleDists <- dist(t(assay(rld))) # original code, not using
+sampleDists <- dist(t(new.rld))
+sampleDists.CeMbio <- dist(t(rld.CeMbio))
+sampleDists.OP50 <- dist(t(rld.OP50))
+
+# Convert from data.frame to matrix
+sampleDistMatrix <- as.matrix(sampleDists) 
+sampleDistMatrix.CeMbio <- as.matrix(sampleDists.CeMbio)
+sampleDistMatrix.OP50 <- as.matrix(sampleDists.OP50)
+
+# Add some labels
+rownames(sampleDistMatrix) <- colnames(new.rld)
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.CeMbio) <- colnames(rld.CeMbio)
+colnames(sampleDistMatrix.CeMbio) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.OP50) <- colnames(rld.OP50)
+colnames(sampleDistMatrix.OP50) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+# Draw the heatmap
+p.CeMbio <- pheatmap(sampleDistMatrix.CeMbio,
+         clustering_distance_rows=sampleDists.CeMbio,
+         clustering_distance_cols=sampleDists.CeMbio,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+p.OP50 <- pheatmap(sampleDistMatrix.OP50,
+         clustering_distance_rows=sampleDists.OP50,
+         clustering_distance_cols=sampleDists.OP50,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+# Save the CORRELATION MATRIX
+png("03_output/corr_matrix_CeMbio.png")
+        par(mfrow=c(1,1))
+        p.CeMbio
+
+dev.off()
+```
+
+Volcano plots
+Nice ways of displaying the fold change against the p-value.
+```{r}
+#Identify significantly changing genes
+significantLFC.diet <- rbind(subset(resLFC_diet, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet, padj < 0.1 & log2FoldChange < -0.5))
+
+significantLFC.diet.int <- rbind(subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significantLFC.diet.ww <- rbind(subset(resLFC_diet.wholeworm, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.wholeworm, padj < 0.1 & log2FoldChange < -0.5))
+
+
+
+significant_points_to_plot.diet <-resLFC_diet[which(rownames(resLFC_diet) %in% rownames(significantLFC.diet)),] 
+
+significant_points_to_plot.diet.int <-resLFC_diet.intestine[which(rownames(resLFC_diet.intestine) %in% rownames(significantLFC.diet.int)),] 
+
+significant_points_to_plot.diet.ww <-resLFC_diet.wholeworm[which(rownames(resLFC_diet.wholeworm) %in% rownames(significantLFC.diet.ww)),] 
+
+
+# We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
+maxedout.diet <- subset(resLFC_diet, padj < 10e-100)
+maxedout.diet.int <- subset(resLFC_diet.intestine, padj < 10e-100)
+maxedout.diet.ww <- subset(resLFC_diet.wholeworm, padj < 10e-100)
+
+
+png("03_output/volcano plot - diet (int).png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw the plot
+plot(resLFC_diet.intestine$log2FoldChange, -log10(resLFC_diet.intestine$padj),
+     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-6,6), col = "#00000030")
+# Add points
+points(maxedout.diet.int$log2FoldChange, rep(102, length(maxedout.diet.int$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+points(significant_points_to_plot.diet.int$log2FoldChange, -log10(significant_points_to_plot.diet.int$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+dev.off()
+```
+
+
+```{r}
+significantLFC.exposure <- rbind(subset(resLFC_exposure, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure, padj < 0.1 & log2FoldChange < -0.5))
+
+significantLFC.exposure.int <- rbind(subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significantLFC.exposure.ww <- rbind(subset(resLFC_exposure.wholeworm, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.wholeworm, padj < 0.1 & log2FoldChange < -0.5))
+
+
+
+significant_points_to_plot.exposure <-resLFC_exposure[which(rownames(resLFC_exposure) %in% rownames(significantLFC.exposure)),] 
+
+significant_points_to_plot.exposure.int <-resLFC_exposure.intestine[which(rownames(resLFC_exposure.intestine) %in% rownames(significantLFC.exposure.int)),] 
+
+significant_points_to_plot.exposure.ww <-resLFC_exposure.wholeworm[which(rownames(resLFC_exposure.wholeworm) %in% rownames(significantLFC.exposure.ww)),] 
+
+
+maxedout.exposure <- subset(resLFC_exposure, padj < 10e-100)
+maxedout.exposure.int <- subset(resLFC_exposure.intestine, padj < 10e-100)
+maxedout.exposure.ww <- subset(resLFC_exposure.wholeworm, padj < 10e-100)
+
+
+# save plot as a .png
+png("03_output/volcano plot - exposure (int).png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw the plot
+plot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
+       main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+# Add points
+points(maxedout.exposure.int$log2FoldChange, rep(102, length(maxedout.exposure.int$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+
+points(significant_points_to_plot.exposure.int$log2FoldChange, -log10(significant_points_to_plot.exposure.int$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+dev.off()
+```
+
+Get list of significantly changing genes
+```{r}
+# We will use the set of significantly changing genes from our variance shrunken analysis
+resLFC_diet
+resLFC_diet.wholeworm
+resLFC_diet.intestine
+resLFC_diet.intestine.No
+resLFC_diet.intestine.Yes
+resLFC_exposure
+resLFC_exposure.wholeworm
+resLFC_exposure.intestine
+resLFC_exposure.intestine.OP50
+resLFC_exposure.intestine.CeMbio
+
+
+# Select the significant subset of genes that are up-regulated in CeMbio fed worms
+Up_in_CeMbio.int <- subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5)
+Up_in_CeMbio.int <- Up_in_CeMbio.int[order(Up_in_CeMbio.int$padj),]
+
+Down_in_CeMbio.int <- subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange < -0.5)
+Down_in_CeMbio.int <- Down_in_CeMbio.int[order(Down_in_CeMbio.int$padj),]
+
+Up_in_Yes.int <- subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange > 0.5)
+Up_in_Yes.int <- Up_in_Yes.int[order(Up_in_Yes.int$padj),] #order them
+
+Down_in_Yes.int <- subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange < -0.5)
+Down_in_Yes.int <- Down_in_Yes.int[order(Down_in_Yes.int$padj),]
+```
+
+```{r}
+Up_in_Yes.int.CeMbio <- subset(resLFC_exposure.intestine.CeMbio, padj < 0.1 & log2FoldChange < 0.5)
+Up_in_Yes.int.CeMbio <- Up_in_Yes.int.CeMbio[order(Up_in_Yes.int.CeMbio$padj),]
+
+Down_in_Yes.int.CeMbio <- subset(resLFC_exposure.intestine.CeMbio, padj < 0.1 & log2FoldChange < -0.5)
+Down_in_Yes.int.CeMbio <- Down_in_Yes.int.CeMbio[order(Down_in_Yes.int.CeMbio$padj),]
+
+
+Up_in_Yes.int.OP50 <- subset(resLFC_exposure.intestine.OP50, padj < 0.1 & log2FoldChange < 0.5)
+Up_in_Yes.int.OP50 <- Up_in_Yes.int.OP50[order(Up_in_Yes.int.OP50$padj),]
+
+Down_in_Yes.int.OP50 <- subset(resLFC_exposure.intestine.OP50, padj < 0.1 & log2FoldChange < -0.5)
+Down_in_Yes.int.OP50 <- Down_in_Yes.int.OP50[order(Down_in_Yes.int.OP50$padj),]
+
+
+
+
+Up_in_CeMbio.int.Yes <- subset(resLFC_diet.intestine.Yes, padj < 0.1 & log2FoldChange < 0.5)
+Up_in_CeMbio.int.Yes <- Up_in_CeMbio.int.Yes[order(Up_in_CeMbio.int.Yes$padj),]
+
+Down_in_CeMbio.int.Yes <- subset(resLFC_diet.intestine.Yes, padj < 0.1 & log2FoldChange < -0.5)
+Down_in_CeMbio.int.Yes <- Down_in_CeMbio.int.Yes[order(Down_in_CeMbio.int.Yes$padj),]
+
+
+
+Up_in_CeMbio.int.No <- subset(resLFC_diet.intestine.No, padj < 0.1 & log2FoldChange < 0.5)
+Up_in_CeMbio.int.No <- Up_in_CeMbio.int.No[order(Up_in_CeMbio.int.No$padj),]
+
+Down_in_CeMbio.int.No <- subset(resLFC_diet.intestine.No, padj < 0.1 & log2FoldChange < -0.5)
+Down_in_CeMbio.int.No <- Down_in_CeMbio.int.No[order(Down_in_CeMbio.int.No$padj),]
+```
+
+```{r}
+# Save these lists to output files
+write(rownames(Up_in_CeMbio.int), file = "03_output/Genes Up in CeMbio (int).txt", sep = "\n")
+write(rownames(Down_in_CeMbio.int), file = "03_output/Genes Down in CeMbio (int).txt", sep = "\n")
+write(rownames(resLFC_diet), file = "03_output/all_present_genes-diet.txt", sep = "\n")
+
+
+write(rownames(Up_in_Yes.int), file = "03_output/Genes Up in Yes (int).txt", sep = "\n")
+write(rownames(Down_in_Yes.int), file = "03_output/Genes Down in Yes (int).txt", sep = "\n")
+write(rownames(resLFC_exposure), file = "03_output/all_present_genes-exposure.txt", sep = "\n")
+
+
+
+write(rownames(Up_in_Yes.int.CeMbio), file = "03_output/Genes Up in Yes int CeMbio.txt", sep = "\n")
+write(rownames(Down_in_Yes.int.CeMbio), file = "03_output/Genes Down in Yes int CeMbio.txt", sep = "\n")
+write(rownames(Up_in_Yes.int.OP50), file = "03_output/Genes Up in Yes int OP50.txt", sep = "\n")
+write(rownames(Down_in_Yes.int.OP50), file = "03_output/Genes Down in Yes int OP50.txt", sep = "\n")
+
+
+
+write(rownames(Up_in_CeMbio.int.Yes), file = "03_output/Genes Up in CeMbio int Yes.txt", sep = "\n")
+write(rownames(Down_in_CeMbio.int.Yes), file = "03_output/Genes Down in CeMbio int Yes.txt", sep = "\n")
+write(rownames(Up_in_CeMbio.int.No), file = "03_output/Genes Up in CeMbio int No.txt", sep = "\n")
+write(rownames(Down_in_CeMbio.int.No), file = "03_output/Genes Down in CeMbio int No.txt", sep = "\n")
+```
+
+
+make hierarchically clustered heatmaps of all changing genes 
+```{r}
+# get differentially expressed genes
+res_diet_2 <- results(dds,
+                          contrast=c("diet", "CeMbio", "OP50"))
+
+res_exposure_2 <- results(dds,
+                        contrast=c("exposure", "yes", "no"))
+
+#Subset each results table for just the differentially expressed genes:
+sign_diet_up <- subset(res_diet_2, padj < 0.05)
+dim(subset(res_diet_2, padj < 0.1))
+
+sign_exposure <- subset(res_exposure_2, padj < 0.05)
+dim(subset(sign_exposure, padj < 0.1))
+
+
+#Determine how many genes were captured and merge them:
+changing_genes <- rbind(sign_diet, sign_exposure)
+
+dim(changing_genes)
+length(unique(rownames(changing_genes)))
+
+# Get all r-stabilized log values of all the data:
+rdl_all <- assay(rlog(dds, blind=FALSE))
+
+#Subset just the changing genes:
+changing_lrt_rdl <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_genes))
+dim(changing_lrt_rdl)
+head(changing_lrt_rdl)
+
+changing_diet <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_diet))
+changing_exposure <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_exposure))
+
+# Make sure it is in matrix form:
+class(changing_lrt_rdl)
+class(changing_diet)
+class(changing_exposure)
+
+
+# save plot as a .png
+png("03_output/Heatmap - exposure.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
+#p.diet <- pheatmap(changing_diet, 
+#         scale="row", 
+#         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+#         cluster_rows=FALSE, 
+#         cluster_cols=TRUE, 
+#         clustering_distance_rows = "euclidean", 
+#         clustering_method = "complete",
+#         show_rownames = FALSE)
+
+p.exposure <- pheatmap(changing_exposure, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         show_rownames = FALSE)
+
+dev.off()
+```
+
+############################ GO Analysis 
+
+Install Libraries
+```{r}
+install.packages("tidyverse")
+if (!require("BiocManager", quietly = TRUE))
+     install.packages("BiocManager")
+BiocManager::install(version = "3.14")
+BiocManager::install("InterMineR")
+```
+
+Load Libraries
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+library(InterMineR)
+library(ComplexHeatmap)
+library(biomaRt)
+```
+
+```{r}
+# need to add a column of the WbGeneIDs 
+WBgeneID <- rownames(changing_diet)
+changing_diet <- cbind(changing_diet, WBgeneID)
+changing_diet <- as.data.frame(changing_diet)
+
+WBgeneID <- rownames(changing_exposure)
+changing_exposure <- cbind(changing_exposure, WBgeneID)
+changing_exposure <- as.data.frame(changing_exposure)
+
+##########################################
+WBgeneID <- rownames(Down_in_CeMbio.int)
+Down_in_CeMbio.int <- cbind(Down_in_CeMbio.int, WBgeneID)
+Down_in_CeMbio.int <- as.data.frame(Down_in_CeMbio.int)
+
+WBgeneID <- rownames(Up_in_CeMbio.int)
+Up_in_CeMbio.int <- cbind(Up_in_CeMbio.int, WBgeneID)
+Up_in_CeMbio.int <- as.data.frame(Up_in_CeMbio.int)
+
+##########################################
+WBgeneID <- rownames(Down_in_Yes.int)
+Down_in_Yes.int <- cbind(Down_in_Yes.int, WBgeneID)
+Down_in_Yes.int <- as.data.frame(Down_in_Yes.int)
+
+WBgeneID <- rownames(Up_in_Yes.int)
+Up_in_Yes.int <- cbind(Up_in_Yes.int, WBgeneID)
+Up_in_Yes.int <- as.data.frame(Up_in_Yes.int)
+
+##########################################
+WBgeneID <- rownames(Up_in_Yes.int.CeMbio)
+Up_in_Yes.int.CeMbio <- cbind(Up_in_Yes.int.CeMbio, WBgeneID)
+Up_in_Yes.int.CeMbio <- as.data.frame(Up_in_Yes.int.CeMbio)
+
+WBgeneID <- rownames(Down_in_Yes.int.CeMbio)
+Down_in_Yes.int.CeMbio <- cbind(Down_in_Yes.int.CeMbio, WBgeneID)
+Down_in_Yes.int.CeMbio <- as.data.frame(Down_in_Yes.int.CeMbio)
+
+WBgeneID <- rownames(Up_in_Yes.int.OP50)
+Up_in_Yes.int.OP50 <- cbind(Up_in_Yes.int.OP50, WBgeneID)
+Up_in_Yes.int.OP50 <- as.data.frame(Up_in_Yes.int.OP50)
+
+WBgeneID <- rownames(Down_in_Yes.int.OP50)
+Down_in_Yes.int.OP50 <- cbind(Down_in_Yes.int.OP50, WBgeneID)
+Down_in_Yes.int.OP50 <- as.data.frame(Down_in_Yes.int.OP50)
+
+##########################################
+WBgeneID <- rownames(Up_in_CeMbio.int.No)
+Up_in_CeMbio.int.No <- cbind(Up_in_CeMbio.int.No, WBgeneID)
+Up_in_CeMbio.int.No <- as.data.frame(Up_in_CeMbio.int.No)
+
+WBgeneID <- rownames(Up_in_CeMbio.int.Yes)
+Up_in_CeMbio.int.Yes <- cbind(Up_in_CeMbio.int.Yes, WBgeneID)
+Up_in_CeMbio.int.Yes <- as.data.frame(Up_in_CeMbio.int.Yes)
+
+WBgeneID <- rownames(Down_in_CeMbio.int.No)
+Down_in_CeMbio.int.No <- cbind(Down_in_CeMbio.int.No, WBgeneID)
+Down_in_CeMbio.int.No <- as.data.frame(Down_in_CeMbio.int.No)
+
+WBgeneID <- rownames(Down_in_CeMbio.int.Yes)
+Down_in_CeMbio.int.Yes <- cbind(Down_in_CeMbio.int.Yes, WBgeneID)
+Down_in_CeMbio.int.Yes <- as.data.frame(Down_in_CeMbio.int.Yes)
+```
+
+
+Get filternames from https://parasite.wormbase.org/biomart/martview
+```{r}
+Down_in_CeMbio
+Down_in_CeMbio.ww
+Down_in_CeMbio.int
+Up_in_CeMbio
+Up_in_CeMbio.ww
+Up_in_CeMbio.int
+
+Down_in_Yes
+Down_in_Yes.ww
+Down_in_Yes.int
+Up_in_Yes
+Up_in_Yes.ww
+Up_in_Yes.int
+
+
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Down_in_CeMbio.int <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Down_in_CeMbio.int$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Down_in_CeMbio.int, by = c("wbps_gene_id" = "WBgeneID"))
+
+Down_in_CeMbio.int <- Down_in_CeMbio.int %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Down_in_CeMbio.int, file = "03_output/Down_in_CeMbio.int_sets.csv")
+```
+
+```{r}
+Up_in_Yes.int.CeMbio
+Up_in_Yes.int.OP50
+Down_in_Yes.int.CeMbio
+Down_in_Yes.int.OP50
+
+Up_in_CeMbio.int.Yes
+Up_in_CeMbio.int.No
+Down_in_CeMbio.int.Yes
+Down_in_CeMbio.int.No
+
+
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Up_in_CeMbio.int.No <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Up_in_CeMbio.int.No$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Up_in_CeMbio.int.No, by = c("wbps_gene_id" = "WBgeneID"))
+
+Up_in_CeMbio.int.No <- Up_in_CeMbio.int.No %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Up_in_CeMbio.int.No, file = "03_output/Up_in_CeMbio.int.No_sets.csv")
+```
+
+Perform gene ontology
+```{r}
+#install.packages("reticulate")
+library(reticulate)
+
+py_config()
+```
+
+```{python}
+import pandas as pd
+import numpy as np
+import tissue_enrichment_analysis as ea
+import matplotlib.pyplot as plt
+import seaborn as sns
+import csv
+```
+
+```{python}
+tissue = ea.fetch_dictionary('tissue')
+phenotype = ea.fetch_dictionary('phenotype')
+go = ea.fetch_dictionary('go')
+
+
+Up_in_CeMbio_int = pd.read_csv('03_output/Up_in_CeMbio.int_sets.csv')
+Down_in_CeMbio_int = pd.read_csv('03_output/Down_in_CeMbio.int_sets.csv')
+Up_in_Yes_int = pd.read_csv('03_output/Up_in_Yes.int_sets.csv')
+Down_in_Yes_int = pd.read_csv('03_output/Down_in_Yes.int_sets.csv')
+
+Up_in_CeMbio_ww = pd.read_csv('03_output/Up_in_CeMbio.ww_sets.csv')
+Down_in_CeMbio_ww = pd.read_csv('03_output/Down_in_CeMbio.ww_sets.csv')
+Up_in_Yes_ww = pd.read_csv('03_output/Up_in_Yes.ww_sets.csv')
+Down_in_Yes_ww = pd.read_csv('03_output/Down_in_Yes.ww_sets.csv')
+
+
+
+Up_in_Yes_int_CeMbio = pd.read_csv('03_output/Up_in_Yes.int.CeMbio_sets.csv')
+Up_in_Yes_int_OP50 = pd.read_csv('03_output/Up_in_Yes.int.OP50_sets.csv')
+Down_in_Yes_int_CeMbio = pd.read_csv('03_output/Down_in_Yes.int.CeMbio_sets.csv')
+Down_in_Yes_int_OP50 = pd.read_csv('03_output/Down_in_Yes.int.OP50_sets.csv')
+
+Up_in_CeMbio_int_Yes = pd.read_csv('03_output/Up_in_CeMbio.int.Yes_sets.csv')
+Up_in_CeMbio_int_No = pd.read_csv('03_output/Up_in_CeMbio.int.No_sets.csv')
+Down_in_CeMbio_int_Yes = pd.read_csv('03_output/Down_in_CeMbio.int.Yes_sets.csv')
+Down_in_CeMbio_int_No = pd.read_csv('03_output/Down_in_CeMbio.int.No_sets.csv')
+
+
+
+one = Up_in_Yes_int_CeMbio['WBgeneID']
+two = Up_in_Yes_int_OP50['WBgeneID']
+three = Down_in_Yes_int_CeMbio['WBgeneID']
+four = Down_in_Yes_int_OP50['WBgeneID']
+PA14_background_set = pd.DataFrame(pd.concat([one, two, three, four], ignore_index=True))
+
+
+five = Up_in_CeMbio_int_Yes['WBgeneID']
+six = Up_in_CeMbio_int_No['WBgeneID']
+seven = Down_in_CeMbio_int_Yes['WBgeneID'] 
+eight = Down_in_CeMbio_int_No['WBgeneID']
+Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([five, six, seven, eight], ignore_index=True)})
+```
+
+```{python}
+frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
+#PA14_background_set
+#Diet_background_set
+
+result = {}
+for analysis, dictionary in frames.items():
+  result[analysis] = ea.enrichment_analysis(Up_in_Yes_int_CeMbio.WBgeneID, dictionary[dictionary.wbid.isin(PA14_background_set.WBgeneID)], show=True, alpha=10**-1)
+  
+#result = {}
+#for analysis, dictionary in frames.items():
+#  result[analysis] = ea.enrichment_analysis(Up_in_CeMbio_int_No.WBgeneID, #dictionary[dictionary.wbid.isin(Diet_background_set.WBgeneID)], show=True, alpha=10**-1)  
+
+
+# make the figure in the paper:
+fig, ax = plt.subplots(nrows=3, figsize=(8, 10), facecolor='white')
+i= 0
+
+# go through the results hash:
+for t, r in result.items():
+    # calculate the negative log of the Q-values and store
+    r['logQ'] = -r['Q value'].apply(np.log10)
+    # remove np.infinites with np.nan
+    r.logQ.replace([np.inf], np.nan, inplace=True)
+    # remove np.nan with 70 (after 10**-64, the hypergeometric function crashes and returns 0)
+    r.logQ.replace(np.nan, 70, inplace=True)
+    
+    # call the plotting function in the Enrichment Suite to plot the results
+    ea.plot_enrichment_results(r, title=t, analysis=t, ax=ax[i], y='logQ', n_bars=10, color=(0.5, 0.5, 0.5))
+
+    # prettify axes
+    ax[i].set_ylabel(t)
+    if i != 2:
+        ax[i].set_xlabel('')
+    else:
+        ax[i].set_xlabel(r'$-\log_{10}{Q}$')
+    i += 1
+
+# save figure
+plt.savefig('03_output/Up_in_Yes_int_CeMbio_Enrichment_Results-background.svg', bbox_inches='tight')  
+
+# save the results from GO to a csv
+results = result["go"]
+results.to_csv('03_output/Results-Up_in_Yes_int_CeMbio-comparison.csv', index=False)
+```
+
+
+Read in GO results from the comparisons within groups
+```{r}
+# GO results
+Down.in.CeMbio.int.No_comparison <- read.csv2("03_output/Results-Down_in_CeMbio_int_No-comparison.csv", header = TRUE, sep = ",") %>% arrange(logQ)
+
+Down.in.CeMbio.int.Yes_comparison <- read.csv2("03_output/Results-Down_in_CeMbio_int_Yes-comparison.csv", header = TRUE, sep = ",")
+
+Up.in.CeMbio.int.No_comparison <- read.csv2("03_output/Results-Up_in_CeMbio_int_No-comparison.csv", header = TRUE, sep = ",")
+
+Up.in.CeMbio.int.Yes_comparison <- read.csv2("03_output/Results-Up_in_CeMbio_int_Yes-comparison.csv", header = TRUE, sep = ",")
+
+
+# GO results
+Down.in.Yes.int.CeMbio_comparison <- read.csv2("03_output/Results-Down_in_Yes_int_CeMbio-comparison.csv", header = TRUE, sep = ",")
+
+Down.in.Yes.int.OP50_comparison <- read.csv2("03_output/Results-Down_in_Yes_int_OP50-comparison.csv", header = TRUE, sep = ",")
+
+Up.in.Yes.int.CeMbio_comparison <- read.csv2("03_output/Results-Up_in_Yes_int_CeMbio-comparison.csv", header = TRUE, sep = ",")
+
+Up.in.Yes.int.OP50_comparison <- read.csv2("03_output/Results-Up_in_Yes_int_OP50-comparison.csv", header = TRUE, sep = ",")
+```
+
+Plot the GO comparisons
+```{r}
+library(ggplot2)
+
+Down.in.CeMbio.int.No_comparison
+Down.in.CeMbio.int.Yes_comparison
+Up.in.CeMbio.int.No_comparison
+Up.in.CeMbio.int.Yes_comparison
+
+Down.in.Yes.int.CeMbio_comparison
+Down.in.Yes.int.OP50_comparison
+Up.in.Yes.int.CeMbio_comparison
+Up.in.Yes.int.OP50_comparison
+
+
+# save plot as a .png
+png("03_output/GO_Up.in.Yes.int.OP50_comparison.png")
+Up.in.Yes.int.OP50_comparison %>% top_n(10, logQ) %>%
+ggplot(aes(x = reorder(Term, desc(logQ)), y = logQ)) +
+  geom_bar(stat = "identity", fill = "#808080") +
+  coord_flip() +
+  labs(title = "GO Analysis", x = "Term", y = expression("-log"[10]*"{Q}")) + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1, vjust = 1))
+
+dev.off()
+```
+
+creat an upset plot
+```{r}
+#install.packages("UpSetR")
+#BiocManager::install("ComplexHeatmap")
+library(UpSetR)
+library(ComplexHeatmap)
+
+
+Up_in_Yes.int.CeMbio <- read.csv2("03_output/Up_in_Yes.int.CeMbio_sets.csv", header = TRUE, sep = ",")
+Up_in_Yes.int.OP50 <- read.csv2("03_output/Up_in_Yes.int.OP50_sets.csv", header = TRUE, sep = ",")
+Down_in_Yes.int.CeMbio <- read.csv2("03_output/Down_in_Yes.int.CeMbio_sets.csv", header = TRUE, sep = ",")
+Down_in_Yes.int.OP50 <- read.csv2("03_output/Down_in_Yes.int.OP50_sets.csv", header = TRUE, sep = ",")
+
+Up_in_CeMbio.int.Yes <- read.csv2("03_output/Up_in_CeMbio.int.Yes_sets.csv", header = TRUE, sep = ",")
+Up_in_CeMbio.int.No <- read.csv2("03_output/Up_in_CeMbio.int.No_sets.csv", header = TRUE, sep = ",")
+Down_in_CeMbio.int.Yes <- read.csv2("03_output/Down_in_CeMbio.int.Yes_sets.csv", header = TRUE, sep = ",")
+Down_in_CeMbio.int.No <- read.csv2("03_output/Down_in_CeMbio.int.No_sets.csv", header = TRUE, sep = ",")
+```
+
+```{r}
+lt <- list(Up_in_Yes.int.CeMbio = Up_in_Yes.int.CeMbio$WBgeneID, Up_in_Yes.int.OP50 = Up_in_Yes.int.OP50$WBgeneID, Down_in_Yes.int.CeMbio = Down_in_Yes.int.CeMbio$WBgeneID, Down_in_Yes.int.OP50 = Down_in_Yes.int.OP50$WBgeneID)
+
+str(lt)
+
+lt <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
+
+lt
+str(lt)
+list_to_matrix(lt)
+
+m1 = make_comb_mat(lt)
+set_name(m1)
+comb_name(m1)
+set_size(m1)
+comb_size(m1)
+comb_degree(m1)
+t(m1)
+
+
+ss = set_size(m1)
+cs = comb_size(m1)
+
+plot_t <- UpSet(m1, 
+      set_order = order(ss),
+      comb_order = order(comb_degree(m1), -cs),
+      comb_col = c("blue", "lightblue", "black")[comb_degree(m1)],
+      left_annotation = upset_left_annotation(m1))
+
+plot_t
+```
