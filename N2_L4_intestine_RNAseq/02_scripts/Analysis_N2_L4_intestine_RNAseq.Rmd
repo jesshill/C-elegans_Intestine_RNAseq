@@ -578,7 +578,6 @@ Down_in_CeMbio.int.Yes <- cbind(Down_in_CeMbio.int.Yes, WBgeneID)
 Down_in_CeMbio.int.Yes <- as.data.frame(Down_in_CeMbio.int.Yes)
 ```
 
-
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
 Up_in_Yes.int.CeMbio
@@ -593,26 +592,23 @@ Down_in_CeMbio.int.No
 
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
-Up_in_CeMbio.int.No <- biomaRt::getBM(
+Down_in_CeMbio.int.No <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
-  value = Up_in_CeMbio.int.No$WBgeneID,
+  value = Down_in_CeMbio.int.No$WBgeneID,
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(Up_in_CeMbio.int.No, by = c("wbps_gene_id" = "WBgeneID"))
+) %>% right_join(Down_in_CeMbio.int.No, by = c("wbps_gene_id" = "WBgeneID"))
 
-Up_in_CeMbio.int.No <- Up_in_CeMbio.int.No %>% rename(WBgeneID = "wbps_gene_id")
+Down_in_CeMbio.int.No <- Down_in_CeMbio.int.No %>% rename(WBgeneID = "wbps_gene_id")
 
-write_csv(Up_in_CeMbio.int.No, file = "03_output/Up_in_CeMbio.int.No_sets.csv")
+write_csv(Down_in_CeMbio.int.No, file = "03_output/Down_in_CeMbio.int.No_sets.csv")
 ```
 
 Perform gene ontology
 ```{r}
 #install.packages("reticulate")
 library(reticulate)
-
-py_config()
 ```
-
 ```{python}
 import pandas as pd
 import numpy as np
@@ -621,25 +617,12 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import csv
 ```
-
 ```{python}
 tissue = ea.fetch_dictionary('tissue')
 phenotype = ea.fetch_dictionary('phenotype')
 go = ea.fetch_dictionary('go')
-
-
-Up_in_CeMbio_int = pd.read_csv('03_output/Up_in_CeMbio.int_sets.csv')
-Down_in_CeMbio_int = pd.read_csv('03_output/Down_in_CeMbio.int_sets.csv')
-Up_in_Yes_int = pd.read_csv('03_output/Up_in_Yes.int_sets.csv')
-Down_in_Yes_int = pd.read_csv('03_output/Down_in_Yes.int_sets.csv')
-
-Up_in_CeMbio_ww = pd.read_csv('03_output/Up_in_CeMbio.ww_sets.csv')
-Down_in_CeMbio_ww = pd.read_csv('03_output/Down_in_CeMbio.ww_sets.csv')
-Up_in_Yes_ww = pd.read_csv('03_output/Up_in_Yes.ww_sets.csv')
-Down_in_Yes_ww = pd.read_csv('03_output/Down_in_Yes.ww_sets.csv')
-
-
-
+```
+```{python}
 Up_in_Yes_int_CeMbio = pd.read_csv('03_output/Up_in_Yes.int.CeMbio_sets.csv')
 Up_in_Yes_int_OP50 = pd.read_csv('03_output/Up_in_Yes.int.OP50_sets.csv')
 Down_in_Yes_int_CeMbio = pd.read_csv('03_output/Down_in_Yes.int.CeMbio_sets.csv')
@@ -649,15 +632,13 @@ Up_in_CeMbio_int_Yes = pd.read_csv('03_output/Up_in_CeMbio.int.Yes_sets.csv')
 Up_in_CeMbio_int_No = pd.read_csv('03_output/Up_in_CeMbio.int.No_sets.csv')
 Down_in_CeMbio_int_Yes = pd.read_csv('03_output/Down_in_CeMbio.int.Yes_sets.csv')
 Down_in_CeMbio_int_No = pd.read_csv('03_output/Down_in_CeMbio.int.No_sets.csv')
-
-
-
+```
+```{python}
 one = Up_in_Yes_int_CeMbio['WBgeneID']
 two = Up_in_Yes_int_OP50['WBgeneID']
 three = Down_in_Yes_int_CeMbio['WBgeneID']
 four = Down_in_Yes_int_OP50['WBgeneID']
 PA14_background_set = pd.DataFrame(pd.concat([one, two, three, four], ignore_index=True))
-
 
 five = Up_in_CeMbio_int_Yes['WBgeneID']
 six = Up_in_CeMbio_int_No['WBgeneID']
@@ -665,7 +646,6 @@ seven = Down_in_CeMbio_int_Yes['WBgeneID']
 eight = Down_in_CeMbio_int_No['WBgeneID']
 Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([five, six, seven, eight], ignore_index=True)})
 ```
-
 ```{python}
 frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
 #PA14_background_set
