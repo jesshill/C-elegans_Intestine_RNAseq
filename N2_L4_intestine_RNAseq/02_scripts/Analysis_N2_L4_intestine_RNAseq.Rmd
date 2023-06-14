@@ -648,17 +648,28 @@ Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([five, six, seven, eig
 ```
 ```{python}
 frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
-#PA14_background_set
-#Diet_background_set
+###############################
+PA14_background_set
+Diet_background_set
+
+Up_in_Yes_int_CeMbio
+Up_in_Yes_int_OP50
+Down_in_Yes_int_CeMbio
+Down_in_Yes_int_OP50
+
+Up_in_CeMbio_int_Yes
+Up_in_CeMbio_int_No
+Down_in_CeMbio_int_Yes
+Down_in_CeMbio_int_No
+###############################
 
 result = {}
 for analysis, dictionary in frames.items():
   result[analysis] = ea.enrichment_analysis(Up_in_Yes_int_CeMbio.WBgeneID, dictionary[dictionary.wbid.isin(PA14_background_set.WBgeneID)], show=True, alpha=10**-1)
   
-#result = {}
-#for analysis, dictionary in frames.items():
-#  result[analysis] = ea.enrichment_analysis(Up_in_CeMbio_int_No.WBgeneID, #dictionary[dictionary.wbid.isin(Diet_background_set.WBgeneID)], show=True, alpha=10**-1)  
-
+result = {}
+for analysis, dictionary in frames.items():
+  result[analysis] = ea.enrichment_analysis(Up_in_CeMbio_int_No.WBgeneID, dictionary[dictionary.wbid.isin(Diet_background_set.WBgeneID)], show=True, alpha=10**-1)  
 
 # make the figure in the paper:
 fig, ax = plt.subplots(nrows=3, figsize=(8, 10), facecolor='white')
