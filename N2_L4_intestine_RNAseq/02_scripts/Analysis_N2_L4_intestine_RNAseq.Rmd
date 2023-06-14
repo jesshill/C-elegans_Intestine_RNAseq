@@ -222,10 +222,9 @@ png("03_output/MA plot - exposure shrunken (int).png")
 par(mfrow=c(1,1))
 # create the plot
 #check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
-
-#plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
-#       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
-#       xlab = "means of normalized counts")
+plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
+       xlab = "means of normalized counts")
 
 plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
        ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
@@ -292,25 +291,20 @@ Volcano plots
 Nice ways of displaying the fold change against the p-value.
 ```{r}
 #Identify significantly changing genes
-significantLFC.diet <- rbind(subset(resLFC_diet, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet, padj < 0.1 & log2FoldChange < -0.5))
-
 significantLFC.diet.int <- rbind(subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange < -0.5))
-
-significantLFC.diet.ww <- rbind(subset(resLFC_diet.wholeworm, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.wholeworm, padj < 0.1 & log2FoldChange < -0.5))
-
-
-
-significant_points_to_plot.diet <-resLFC_diet[which(rownames(resLFC_diet) %in% rownames(significantLFC.diet)),] 
 
 significant_points_to_plot.diet.int <-resLFC_diet.intestine[which(rownames(resLFC_diet.intestine) %in% rownames(significantLFC.diet.int)),] 
 
-significant_points_to_plot.diet.ww <-resLFC_diet.wholeworm[which(rownames(resLFC_diet.wholeworm) %in% rownames(significantLFC.diet.ww)),] 
+
+
+significantLFC.exposure.int <- rbind(subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.exposure.int <-resLFC_exposure.intestine[which(rownames(resLFC_exposure.intestine) %in% rownames(significantLFC.exposure.int)),] 
 
 
 # We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
-maxedout.diet <- subset(resLFC_diet, padj < 10e-100)
 maxedout.diet.int <- subset(resLFC_diet.intestine, padj < 10e-100)
-maxedout.diet.ww <- subset(resLFC_diet.wholeworm, padj < 10e-100)
+maxedout.exposure.int <- subset(resLFC_exposure.intestine, padj < 10e-100)
 
 
 png("03_output/volcano plot - diet (int).png")
@@ -331,28 +325,7 @@ abline(v=-0.5, col = "blue", lty = "dashed")
 abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
 dev.off()
-```
 
-
-```{r}
-significantLFC.exposure <- rbind(subset(resLFC_exposure, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure, padj < 0.1 & log2FoldChange < -0.5))
-
-significantLFC.exposure.int <- rbind(subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange < -0.5))
-
-significantLFC.exposure.ww <- rbind(subset(resLFC_exposure.wholeworm, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.wholeworm, padj < 0.1 & log2FoldChange < -0.5))
-
-
-
-significant_points_to_plot.exposure <-resLFC_exposure[which(rownames(resLFC_exposure) %in% rownames(significantLFC.exposure)),] 
-
-significant_points_to_plot.exposure.int <-resLFC_exposure.intestine[which(rownames(resLFC_exposure.intestine) %in% rownames(significantLFC.exposure.int)),] 
-
-significant_points_to_plot.exposure.ww <-resLFC_exposure.wholeworm[which(rownames(resLFC_exposure.wholeworm) %in% rownames(significantLFC.exposure.ww)),] 
-
-
-maxedout.exposure <- subset(resLFC_exposure, padj < 10e-100)
-maxedout.exposure.int <- subset(resLFC_exposure.intestine, padj < 10e-100)
-maxedout.exposure.ww <- subset(resLFC_exposure.wholeworm, padj < 10e-100)
 
 
 # save plot as a .png
@@ -381,12 +354,11 @@ Get list of significantly changing genes
 ```{r}
 # We will use the set of significantly changing genes from our variance shrunken analysis
 resLFC_diet
-resLFC_diet.wholeworm
 resLFC_diet.intestine
 resLFC_diet.intestine.No
 resLFC_diet.intestine.Yes
+
 resLFC_exposure
-resLFC_exposure.wholeworm
 resLFC_exposure.intestine
 resLFC_exposure.intestine.OP50
 resLFC_exposure.intestine.CeMbio
