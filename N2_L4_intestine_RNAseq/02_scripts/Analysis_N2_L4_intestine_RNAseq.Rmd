@@ -544,24 +544,6 @@ changing_exposure <- cbind(changing_exposure, WBgeneID)
 changing_exposure <- as.data.frame(changing_exposure)
 
 ##########################################
-WBgeneID <- rownames(Down_in_CeMbio.int)
-Down_in_CeMbio.int <- cbind(Down_in_CeMbio.int, WBgeneID)
-Down_in_CeMbio.int <- as.data.frame(Down_in_CeMbio.int)
-
-WBgeneID <- rownames(Up_in_CeMbio.int)
-Up_in_CeMbio.int <- cbind(Up_in_CeMbio.int, WBgeneID)
-Up_in_CeMbio.int <- as.data.frame(Up_in_CeMbio.int)
-
-##########################################
-WBgeneID <- rownames(Down_in_Yes.int)
-Down_in_Yes.int <- cbind(Down_in_Yes.int, WBgeneID)
-Down_in_Yes.int <- as.data.frame(Down_in_Yes.int)
-
-WBgeneID <- rownames(Up_in_Yes.int)
-Up_in_Yes.int <- cbind(Up_in_Yes.int, WBgeneID)
-Up_in_Yes.int <- as.data.frame(Up_in_Yes.int)
-
-##########################################
 WBgeneID <- rownames(Up_in_Yes.int.CeMbio)
 Up_in_Yes.int.CeMbio <- cbind(Up_in_Yes.int.CeMbio, WBgeneID)
 Up_in_Yes.int.CeMbio <- as.data.frame(Up_in_Yes.int.CeMbio)
@@ -599,36 +581,6 @@ Down_in_CeMbio.int.Yes <- as.data.frame(Down_in_CeMbio.int.Yes)
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
-Down_in_CeMbio
-Down_in_CeMbio.ww
-Down_in_CeMbio.int
-Up_in_CeMbio
-Up_in_CeMbio.ww
-Up_in_CeMbio.int
-
-Down_in_Yes
-Down_in_Yes.ww
-Down_in_Yes.int
-Up_in_Yes
-Up_in_Yes.ww
-Up_in_Yes.int
-
-
-paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
-
-Down_in_CeMbio.int <- biomaRt::getBM(
-  mart = paramart,
-  filter = c("wbps_gene_id"),
-  value = Down_in_CeMbio.int$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(Down_in_CeMbio.int, by = c("wbps_gene_id" = "WBgeneID"))
-
-Down_in_CeMbio.int <- Down_in_CeMbio.int %>% rename(WBgeneID = "wbps_gene_id")
-
-write_csv(Down_in_CeMbio.int, file = "03_output/Down_in_CeMbio.int_sets.csv")
-```
-
-```{r}
 Up_in_Yes.int.CeMbio
 Up_in_Yes.int.OP50
 Down_in_Yes.int.CeMbio
@@ -638,7 +590,6 @@ Up_in_CeMbio.int.Yes
 Up_in_CeMbio.int.No
 Down_in_CeMbio.int.Yes
 Down_in_CeMbio.int.No
-
 
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
