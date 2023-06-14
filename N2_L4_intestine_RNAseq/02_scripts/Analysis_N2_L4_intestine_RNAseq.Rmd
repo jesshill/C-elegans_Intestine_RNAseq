@@ -357,12 +357,12 @@ resLFC_diet
 resLFC_diet.intestine
 resLFC_diet.intestine.No
 resLFC_diet.intestine.Yes
-
 resLFC_exposure
 resLFC_exposure.intestine
 resLFC_exposure.intestine.OP50
 resLFC_exposure.intestine.CeMbio
 
+####################################################################
 
 # Select the significant subset of genes that are up-regulated in CeMbio fed worms
 Up_in_CeMbio.int <- subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5)
@@ -393,14 +393,13 @@ Down_in_Yes.int.OP50 <- subset(resLFC_exposure.intestine.OP50, padj < 0.1 & log2
 Down_in_Yes.int.OP50 <- Down_in_Yes.int.OP50[order(Down_in_Yes.int.OP50$padj),]
 
 
-
+####################################################################
 
 Up_in_CeMbio.int.Yes <- subset(resLFC_diet.intestine.Yes, padj < 0.1 & log2FoldChange < 0.5)
 Up_in_CeMbio.int.Yes <- Up_in_CeMbio.int.Yes[order(Up_in_CeMbio.int.Yes$padj),]
 
 Down_in_CeMbio.int.Yes <- subset(resLFC_diet.intestine.Yes, padj < 0.1 & log2FoldChange < -0.5)
 Down_in_CeMbio.int.Yes <- Down_in_CeMbio.int.Yes[order(Down_in_CeMbio.int.Yes$padj),]
-
 
 
 Up_in_CeMbio.int.No <- subset(resLFC_diet.intestine.No, padj < 0.1 & log2FoldChange < 0.5)
@@ -440,18 +439,17 @@ write(rownames(Down_in_CeMbio.int.No), file = "03_output/Genes Down in CeMbio in
 make hierarchically clustered heatmaps of all changing genes 
 ```{r}
 # get differentially expressed genes
-res_diet_2 <- results(dds,
+res_diet.int_2 <- results(dds_intestine.only,
                           contrast=c("diet", "CeMbio", "OP50"))
 
-res_exposure_2 <- results(dds,
+res_exposure.int_2 <- results(dds_intestine.only,
                         contrast=c("exposure", "yes", "no"))
 
 #Subset each results table for just the differentially expressed genes:
-sign_diet_up <- subset(res_diet_2, padj < 0.05)
-dim(subset(res_diet_2, padj < 0.1))
-
-sign_exposure <- subset(res_exposure_2, padj < 0.05)
-dim(subset(sign_exposure, padj < 0.1))
+sign_diet <- subset(res_diet.int_2, padj < 0.05)
+dim(subset(res_diet.int_2, padj < 0.1))
+sign_exposure <- subset(res_exposure.int_2, padj < 0.05)
+dim(subset(res_exposure.int_2, padj < 0.1))
 
 
 #Determine how many genes were captured and merge them:
@@ -461,7 +459,7 @@ dim(changing_genes)
 length(unique(rownames(changing_genes)))
 
 # Get all r-stabilized log values of all the data:
-rdl_all <- assay(rlog(dds, blind=FALSE))
+rdl_all <- assay(rlog(dds_intestine.only, blind=FALSE))
 
 #Subset just the changing genes:
 changing_lrt_rdl <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_genes))
@@ -483,14 +481,15 @@ png("03_output/Heatmap - exposure.png")
 par(mfrow=c(1,1))
 # Draw a heat map
 # Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
-#p.diet <- pheatmap(changing_diet, 
-#         scale="row", 
-#         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
-#         cluster_rows=FALSE, 
-#         cluster_cols=TRUE, 
-#         clustering_distance_rows = "euclidean", 
-#         clustering_method = "complete",
-#         show_rownames = FALSE)
+p.diet <- pheatmap(changing_diet, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         show_rownames = FALSE)
+
 
 p.exposure <- pheatmap(changing_exposure, 
          scale="row", 
