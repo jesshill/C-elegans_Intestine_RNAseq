@@ -845,31 +845,22 @@ row.names(clec_WBgeneIDs) <- rows
 clec_WBgeneIDs
 
 
-################
-
-plotMA(resLFC_exposure.intestine, ylim = c(-5,5))
-with(subset(resLFC_exposure.intestine, symbol %in% c("Gene1", "Gene2")), {
-  points(baseMean, log2FoldChange, col = "dodgerblue", cex = 2, lwd = 2)
-  text(baseMean, log2FoldChange, c("Gene1", "Gene2"), pos = 2, col = "red")
-})
-
 
 # Save the plot
 png("03_output/MA plot - exposure shrunken (int).png")
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # create the plot
-plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+plotMA(resLFC_exposure.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
        ylab = "log fold change (ratio of normalized CeMbio / OP50)",
        xlab = "means of normalized counts")
-with(subset(resLFC_diet.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=clec_WBgeneIDs, cex=.8))
+text(x=resLFC_exposure.intestine$baseMean, y=resLFC_exposure.intestine$log2FoldChange, label=(row.names(resLFC_exposure.intestine) %in% row.names(clec_WBgeneIDs)), cex=0.3)
+
 
 
 plotMA(resLFC_exposure.intestine.data, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
        ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
        xlab = "means of normalized counts")
-with(subset(resLFC_exposure.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=X, cex=.8))
-
 # Increase the font size of the axis labels
 par(cex.lab=2)
 # to stop saving plots and display the plot on the screen 
@@ -899,14 +890,14 @@ png("03_output/volcano plot - diet (int).png")
 # Reset parameters
 par(mfrow=c(1,1))
 # Draw the plot
-plot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
+ggplot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
      main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-10,10), col = "#00000030")
 # Add points and labels
 points(maxedout.exposure.int$log2FoldChange, rep(102, length(maxedout.exposure.int$log2FoldChange)), 
        pch=20, cex = 0.75, ylim = c(0, 100), col = "green")
 points(significant_points_to_plot.exposure.int$log2FoldChange, -log10(significant_points_to_plot.exposure.int$padj),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-text(x=resLFC_exposure.intestine$log2FoldChange, y=-log10(resLFC_exposure.intestine$pvalue), label=(row.names(resLFC_exposure.intestine) %in% row.names(clec_WBgeneIDs)), cex=0.3)
+labels = rownames(resLFC_exposure.intestine)[rownames(resLFC_exposure.intestine) %in% clec_WBgeneIDs]
 # Add lines
 abline(v=0, col = "blue")
 abline(v=0.5, col = "blue", lty = "dashed")
@@ -916,5 +907,23 @@ abline(h=-log10(0.1), col = "blue", lty = "dashed")
 dev.off()
 ```
 
+text(x=resLFC_diet.intestine$log2FoldChange, y=-log10(resLFC_diet.intestine$pvalue), label=(row.names(resLFC_diet.intestine) %in% row.names(clec_WBgeneIDs)), cex=0.3)
 
 
+text(x=resLFC_exposure.intestine$log2FoldChange, y=-log10(resLFC_exposure.intestine$pvalue), label=rownames(resLFC_exposure.intestine %in% clec_WBgeneIDs), cex=0.3)
+
+
+
+plot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
+     main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-10,10), col = "#00000030")
+# Add points and labels
+points(maxedout.exposure.int$log2FoldChange, rep(102, length(maxedout.exposure.int$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "green")
+points(significant_points_to_plot.exposure.int$log2FoldChange, -log10(significant_points_to_plot.exposure.int$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+labels = rownames(resLFC_exposure.intestine)[rownames(resLFC_exposure.intestine) %in% clec_WBgeneIDs]
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
