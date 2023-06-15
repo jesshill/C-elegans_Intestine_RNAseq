@@ -378,6 +378,7 @@ Down_in_Yes.int <- subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange
 Down_in_Yes.int <- Down_in_Yes.int[order(Down_in_Yes.int$padj),]
 ```
 
+# am i loosing power here? should i just subset the above results?
 ```{r}
 Up_in_Yes.int.CeMbio <- subset(resLFC_exposure.intestine.CeMbio, padj < 0.1 & log2FoldChange < 0.5)
 Up_in_Yes.int.CeMbio <- Up_in_Yes.int.CeMbio[order(Up_in_Yes.int.CeMbio$padj),]
@@ -776,18 +777,24 @@ Down_in_CeMbio.int.Yes <- read.csv2("03_output/Down_in_CeMbio.int.Yes_sets.csv",
 Down_in_CeMbio.int.No <- read.csv2("03_output/Down_in_CeMbio.int.No_sets.csv", header = TRUE, sep = ",")
 ```
 ```{r}
-
+Up_in_CeMbio.int
+Down_in_CeMbio.int
+Up_in_Yes.int
+Down_in_Yes.int
 ```
 ```{r}
 lt <- list(Up_in_Yes.int.CeMbio = Up_in_Yes.int.CeMbio$WBgeneID, Up_in_Yes.int.OP50 = Up_in_Yes.int.OP50$WBgeneID, Down_in_Yes.int.CeMbio = Down_in_Yes.int.CeMbio$WBgeneID, Down_in_Yes.int.OP50 = Down_in_Yes.int.OP50$WBgeneID)
 
+lt <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
+
+
+lt <- list(Up_in_CeMbio.int = Up_in_CeMbio.int$WBgeneID, 
+           Down_in_CeMbio.int = Down_in_CeMbio.int$WBgeneID, 
+           Up_in_Yes.int = Up_in_Yes.int$WBgeneID, 
+           Down_in_Yes.int = Down_in_Yes.int$WBgeneID)
+
 str(lt)
 list_to_matrix(lt)
-
-lt2 <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
-
-str(lt2)
-list_to_matrix(lt2)
 
 m1 = make_comb_mat(lt)
 #m1 = make_comb_mat(lt2)
@@ -797,7 +804,6 @@ set_size(m1)
 comb_size(m1)
 comb_degree(m1)
 t(m1)
-
 
 ss = set_size(m1)
 cs = comb_size(m1)
@@ -811,38 +817,104 @@ plot_t <- UpSet(m1,
 plot_t
 ```
 
-
+GO analysis 
 ```{r}
 BiocManager::install("PANTHER.db")
 
 browseVignettes("PANTHER.db")
 ```
 
+-----------------------------------------------------
 
-
-
-
-
-
-_________________need to keep working on 
+MA plot
 ```{r}
-write.csv(resLFC_exposure.intestine, file = "03_output/resLFC_exposure.intestine.csv")
-resLFC_exposure.intestine.data <- read.csv("03_output/resLFC_exposure.intestine.csv")
+install.packages("readxl")
+library(readxl)
 
-plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
+#When plotMA is called with a data.frame, plotMA expects the data frame to have 3 columns, two numeric ones for mean and log fold change, and a logical one for significance.
+
+write.csv(resLFC_exposure.intestine, file = "03_output/resLFC_exposure.intestine.csv")
+write.csv(resLFC_diet.intestine, file = "03_output/resLFC_diet.intestine.csv")
+clec_IDs <- read_excel("03_output/clec_WBgeneIDs.xlsx", sheet=3)
+clec_IDs <- as.data.frame(clec_IDs)
+headers <- c("WBgeneID", "GeneName")
+colnames(clec_IDs) <- headers
+clec_WBgeneIDs <- clec_IDs[1]
+rows <- clec_WBgeneIDs$WBgeneID
+row.names(clec_WBgeneIDs) <- rows
+clec_WBgeneIDs
+
+
+################
+
+plotMA(resLFC_exposure.intestine, ylim = c(-5,5))
+with(subset(resLFC_exposure.intestine, symbol %in% c("Gene1", "Gene2")), {
+  points(baseMean, log2FoldChange, col = "dodgerblue", cex = 2, lwd = 2)
+  text(baseMean, log2FoldChange, c("Gene1", "Gene2"), pos = 2, col = "red")
+})
+
+
+# Save the plot
+png("03_output/MA plot - exposure shrunken (int).png")
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
+       xlab = "means of normalized counts")
+with(subset(resLFC_diet.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=clec_WBgeneIDs, cex=.8))
+
+
+plotMA(resLFC_exposure.intestine.data, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
        ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
        xlab = "means of normalized counts")
-with(subset(resLFC_exposure.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=Gene, cex=.8))
+with(subset(resLFC_exposure.intestine, padj<.05 & abs(log2FoldChange)>1), textxy(log2FoldChange, -log10(pvalue), labs=X, cex=.8))
+
+# Increase the font size of the axis labels
+par(cex.lab=2)
+# to stop saving plots and display the plot on the screen 
+dev.off() 
 
 
-
-
-
-#plotMA(res, ylim = c(-7,7))
-plotMA(resLFC_exposure.intestine, ylim = c(-7,7))
-with(subset(resLFC_exposure.intestine, symbol %in% grep(resLFC_exposure.intestine, "clec*")), {
-  points(baseMean, log2FoldChange, col = "dodgerblue", cex = 2, lwd = 2)
-  text(baseMean, log2FoldChange, c("clec*"), pos = 2, col = "dodgerblue")
-})
 ```
-_________________
+
+Volcano plots
+```{r}
+#Identify significantly changing genes
+significantLFC.diet.int <- rbind(subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.diet.int <-resLFC_diet.intestine[which(rownames(resLFC_diet.intestine) %in% rownames(significantLFC.diet.int)),] 
+
+
+significantLFC.exposure.int <- rbind(subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.exposure.int <-resLFC_exposure.intestine[which(rownames(resLFC_exposure.intestine) %in% rownames(significantLFC.exposure.int)),] 
+
+# We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
+maxedout.diet.int <- subset(resLFC_diet.intestine, padj < 10e-100)
+maxedout.exposure.int <- subset(resLFC_exposure.intestine, padj < 10e-100)
+
+
+png("03_output/volcano plot - diet (int).png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw the plot
+plot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
+     main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-10,10), col = "#00000030")
+# Add points and labels
+points(maxedout.exposure.int$log2FoldChange, rep(102, length(maxedout.exposure.int$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "green")
+points(significant_points_to_plot.exposure.int$log2FoldChange, -log10(significant_points_to_plot.exposure.int$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+text(x=resLFC_exposure.intestine$log2FoldChange, y=-log10(resLFC_exposure.intestine$pvalue), label=(row.names(resLFC_exposure.intestine) %in% row.names(clec_WBgeneIDs)), cex=0.3)
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+dev.off()
+```
+
+
+
