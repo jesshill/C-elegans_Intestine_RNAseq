@@ -420,7 +420,7 @@ write(rownames(Up_in_Yes.int), file = "03_output/Genes Up in Yes (int).txt", sep
 write(rownames(Down_in_Yes.int), file = "03_output/Genes Down in Yes (int).txt", sep = "\n")
 write(rownames(resLFC_exposure), file = "03_output/all_present_genes-exposure.txt", sep = "\n")
 
-
+######################################### ******
 
 write(rownames(Up_in_Yes.int.CeMbio), file = "03_output/Genes Up in Yes int CeMbio.txt", sep = "\n")
 write(rownames(Down_in_Yes.int.CeMbio), file = "03_output/Genes Down in Yes int CeMbio.txt", sep = "\n")
@@ -640,11 +640,15 @@ three = Down_in_Yes_int_CeMbio['WBgeneID']
 four = Down_in_Yes_int_OP50['WBgeneID']
 PA14_background_set = pd.DataFrame(pd.concat([one, two, three, four], ignore_index=True))
 
+PA14_background_set.to_csv('03_output/PA14_background_set.csv', index=False)
+
 five = Up_in_CeMbio_int_Yes['WBgeneID']
 six = Up_in_CeMbio_int_No['WBgeneID']
 seven = Down_in_CeMbio_int_Yes['WBgeneID'] 
 eight = Down_in_CeMbio_int_No['WBgeneID']
 Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([five, six, seven, eight], ignore_index=True)})
+
+Diet_background_set.to_csv('03_output/Diet_background_set.csv', index=False)
 ```
 ```{python}
 frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
@@ -771,19 +775,22 @@ Up_in_CeMbio.int.No <- read.csv2("03_output/Up_in_CeMbio.int.No_sets.csv", heade
 Down_in_CeMbio.int.Yes <- read.csv2("03_output/Down_in_CeMbio.int.Yes_sets.csv", header = TRUE, sep = ",")
 Down_in_CeMbio.int.No <- read.csv2("03_output/Down_in_CeMbio.int.No_sets.csv", header = TRUE, sep = ",")
 ```
+```{r}
 
+```
 ```{r}
 lt <- list(Up_in_Yes.int.CeMbio = Up_in_Yes.int.CeMbio$WBgeneID, Up_in_Yes.int.OP50 = Up_in_Yes.int.OP50$WBgeneID, Down_in_Yes.int.CeMbio = Down_in_Yes.int.CeMbio$WBgeneID, Down_in_Yes.int.OP50 = Down_in_Yes.int.OP50$WBgeneID)
 
 str(lt)
-
-lt <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
-
-lt
-str(lt)
 list_to_matrix(lt)
 
+lt2 <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
+
+str(lt2)
+list_to_matrix(lt2)
+
 m1 = make_comb_mat(lt)
+#m1 = make_comb_mat(lt2)
 set_name(m1)
 comb_name(m1)
 set_size(m1)
@@ -805,10 +812,11 @@ plot_t
 ```
 
 
+```{r}
+BiocManager::install("PANTHER.db")
 
-
-
-
+browseVignettes("PANTHER.db")
+```
 
 
 
