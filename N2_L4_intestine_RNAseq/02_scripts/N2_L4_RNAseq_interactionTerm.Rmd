@@ -1,0 +1,198 @@
+---
+title: "N2_L4_intesinte_RNAseq_interactionTerm"
+author: "Jessica Hill"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+install packages
+```{r}
+# If you don't have bioconductor, install it. This version works with R version 4.1. Use "3.11" for R version 4.0
+
+#if (!require("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+#BiocManager::install(version = "3.16")
+
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
+
+#BiocManager::install("DESeq2")
+#BiocManager::install("apeglm")
+#install.packages("corrplot")
+#install.packages("pheatmap")
+#install.packages("RColorBrewer")
+#BiocManager::install("topGO")
+
+#install.packages("calibrate")
+```
+
+load packages
+```{r load-packages, include=FALSE}
+library(DESeq2)
+library(corrplot)
+library(RColorBrewer)
+library(pheatmap)
+library(apeglm)
+library(dplyr)
+library(tidyverse)
+library(biomaRt)
+library(calibrate)
+```
+
+read in the data
+```{r}
+data <- read.table(file = "01_input/all.counts.txt", header = TRUE)
+```
+
+Prepare our input data for analysis.
+We read in a count matrix, which we will name counts, and the sample information table, which we will name coldata.
+Generate a table called "counts" out of the countsData table.
+```{r}
+colnames(data)
+
+counts <- as.matrix(data[,6:28]) # we should remove Rep3 OP50 whole worm because it is a shitty sample
+```
+
+
+```{r}
+# what are the original column names?
+colnames(counts)
+
+# now reassign 
+colnames(counts) <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.CeMbio.to.PA14.wholeworm', 'Rep1.CeMbio.wholeworm', 'Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine', 'Rep1.OP50.to.PA14.wholeworm', 'Rep1.OP50.wholeworm', 'Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.CeMbio.to.PA14.wholeworm', 'Rep2.CeMbio.wholeworm', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine', 'Rep2.OP50.to.PA14.wholeworm', 'Rep2.OP50.wholeworm', 'Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.CeMbio.to.PA14.wholeworm', 'Rep3.CeMbio.wholeworm', 'Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine', 'Rep3.OP50.to.PA14.wholeworm')
+
+dim(counts)
+```
+
+Now make the sample information table, which we will name coldata.
+```{r}
+diet <- c('CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50', 'OP50', 'CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50', 'OP50', 'CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50')
+exposure <- c('no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes')
+rep <- c('rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3')
+sampleID <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.CeMbio.to.PA14.wholeworm', 'Rep1.CeMbio.wholeworm', 'Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine', 'Rep1.OP50.to.PA14.wholeworm', 'Rep1.OP50.wholeworm', 'Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.CeMbio.to.PA14.wholeworm', 'Rep2.CeMbio.wholeworm', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine', 'Rep2.OP50.to.PA14.wholeworm', 'Rep2.OP50.wholeworm', 'Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.CeMbio.to.PA14.wholeworm', 'Rep3.CeMbio.wholeworm', 'Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine', 'Rep3.OP50.to.PA14.wholeworm')
+  
+coldata <- data.frame(sampleID, diet, exposure, rep)
+coldata
+
+rownames(coldata)<- coldata$sampleID
+coldata
+```
+
+Create an ddsHTSeq object out of counts and coldata.
+This will set a base design for your experiment.
+Load the counts data and to attach it/them to the metadata.
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = counts,
+                              colData = coldata,
+                              design = ~ diet + exposure*diet)
+
+# how many genes do we have?
+dim(dds)
+```
+
+pre-filtering (filter for present genes). 
+Not necessary, but helps keep things fast. 
+```{r}
+#Exclude all samples that have less than 10 reads:
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+
+#How many did we exclude?
+dim(dds) 
+```
+
+Visualize read count distribution
+```{r}
+raw_count_threshold <- 10
+hist(log10(rowSums(counts(dds))), breaks = 50)
+abline(v = log10(raw_count_threshold), col = "red", lty = 2)
+```
+
+
+```{r}
+dds1 <- dds
+dds2 <- dds
+dds3 <- dds
+dds4 <- dds
+```
+
+Factor Levels
+Organize the categories into an order that makes sense
+```{r}
+dds1$diet <- factor(dds1$diet, levels = c("OP50", "CeMbio"))
+dds1$exposure <- factor(dds1$exposure, levels = c("no", "yes")) 
+
+dds2$diet <- factor(dds2$diet, levels = c("OP50", "CeMbio"))
+dds2$exposure <- factor(dds2$exposure, levels = c("yes", "no"))
+
+dds3$diet <- factor(dds3$diet, levels = c("CeMbio", "OP50"))
+dds3$exposure <- factor(dds3$exposure, levels = c("no", "yes"))
+
+dds4$diet <- factor(dds4$diet, levels = c("CeMbio", "OP50"))
+dds4$exposure <- factor(dds4$exposure, levels = c("yes", "no")) 
+```
+
+```{r}
+dds4$diet = relevel(dds4$diet, "CeMbio")
+dds4$exposure = relevel(dds4$exposure, "yes")
+```
+
+Perform DESEQ2 analysis
+```{r}
+#Will transform dds into a specialized object
+dds1 <- DESeq(dds1)
+dds2 <- DESeq(dds2)
+dds3 <- DESeq(dds3)
+dds4 <- DESeq(dds4)
+
+plotDispEsts(dds1)
+
+# Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
+dds1$sizeFactor
+
+#Access the normalized counts using counts(x, normalized = TRUE)
+#Access the raw count info using counts(x, normalized = FALSE)
+head(counts(dds1, normalized = TRUE))
+```
+
+
+differential expression analysis 
+```{r}
+#calculate the statistically significant differences between CeMbio and OP50 diets
+res_diet1 <- results(dds1,
+                            lfc = 0.5,
+                            contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet1)
+
+
+res_exposure1 <- results(dds1,
+                            lfc = 0.5,
+                            contrast=c("exposure", "yes", "no"))
+summary(res_exposure1)
+```
+perform log fold change shrinkage for visualization
+```{r}
+# An input requirement of the lfcShrink function is a coef term. This is pulled from the resultsNames of dds:
+resultsNames(dds1)
+```
+
+```{r}
+res_diet2 <- results(dds2,
+                            lfc = 0.5,
+                            contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet2)
+
+
+res_exposure2 <- results(dds2,
+                            lfc = 0.5,
+                            contrast=c("exposure", "yes", "no"))
+summary(res_exposure2)
+
+resultsNames(dds2)
+```
