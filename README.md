@@ -51,12 +51,11 @@ The directionality of this library is:
   
 ---
 
+![](pipeline.png)
+
+---
+
 ### Pipeline 2
 
 - ...
 - ... 
-
-
---- 
-
-![](pipeline.png)
