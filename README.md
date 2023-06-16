@@ -29,7 +29,7 @@ The directionality of this library is:
 
 ### (find in the scripts directory)
 
-## Pipeline 1
+#### Pipeline 1
 
 - fastp.sbatch (need to convert into an array job!) 
   - Specify UMI in the read index
@@ -51,9 +51,10 @@ The directionality of this library is:
   
 ---
 
-## Pipeline 2
+#### Pipeline 2
 
 - ...
+- ... 
 
 
 --- 
