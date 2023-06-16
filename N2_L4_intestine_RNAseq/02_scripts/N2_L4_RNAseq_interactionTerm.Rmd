@@ -196,3 +196,18 @@ summary(res_exposure2)
 
 resultsNames(dds2)
 ```
+
+```{r}
+res_diet3 <- results(dds3,
+                            lfc = 0.5,
+                            contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet3)
+
+
+res_exposure3 <- results(dds3,
+                            lfc = 0.5,
+                            contrast=c("exposure", "yes", "no"))
+summary(res_exposure3)
+
+resultsNames(dds3)
+```
