@@ -181,6 +181,16 @@ perform log fold change shrinkage for visualization
 # An input requirement of the lfcShrink function is a coef term. This is pulled from the resultsNames of dds:
 resultsNames(dds1)
 ```
+```{r}
+resLFC_diet1 <- lfcShrink(dds1, coef=2, type="apeglm")
+summary(resLFC_diet1)
+
+resLFC_exposure1 <- lfcShrink(dds1, coef=3, type="apeglm")
+summary(resLFC_exposure1)
+
+res_LFC_interaction1 <- lfcShrink(dds1, coef=4, type="apeglm")
+summary(res_LFC_interaction1)
+```
 
 ```{r}
 res_diet2 <- results(dds2,
@@ -195,6 +205,16 @@ res_exposure2 <- results(dds2,
 summary(res_exposure2)
 
 resultsNames(dds2)
+
+
+resLFC_diet2 <- lfcShrink(dds2, coef=2, type="apeglm")
+summary(resLFC_diet2)
+
+resLFC_exposure2 <- lfcShrink(dds2, coef=3, type="apeglm")
+summary(resLFC_exposure2)
+
+res_LFC_interaction2 <- lfcShrink(dds2, coef=4, type="apeglm")
+summary(res_LFC_interaction2)
 ```
 
 ```{r}
@@ -210,6 +230,16 @@ res_exposure3 <- results(dds3,
 summary(res_exposure3)
 
 resultsNames(dds3)
+
+
+resLFC_diet3 <- lfcShrink(dds3, coef=2, type="apeglm")
+summary(resLFC_diet3)
+
+resLFC_exposure3 <- lfcShrink(dds3, coef=3, type="apeglm")
+summary(resLFC_exposure3)
+
+res_LFC_interaction3 <- lfcShrink(dds3, coef=4, type="apeglm")
+summary(res_LFC_interaction3)
 ```
 
 ```{r}
@@ -225,9 +255,50 @@ res_exposure4 <- results(dds4,
 summary(res_exposure4)
 
 resultsNames(dds4)
+
+
+resLFC_diet4 <- lfcShrink(dds4, coef=2, type="apeglm")
+summary(resLFC_diet4)
+
+resLFC_exposure4 <- lfcShrink(dds4, coef=3, type="apeglm")
+summary(resLFC_exposure4)
+
+res_LFC_interaction4 <- lfcShrink(dds4, coef=4, type="apeglm")
+summary(res_LFC_interaction4)
 ```
 
 
 
+MA plot
+```{r}
+plotMA(res_LFC_interaction1, ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized ... / ...)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+```
 
+```{r}
+plotMA(res_LFC_interaction2, ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized ... / ...)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+```
+
+```{r}
+plotMA(res_LFC_interaction3, ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized ... / ...)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+```
+
+```{r}
+plotMA(res_LFC_interaction4, ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized ... / ...)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+```
 
