@@ -1,7 +1,7 @@
 # C. elegans Intestine RNAseq
 
 ---
-### Experiment Background
+## Experiment Background
 
 RNAseq of hand dissected intestine sections from L4 stage N2 worms.
 
@@ -25,11 +25,11 @@ The directionality of this library is:
 
 ---
 
-### Scripts for RNAseq pipeline on Alpine 
+## Scripts for RNAseq pipeline on Alpine 
 
-### (find in the scripts directory)
+## (find in the scripts directory)
 
-## Pipeline 1
+### Pipeline 1
 
 - fastp.sbatch (need to convert into an array job!) 
   - Specify UMI in the read index
@@ -51,11 +51,11 @@ The directionality of this library is:
   
 ---
 
-## Pipeline 2
+![](pipeline.png)
+
+---
+
+### Pipeline 2
 
 - ...
-
-
---- 
-
-![](pipeline.png)
+- ... 
