@@ -90,7 +90,7 @@ Load the counts data and to attach it/them to the metadata.
 ```{r}
 dds <- DESeqDataSetFromMatrix(countData = counts,
                               colData = coldata,
-                              design = ~ diet + exposure*diet)
+                              design = ~ diet + exposure:diet)
 
 # how many genes do we have?
 dim(dds)
