@@ -29,6 +29,8 @@ The directionality of this library is:
 
 ### (find in the scripts directory)
 
+## Pipeline 1
+
 - fastp.sbatch (need to convert into an array job!) 
   - Specify UMI in the read index
   - Use options: 
@@ -41,12 +43,18 @@ The directionality of this library is:
     - --rna-strandedness RF
   - For single-end reads, use F or R. For paired-end reads, use FR or RF. Where the firststrand corresponds to R and RF, and the secondstrand corresponds to F and FR.
 
-- FeatureCounts_array.sbatch
+- FeatureCounts_array.sbatch   (no way to account for UMIs in counting) 
   - Specify strand-specific read counting 
   - Use options: 
     - -s 2
   - -s specifies strand-specific read counting. 0 for unstranded reads, 1 for stranded reads and 2 for reversely stranded reads. This depends on the library used in the sequencing protocol.
   
+---
+
+## Pipeline 2
+
+- ...
+
 
 --- 
 
