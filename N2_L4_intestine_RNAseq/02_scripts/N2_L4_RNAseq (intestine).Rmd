@@ -155,12 +155,15 @@ dim(dds) # 18265
 
 keep <- rowSums(counts(dds1)) >= 10
 dds1 <- dds1[keep,]
+
+keep <- rowSums(counts(dds2)) >= 10
+dds2 <- dds2[keep,]
 ```
 
 Visualize read count distribution
 ```{r}
 raw_count_threshold <- 10
-hist(log10(rowSums(counts(dds))), breaks = 50)
+hist(log10(rowSums(counts(dds2))), breaks = 50)
 abline(v = log10(raw_count_threshold), col = "red", lty = 2)
 ```
 
@@ -173,6 +176,9 @@ dds$exposure <- factor(dds$exposure, levels = c("no", "yes")) # this sets no as 
 
 dds1$diet <- factor(dds1$diet, levels = c("OP50", "CeMbio")) 
 dds1$exposure <- factor(dds1$exposure, levels = c("no", "yes"))
+
+dds2$diet <- factor(dds2$diet, levels = c("OP50", "CeMbio")) 
+dds2$exposure <- factor(dds2$exposure, levels = c("no", "yes"))
 #######################
 
 dds$diet <- relevel(dds$diet, ref = "OP50")
@@ -189,6 +195,7 @@ dim(dds)
 plotDispEsts(dds)
 
 dds1 <- DESeq(dds1)
+dds2 <- DESeq(dds2)
 
 # Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
 dds$sizeFactor
@@ -202,11 +209,29 @@ head(counts(dds, normalized = TRUE))
 
 Results tables are generated using the function results, which extracts a results table with log2 fold changes, p values and adjusted p values. With no additional arguments to results, the log2 fold change and Wald test p value will be for the last variable in the design formula, and if this is a factor, the comparison will be the last level of this variable over the reference level (see previous note on factor levels). However, the order of the variables of the design do not matter so long as the user specifies the comparison to build a results table for, using the name or contrast arguments of results.
 
+Contrast: a character vector with exactly three elements: the name of a factor in the design formula, the name of the numerator level for the fold change, and the name of the denominator level for the fold change (simplest case)
 
-A contrast is a linear combination of estimated log2 fold changes, which can be used to test if differences between groups are equal to zero. The simplest use case for contrasts is an experimental design containing a factor with three levels, say A, B and C. Contrasts enable the user to generate results for all 3 possible differences: log2 fold change of B vs A, of C vs A, and of C vs B. The contrast argument of results function is used to extract test results of log2 fold changes of interest, for example:
+--- (see ?results())
+# Example 2: two conditions, two genotypes, with an interaction term
 
-results(dds, contrast=c("condition","C","B"))
+dds <- makeExampleDESeqDataSet(n=100,m=12)
+dds$genotype <- factor(rep(rep(c("I","II"),each=3),2))
 
+design(dds) <- ~ genotype + condition + genotype:condition
+dds <- DESeq(dds) 
+resultsNames(dds)
+
+# the condition effect for genotype I (the main effect)
+results(dds, contrast=c("condition","B","A"))
+
+# the condition effect for genotype II
+# this is, by definition, the main effect *plus* the interaction term
+# (the extra condition effect in genotype II compared to genotype I).
+results(dds, list( c("condition_B_vs_A","genotypeII.conditionB") ))
+
+# the interaction term, answering: is the condition effect *different* across genotypes?
+results(dds, name="genotypeII.conditionB")
+---
 
 
 extract results 
@@ -248,13 +273,18 @@ summary(res_exposure)
 ```{r}
 res_diet2 <- results(dds2,
                     lfc = 0.5,
-                    contrast=c("diet", "CeMbio", "OP50"))
+                    contrast=c("diet", "CeMbio", "OP50")) # the diet effect for no exposure
 summary(res_diet2)
 
 res_exposure2 <- results(dds2,
                     lfc = 0.5,
-                    contrast=c("exposure", "yes", "no"))
+                    contrast=c("exposure", "yes", "no")) # the exposure effect for OP50
 summary(res_exposure2)
+
+res_interaction2 <- results(dds2,
+                            lfc = 0.5,
+                            contrast=list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes"))) # the exposure effect for CeMbio
+summary(res_interaction2)
 ```
 
 ```{r}
@@ -263,24 +293,39 @@ resultsNames(dds1)
 resultsNames(dds2)
 ```
 
-
-
-
-
-
-
-
-
+Visualization 
 ```{r}
-resLFC_diet1 <- lfcShrink(dds1, coef=2, type="apeglm")
-summary(resLFC_diet1)
+# Plot the the default MA-plot and the shrunken MA-plot:
+# Save the plot
+png("03_output/MA plot - exposure shrunken (int).png")
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+#check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
+plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
+       xlab = "means of normalized counts")
 
-resLFC_exposure1 <- lfcShrink(dds1, coef=3, type="apeglm")
-summary(resLFC_exposure1)
+plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+# to stop saving plots and display the plot on the screen 
+dev.off() 
 
-res_LFC_interaction1 <- lfcShrink(dds1, coef=4, type="apeglm")
-summary(res_LFC_interaction1)
 ```
+
+
+
+
+
+
+
+
+
+
+
 
 
 
