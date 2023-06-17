@@ -134,7 +134,7 @@ dds2$exposure <- factor(dds2$exposure, levels = c("yes", "no"))
 dds3$diet <- factor(dds3$diet, levels = c("CeMbio", "OP50"))
 dds3$exposure <- factor(dds3$exposure, levels = c("no", "yes"))
 
-dds4$diet <- factor(dds4$diet, levels = c("CeMbio", "OP50"))
+dds4$diet <- factor(dds4$diet, levels = c("CeMbio", "OP50")) 
 dds4$exposure <- factor(dds4$exposure, levels = c("yes", "no")) 
 ```
 

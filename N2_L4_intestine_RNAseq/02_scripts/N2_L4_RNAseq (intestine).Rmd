@@ -6,7 +6,11 @@ output: html_document
 ---
 
 all whole worm controls have been taken out!
-that will be a seperate analysis just for evaluating purity
+that will be a separate analysis just for evaluating purity
+
+
+http://bioconductor.org/packages/devel/bioc/vignettes/DESeq2/inst/doc/DESeq2.html
+
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
@@ -46,6 +50,22 @@ library(biomaRt)
 library(calibrate)
 ```
 
+
+# Analysis outline
+
+- Import counts and format for DESeq2 analysis
+- Filter low abundance counts based on counts per million (CPM)
+- Perform differential expression analysis
+- Visualize pairwise sample correlation
+- Categorize gene expression with alternative hypothesis
+- Visualize unshrunken pairwise differential expression
+- Visualize shrunken pairwise differential expression
+- Measure tissue expressed genes
+- Visualize developmentally dynamic intestine genes
+- Identify novel intestine genes in each stage for smFISH experiments
+
+
+
 read in the data
 ```{r}
 data <- read.table(file = "01_input/all.counts.txt", header = TRUE)
@@ -58,49 +78,69 @@ Generate a table called "counts" out of the countsData table.
 colnames(data)
 
 counts <- as.matrix(data[,6:28]) # we should remove Rep3 OP50 whole worm because it is a shitty sample
+
+counts_int <- counts[, grep("intestine", colnames(counts))]
+str(counts_int)
 ```
 
 
 ```{r}
 # what are the original column names?
-colnames(counts)
+colnames(counts_int)
 
 # now reassign 
-colnames(counts) <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.CeMbio.to.PA14.wholeworm', 'Rep1.CeMbio.wholeworm', 'Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine', 'Rep1.OP50.to.PA14.wholeworm', 'Rep1.OP50.wholeworm', 'Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.CeMbio.to.PA14.wholeworm', 'Rep2.CeMbio.wholeworm', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine', 'Rep2.OP50.to.PA14.wholeworm', 'Rep2.OP50.wholeworm', 'Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.CeMbio.to.PA14.wholeworm', 'Rep3.CeMbio.wholeworm', 'Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine', 'Rep3.OP50.to.PA14.wholeworm')
+colnames(counts_int) <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.OP50.intestine','Rep1.OP50.to.PA14.intestine','Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine','Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine','Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.OP50.intestine','Rep3.OP50.to.PA14.intestine')
 
-dim(counts)
+dim(counts_int)
 ```
 
 Now make the sample information table, which we will name coldata.
 ```{r}
-diet <- c('CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50', 'OP50', 'CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50', 'OP50', 'CeMbio', 'CeMbio', 'CeMbio', 'CeMbio', 'OP50', 'OP50', 'OP50')
-exposure <- c('no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes', 'no', 'no', 'yes', 'yes')
-rep <- c('rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep1', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep2', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3', 'rep3')
-sampleID <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.CeMbio.to.PA14.wholeworm', 'Rep1.CeMbio.wholeworm', 'Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine', 'Rep1.OP50.to.PA14.wholeworm', 'Rep1.OP50.wholeworm', 'Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.CeMbio.to.PA14.wholeworm', 'Rep2.CeMbio.wholeworm', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine', 'Rep2.OP50.to.PA14.wholeworm', 'Rep2.OP50.wholeworm', 'Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.CeMbio.to.PA14.wholeworm', 'Rep3.CeMbio.wholeworm', 'Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine', 'Rep3.OP50.to.PA14.wholeworm')
+diet <- c('CeMbio','CeMbio','OP50','OP50','CeMbio','CeMbio','OP50','OP50','CeMbio','CeMbio','OP50','OP50')
+exposure <- c('no','yes','no','yes','no','yes','no','yes','no','yes','no','yes')
+rep <- c('rep1','rep1','rep1','rep1','rep2', 'rep2', 'rep2', 'rep2','rep3', 'rep3', 'rep3', 'rep3')
+group <- c('CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes')
+sampleID <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine','Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine','Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine')
   
-coldata <- data.frame(sampleID, diet, exposure, rep)
+coldata <- data.frame(sampleID, diet, exposure, group, rep)
 coldata
 
 rownames(coldata)<- coldata$sampleID
 coldata
 ```
 
+
 Create an ddsHTSeq object out of counts and coldata.
 This will set a base design for your experiment.
 Load the counts data and to attach it/them to the metadata.
 ```{r}
-dds <- DESeqDataSetFromMatrix(countData = counts,
+# design 1 - we can use the following approach to obtain the exposure effect for diet
+dds <- DESeqDataSetFromMatrix(countData = counts_int,
+                              colData = coldata,
+                              design = ~ group)
+
+# design 2 - (genotype + condition) the exposure effect represents the overall effect controlling for differences due to diet
+dds1 <- DESeqDataSetFromMatrix(countData = counts_int,
                               colData = coldata,
                               design = ~ diet + exposure)
 
-dds1 <- DESeqDataSetFromMatrix(countData = counts,
+# design 3 - (genotype:condition) the main condition effect only represents the effect of condition for the reference level of genotype (I, or whichever level was defined by the user as the reference level).
+dds2 <- DESeqDataSetFromMatrix(countData = counts_int,
                               colData = coldata,
-                              design = ~ diet + exposure:diet)
+                              design = ~ diet + exposure + exposure:diet)
+
 
 # how many genes do we have?
 dim(dds) #20447
-dim(dds1)
 ```
+
+
+interaction example: 
+'TreatmentTreat.timet1' relates to the time effect for TreatmentTreat Versus TreatmentUnTreat. That is, it tests whether the effect of time is different between treated and untreated. Another way to look at it:
+
+'time_t1_vs_t0' relates to timet1 versus timet0 for TreatmentUntreat. If you re-level Treatment to have Treat as the reference level, then 'time_t1_vs_t0' would relate to timet1 versus timet0 for TreatmentTreat. This would tell you if treated and untreated change in the same way independently at the 2 time-points.
+
+
 
 
 pre-filtering (filter for present genes). 
@@ -111,13 +151,10 @@ keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
 #How many are we left with?
 dim(dds) # 18265
-```
-```{r}
-#Exclude all samples that have less than 10 reads:
+
+
 keep <- rowSums(counts(dds1)) >= 10
 dds1 <- dds1[keep,]
-#How many are we left with?
-dim(dds1) 
 ```
 
 Visualize read count distribution
@@ -126,10 +163,104 @@ raw_count_threshold <- 10
 hist(log10(rowSums(counts(dds))), breaks = 50)
 abline(v = log10(raw_count_threshold), col = "red", lty = 2)
 ```
+
+Factor Levels
+Organize the categories into an order that makes sense
 ```{r}
-raw_count_threshold <- 10
-hist(log10(rowSums(counts(dds1))), breaks = 50)
-abline(v = log10(raw_count_threshold), col = "red", lty = 2)
+dds$diet <- factor(dds$diet, levels = c("OP50", "CeMbio")) # this sets OP50 as the reference levels
+dds$exposure <- factor(dds$exposure, levels = c("no", "yes")) # this sets no as the reference levels
+
+
+dds1$diet <- factor(dds1$diet, levels = c("OP50", "CeMbio")) 
+dds1$exposure <- factor(dds1$exposure, levels = c("no", "yes"))
+#######################
+
+dds$diet <- relevel(dds$diet, ref = "OP50")
+dds$exposure <- relevel(dds$exposure, ref = "no")
+```
+
+
+differential expression analysis 
+Perform DESEQ2 analysis
+```{r}
+#Will transform dds into a specialized object
+dds <- DESeq(dds)
+dim(dds)
+plotDispEsts(dds)
+
+dds1 <- DESeq(dds1)
+
+# Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
+dds$sizeFactor
+
+#Access the normalized counts using counts(x, normalized = TRUE)
+#Access the raw count info using counts(x, normalized = FALSE)
+head(counts(dds, normalized = TRUE))
+#head(counts(dds, normalized = FALSE))
+```
+
+
+Results tables are generated using the function results, which extracts a results table with log2 fold changes, p values and adjusted p values. With no additional arguments to results, the log2 fold change and Wald test p value will be for the last variable in the design formula, and if this is a factor, the comparison will be the last level of this variable over the reference level (see previous note on factor levels). However, the order of the variables of the design do not matter so long as the user specifies the comparison to build a results table for, using the name or contrast arguments of results.
+
+
+A contrast is a linear combination of estimated log2 fold changes, which can be used to test if differences between groups are equal to zero. The simplest use case for contrasts is an experimental design containing a factor with three levels, say A, B and C. Contrasts enable the user to generate results for all 3 possible differences: log2 fold change of B vs A, of C vs A, and of C vs B. The contrast argument of results function is used to extract test results of log2 fold changes of interest, for example:
+
+results(dds, contrast=c("condition","C","B"))
+
+
+
+extract results 
+```{r}
+#calculate the statistically significant differences between CeMbio and OP50 diets
+res1 <- results(dds,
+                    lfc = 0.5,
+                    contrast=c("group", "OP50_yes", "OP50_no"))
+summary(res1)
+
+res2 <- results(dds,
+                    lfc = 0.5,
+                    contrast=c("group", "CeMbio_yes", "CeMbio_no"))
+summary(res2)
+
+res3 <- results(dds,
+                    lfc = 0.5,
+                    contrast=c("group", "CeMbio_yes", "OP50_yes"))
+summary(res3)
+
+res4 <- results(dds,
+                    lfc = 0.5,
+                    contrast=c("group", "CeMbio_no", "OP50_no"))
+summary(res4)
+```
+
+```{r}
+res_diet <- results(dds1,
+                    lfc = 0.5,
+                    contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet)
+
+res_exposure <- results(dds1,
+                    lfc = 0.5,
+                    contrast=c("exposure", "yes", "no"))
+summary(res_exposure)
+```
+
+```{r}
+res_diet2 <- results(dds2,
+                    lfc = 0.5,
+                    contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet2)
+
+res_exposure2 <- results(dds2,
+                    lfc = 0.5,
+                    contrast=c("exposure", "yes", "no"))
+summary(res_exposure2)
+```
+
+```{r}
+resultsNames(dds)
+resultsNames(dds1)
+resultsNames(dds2)
 ```
 
 
@@ -140,3 +271,20 @@ abline(v = log10(raw_count_threshold), col = "red", lty = 2)
 
 
 
+```{r}
+resLFC_diet1 <- lfcShrink(dds1, coef=2, type="apeglm")
+summary(resLFC_diet1)
+
+resLFC_exposure1 <- lfcShrink(dds1, coef=3, type="apeglm")
+summary(resLFC_exposure1)
+
+res_LFC_interaction1 <- lfcShrink(dds1, coef=4, type="apeglm")
+summary(res_LFC_interaction1)
+```
+
+
+
+
+```{r}
+DESeq2::plotPCA(res_diet, intgroup="diet")
+```
