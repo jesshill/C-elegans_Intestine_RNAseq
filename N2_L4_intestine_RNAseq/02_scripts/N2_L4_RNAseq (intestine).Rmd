@@ -35,6 +35,7 @@ install packages
 #BiocManager::install("topGO")
 
 #install.packages("calibrate")
+#install.packages('ashr')
 ```
 
 load packages
@@ -48,6 +49,7 @@ library(dplyr)
 library(tidyverse)
 library(biomaRt)
 library(calibrate)
+library(ashr)
 ```
 
 
@@ -293,30 +295,67 @@ resultsNames(dds1)
 resultsNames(dds2)
 ```
 
-Visualization 
+perform log fold change shrinkage for visualization
 ```{r}
-# Plot the the default MA-plot and the shrunken MA-plot:
-# Save the plot
-png("03_output/MA plot - exposure shrunken (int).png")
+res1LFC <- lfcShrink(dds, contrast = c("group", "OP50_yes", "OP50_no"), type="ashr")
+
+res2LFC <- lfcShrink(dds, contrast = c("group", "CeMbio_yes", "CeMbio_no"), type="ashr")
+
+res3LFC <- lfcShrink(dds, contrast = c("group", "CeMbio_yes", "OP50_yes"), type="ashr")
+
+res4LFC <- lfcShrink(dds, contrast = c("group", "CeMbio_no", "OP50_no"), type="ashr")
+```
+
+```{r}
+reslfc_diet <- lfcShrink(dds1, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
+  
+reslfc_exposure <- lfcShrink(dds1, contrast = c("exposure", "yes", "no"), type="ashr")
+```
+
+```{r}
+reslfc_diet2 <- lfcShrink(dds2, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
+  
+reslfc_exposure2 <- lfcShrink(dds2, contrast = c("exposure", "yes", "no"), type="ashr")  
+
+reslfc_interaction2 <- lfcShrink(dds2, contrast = list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes")), type="ashr")
+```
+
+
+Exploring and exporting results
+MA plot
+```{r}
+res1LFC # "OP50_yes", "OP50_no"
+res2LFC # "CeMbio_yes", "CeMbio_no"
+res3LFC # "CeMbio_yes", "OP50_yes"
+res4LFC # "CeMbio_no", "OP50_no"
+
+reslfc_diet # "CeMbio", "OP50"
+reslfc_exposure # "yes", "no"
+
+reslfc_diet2 # "CeMbio", "OP50"
+reslfc_exposure2 # "yes", "no"
+reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # create the plot
 #check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
-plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
-       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
-       xlab = "means of normalized counts")
-
-plotMA(resLFC_exposure.intestine, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
-       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
+plotMA(reslfc_interaction2, ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized ... / ...)",
        xlab = "means of normalized counts")
 # Increase the font size of the axis labels
 par(cex.lab=2)
-# to stop saving plots and display the plot on the screen 
-dev.off() 
-
 ```
 
 
+Sample distance matrix
+```{r}
+rld <- rlog(dds, blind=FALSE)
+new.rld <- assay(rld)
+
+rld.CeMbio <- new.rld[, grep("CeMbio", colnames(new.rld))]
+rld.OP50 <- new.rld[, grep("OP50", colnames(new.rld))]
+```
 
 
 

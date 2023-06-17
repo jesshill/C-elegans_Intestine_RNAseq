@@ -235,7 +235,8 @@ par(cex.lab=2)
 dev.off() 
 ```
 
-correlation matrices
+
+Sample distance matrix
 ```{r}
 #Take r-stabilized log transformations of all the normalized count data. This will help with the problem that the data is noisy and it will help with the problem that the data is spread across a wide range of values.
 rld <- rlog(dds, blind=FALSE)
