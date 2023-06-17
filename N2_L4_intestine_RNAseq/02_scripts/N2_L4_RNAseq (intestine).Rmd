@@ -355,20 +355,161 @@ new.rld <- assay(rld)
 
 rld.CeMbio <- new.rld[, grep("CeMbio", colnames(new.rld))]
 rld.OP50 <- new.rld[, grep("OP50", colnames(new.rld))]
+
+
+# Calculate the distances between each sample
+#sampleDists <- dist(t(assay(rld))) # original code, not using
+sampleDists <- dist(t(new.rld))
+sampleDists.CeMbio <- dist(t(rld.CeMbio))
+sampleDists.OP50 <- dist(t(rld.OP50))
+
+# Convert from data.frame to matrix
+sampleDistMatrix <- as.matrix(sampleDists) 
+sampleDistMatrix.CeMbio <- as.matrix(sampleDists.CeMbio)
+sampleDistMatrix.OP50 <- as.matrix(sampleDists.OP50)
+
+# Add some labels
+rownames(sampleDistMatrix) <- colnames(new.rld)
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.CeMbio) <- colnames(rld.CeMbio)
+colnames(sampleDistMatrix.CeMbio) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.OP50) <- colnames(rld.OP50)
+colnames(sampleDistMatrix.OP50) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+# Draw the heatmap
+p.CeMbio <- pheatmap(sampleDistMatrix.CeMbio,
+         clustering_distance_rows=sampleDists.CeMbio,
+         clustering_distance_cols=sampleDists.CeMbio,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+p.OP50 <- pheatmap(sampleDistMatrix.OP50,
+         clustering_distance_rows=sampleDists.OP50,
+         clustering_distance_cols=sampleDists.OP50,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
 ```
 
 
 
+Volcano plots
+Nice ways of displaying the fold change against the p-value.
+```{r}
+#Identify significantly changing genes
+significantLFC.diet <- rbind(subset(reslfc_diet, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_diet, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.diet <-reslfc_diet[which(rownames(reslfc_diet) %in% rownames(significantLFC.diet)),] 
+
+
+
+significantLFC.exposure <- rbind(subset(reslfc_exposure, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_exposure, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.exposure <-reslfc_exposure[which(rownames(reslfc_exposure) %in% rownames(significantLFC.exposure)),] 
+
+
+# We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
+maxedout.diet <- subset(reslfc_diet, padj < 10e-100)
+maxedout.exposure <- subset(reslfc_exposure, padj < 10e-100)
+
+
+
+plot(reslfc_diet$log2FoldChange, -log10(reslfc_diet$padj),
+     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-6,6), col = "#00000030")
+# Add points
+points(maxedout.diet$log2FoldChange, rep(102, length(maxedout.diet$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+points(significant_points_to_plot.diet$log2FoldChange, -log10(significant_points_to_plot.diet$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
 
 
 
+plot(reslfc_exposure$log2FoldChange, -log10(reslfc_exposure$padj),
+       main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+# Add points
+points(maxedout.exposure$log2FoldChange, rep(102, length(maxedout.exposure$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
 
-
-
-
-
+points(significant_points_to_plot.exposure$log2FoldChange, -log10(significant_points_to_plot.exposure$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+```
 
 ```{r}
-DESeq2::plotPCA(res_diet, intgroup="diet")
+plotPCA(rld, intgroup=c("diet", "exposure", "rep"))
 ```
+
+
+
+Check contamination
+```{r}
+## positive intestine controls
+# elt-2 = WBGene00001250
+# elt-7 = WBGene00015981
+# ges-1 = WBGene00001578
+
+## germline
+# glh-1 = WBGene00001598
+# nos-2 = WBGene00003784 
+
+## muscle
+# myo-3 = WBGene00003515
+
+## neuron
+# hlh-2 = WBGene00001949
+# rab-3 = WBGene00004267
+
+plotCounts(dds2, gene=which(rownames(reslfc_diet2) == "WBGene00003515"), intgroup="diet")
+
+reslfc_diet2 # "CeMbio", "OP50"
+reslfc_exposure2 # "yes", "no"
+reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+```
+
+
+
+Get list of significantly changing genes
+```{r}
+# We will use the set of significantly changing genes from our variance shrunken analysis
+res1LFC # "OP50_yes", "OP50_no"
+res2LFC # "CeMbio_yes", "CeMbio_no"
+res3LFC # "CeMbio_yes", "OP50_yes"
+res4LFC # "CeMbio_no", "OP50_no"
+
+reslfc_diet # "CeMbio", "OP50"
+reslfc_exposure # "yes", "no"
+
+reslfc_diet2 # "CeMbio", "OP50"
+reslfc_exposure2 # "yes", "no"
+reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+
+
+
+# Select the significant subset of genes that are up-regulated and down-regulated
+Up_OP50.yes.vs.OP50.no <- subset(res1LFC, padj < 0.1 & log2FoldChange > 0.5)
+Up_OP50.yes.vs.OP50.no <- Up_OP50.yes.vs.OP50.no[order(Up_OP50.yes.vs.OP50.no$padj),]
+
+Down_OP50.yes.vs.OP50.no <- subset(res1LFC, padj < 0.1 & log2FoldChange > -0.5)
+Down_OP50.yes.vs.OP50.no <- Down_OP50.yes.vs.OP50.no[order(Down_OP50.yes.vs.OP50.no$padj),]
+
+
+```
+
+
+Save these lists to output files
+```{r}
+write(rownames(Up_OP50.yes.vs.OP50.no), file = "03_output/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+
+
