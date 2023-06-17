@@ -52,22 +52,6 @@ library(calibrate)
 library(ashr)
 ```
 
-
-# Analysis outline
-
-- Import counts and format for DESeq2 analysis
-- Filter low abundance counts based on counts per million (CPM)
-- Perform differential expression analysis
-- Visualize pairwise sample correlation
-- Categorize gene expression with alternative hypothesis
-- Visualize unshrunken pairwise differential expression
-- Visualize shrunken pairwise differential expression
-- Measure tissue expressed genes
-- Visualize developmentally dynamic intestine genes
-- Identify novel intestine genes in each stage for smFISH experiments
-
-
-
 read in the data
 ```{r}
 data <- read.table(file = "01_input/all.counts.txt", header = TRUE)
