@@ -128,14 +128,19 @@ abline(v = log10(raw_count_threshold), col = "red", lty = 2)
 
 
 
+Factor Levels
+Organize the categories into an order that makes sense
+```{r}
+dds$diet <- factor(dds$diet, levels = c("OP50", "CeMbio")) # this sets OP50 as the reference levels
+dds$exposure <- factor(dds$exposure, levels = c("no", "yes")) # this sets no as the reference levels
+```
+
+
+
 Perform DESEQ2 analysis
 ```{r}
 #Will transform dds into a specialized object
 dds <- DESeq(dds)
-
-class(dds)
-str(dds)
-dim(dds)
 plotDispEsts(dds)
 
 # Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
@@ -144,8 +149,9 @@ dds$sizeFactor
 #Access the normalized counts using counts(x, normalized = TRUE)
 #Access the raw count info using counts(x, normalized = FALSE)
 head(counts(dds, normalized = TRUE))
-head(counts(dds, normalized = FALSE))
+#head(counts(dds, normalized = FALSE))
 ```
+
 
 
 differential expression analysis 
@@ -189,7 +195,7 @@ png("03_output/MA plot - exposure shrunken (int).png")
 par(mfrow=c(1,1))
 # create the plot
 #check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
-plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+plotMA(resLFC_diet, main="CeMbio v. OP50", ylim = c(-7,7), 
        ylab = "log fold change (ratio of normalized CeMbio / OP50)",
        xlab = "means of normalized counts")
 # Increase the font size of the axis labels
@@ -314,5 +320,20 @@ abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
 dev.off()
 ```
+
+
+```{r}
+plotPCA(rld, intgroup=c("diet", "exposure", "rep"))
+```
+```{r}
+pcaData <- plotPCA(rld, intgroup=c("diet", "exposure"), returnData=TRUE)
+percentVar <- round(100 * attr(pcaData, "percentVar"))
+ggplot(pcaData, aes(PC1, PC2, color=diet, shape=exposure)) +
+  geom_point(size=3) +
+  xlab(paste0("PC1: ",percentVar[1],"% variance")) +
+  ylab(paste0("PC2: ",percentVar[2],"% variance")) + 
+  coord_fixed()
+```
+
 
 
