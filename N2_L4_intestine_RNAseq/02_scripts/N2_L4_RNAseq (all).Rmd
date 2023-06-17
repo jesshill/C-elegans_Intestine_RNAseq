@@ -20,21 +20,23 @@ requirements
 install packages
 ```{r}
 # If you don't have bioconductor, install it. This version works with R version 4.1. Use "3.11" for R version 4.0
-if (!require("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
-BiocManager::install(version = "3.16")
 
-if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
+#if (!require("BiocManager", quietly = TRUE))
+#        install.packages("BiocManager")
+#BiocManager::install(version = "3.16")
 
-BiocManager::install("DESeq2")
-BiocManager::install("apeglm")
-install.packages("corrplot")
-install.packages("pheatmap")
-install.packages("RColorBrewer")
-BiocManager::install("topGO")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#        install.packages("BiocManager")
 
-install.packages("calibrate")
+#BiocManager::install("DESeq2")
+#BiocManager::install("apeglm")
+#install.packages("corrplot")
+#install.packages("pheatmap")
+#install.packages("RColorBrewer")
+#BiocManager::install("topGO")
+
+#install.packages("calibrate")
+#install.packages('ashr')
 ```
 
 load packages
@@ -48,6 +50,7 @@ library(dplyr)
 library(tidyverse)
 library(biomaRt)
 library(calibrate)
+library(ashr)
 ```
 
 
@@ -89,3 +92,227 @@ coldata
 rownames(coldata)<- coldata$sampleID
 coldata
 ```
+
+
+Create an ddsHTSeq object out of counts and coldata.
+This will set a base design for your experiment.
+Load the counts data and to attach it/them to the metadata.
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = counts,
+                              colData = coldata,
+                              design = ~ diet + exposure)
+
+# how many genes do we have?
+dim(dds) # 20,447
+```
+
+
+pre-filtering (filter for present genes). 
+Not necessary, but helps keep things fast. 
+```{r}
+#Exclude all samples that have less than 10 reads:
+keep <- rowSums(counts(dds)) >= 10
+dds <- dds[keep,]
+
+#How many did we exclude?
+dim(dds) # now we have 18,265 genes
+```
+
+
+Visualize read count distribution
+```{r}
+raw_count_threshold <- 10
+hist(log10(rowSums(counts(dds))), breaks = 50)
+abline(v = log10(raw_count_threshold), col = "red", lty = 2)
+```
+
+
+
+Perform DESEQ2 analysis
+```{r}
+#Will transform dds into a specialized object
+dds <- DESeq(dds)
+
+class(dds)
+str(dds)
+dim(dds)
+plotDispEsts(dds)
+
+# Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
+dds$sizeFactor
+
+#Access the normalized counts using counts(x, normalized = TRUE)
+#Access the raw count info using counts(x, normalized = FALSE)
+head(counts(dds, normalized = TRUE))
+head(counts(dds, normalized = FALSE))
+```
+
+
+differential expression analysis 
+```{r}
+#calculate the statistically significant differences between CeMbio and OP50 diets
+res_diet <- results(dds,
+                            lfc = 0.5,
+                            contrast=c("diet", "CeMbio", "OP50"))
+summary(res_diet)
+
+
+res_exposure <- results(dds,
+                            lfc = 0.5,
+                            contrast=c("exposure", "yes", "no"))
+summary(res_exposure)
+```
+
+```{r}
+resultsNames(dds)
+```
+
+perform log fold change shrinkage for visualization
+```{r}
+resLFC_diet <- lfcShrink(dds, coef=2, type="ashr")
+summary(resLFC_diet)
+
+resLFC_exposure <- lfcShrink(dds, coef=3, type="ashr")
+summary(resLFC_exposure)
+```
+
+
+
+Exploring and exporting results
+
+MA plot
+```{r}
+# Plot the the default MA-plot and the shrunken MA-plot:
+# Save the plot
+png("03_output/MA plot - exposure shrunken (int).png")
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+#check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
+plotMA(resLFC_diet.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
+       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
+       xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+# to stop saving plots and display the plot on the screen 
+dev.off()
+```
+
+
+Sample distance matrix
+```{r}
+#Take r-stabilized log transformations of all the normalized count data. This will help with the problem that the data is noisy and it will help with the problem that the data is spread across a wide range of values.
+rld <- rlog(dds, blind=FALSE)
+new.rld <- assay(rld)
+
+rld.CeMbio <- new.rld[, grep("CeMbio", colnames(new.rld))]
+rld.OP50 <- new.rld[, grep("OP50", colnames(new.rld))]
+
+# Calculate the distances between each sample
+#sampleDists <- dist(t(assay(rld))) # original code, not using
+sampleDists <- dist(t(new.rld))
+sampleDists.CeMbio <- dist(t(rld.CeMbio))
+sampleDists.OP50 <- dist(t(rld.OP50))
+
+# Convert from data.frame to matrix
+sampleDistMatrix <- as.matrix(sampleDists) 
+sampleDistMatrix.CeMbio <- as.matrix(sampleDists.CeMbio)
+sampleDistMatrix.OP50 <- as.matrix(sampleDists.OP50)
+
+# Add some labels
+rownames(sampleDistMatrix) <- colnames(new.rld)
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.CeMbio) <- colnames(rld.CeMbio)
+colnames(sampleDistMatrix.CeMbio) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.OP50) <- colnames(rld.OP50)
+colnames(sampleDistMatrix.OP50) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+# Draw the heatmap
+p.CeMbio <- pheatmap(sampleDistMatrix.CeMbio,
+         clustering_distance_rows=sampleDists.CeMbio,
+         clustering_distance_cols=sampleDists.CeMbio,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+p.OP50 <- pheatmap(sampleDistMatrix.OP50,
+         clustering_distance_rows=sampleDists.OP50,
+         clustering_distance_cols=sampleDists.OP50,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+# Save the CORRELATION MATRIX
+png("03_output/corr_matrix_CeMbio.png")
+        par(mfrow=c(1,1))
+        p.CeMbio
+
+dev.off()
+```
+
+
+Volcano plots
+Nice ways of displaying the fold change against the p-value.
+```{r}
+#Identify significantly changing genes
+significantLFC.diet.int <- rbind(subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.diet.int <-resLFC_diet.intestine[which(rownames(resLFC_diet.intestine) %in% rownames(significantLFC.diet.int)),] 
+
+
+
+significantLFC.exposure.int <- rbind(subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_exposure.intestine, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.exposure.int <-resLFC_exposure.intestine[which(rownames(resLFC_exposure.intestine) %in% rownames(significantLFC.exposure.int)),] 
+
+
+# We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
+maxedout.diet.int <- subset(resLFC_diet.intestine, padj < 10e-100)
+maxedout.exposure.int <- subset(resLFC_exposure.intestine, padj < 10e-100)
+
+
+png("03_output/volcano plot - diet (int).png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw the plot
+plot(resLFC_diet.intestine$log2FoldChange, -log10(resLFC_diet.intestine$padj),
+     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-6,6), col = "#00000030")
+# Add points
+points(maxedout.diet.int$log2FoldChange, rep(102, length(maxedout.diet.int$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+points(significant_points_to_plot.diet.int$log2FoldChange, -log10(significant_points_to_plot.diet.int$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+dev.off()
+
+
+
+# save plot as a .png
+png("03_output/volcano plot - exposure (int).png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw the plot
+plot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
+       main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+# Add points
+points(maxedout.exposure.int$log2FoldChange, rep(102, length(maxedout.exposure.int$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+
+points(significant_points_to_plot.exposure.int$log2FoldChange, -log10(significant_points_to_plot.exposure.int$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+dev.off()
+```
+
+

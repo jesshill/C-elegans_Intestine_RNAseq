@@ -103,9 +103,6 @@ dds <- DESeqDataSetFromMatrix(countData = counts,
                               colData = coldata,
                               design = ~ diet + exposure)
 
-#try design = ~ diet + exposure * exposure
-#try design = ~ diet + exposure * diet
-
 # how many genes do we have?
 dim(dds) # 20,447
 ```
