@@ -510,6 +510,97 @@ Down_OP50.yes.vs.OP50.no <- Down_OP50.yes.vs.OP50.no[order(Down_OP50.yes.vs.OP50
 
 Save these lists to output files
 ```{r}
-write(rownames(Up_OP50.yes.vs.OP50.no), file = "03_output/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_OP50.yes.vs.OP50.no), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+```
+
+
+
+make hierarchically clustered heatmaps of all changing genes 
+```{r}
+# get differentially expressed genes
+
+res1 # "OP50_yes", "OP50_no"
+res2 # "CeMbio_yes", "CeMbio_no"
+res3 # "CeMbio_yes", "OP50_yes"
+res4 # "CeMbio_no", "OP50_no"
+
+res_diet # "CeMbio", "OP50"
+res_exposure # "yes", "no"
+
+res_diet2 # "CeMbio", "OP50"
+res_exposure2 # "yes", "no"
+res_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+
+
+#Subset each results table for just the differentially expressed genes:
+sign_diet <- subset(res_diet, padj < 0.05)
+dim(subset(res_diet, padj < 0.1))
+sign_exposure <- subset(res_exposure, padj < 0.05)
+dim(subset(res_exposure, padj < 0.1))
+
+
+#Determine how many genes were captured and merge them:
+changing_genes <- rbind(sign_diet, sign_exposure)
+
+dim(changing_genes)
+length(unique(rownames(changing_genes)))
+
+# Get all r-stabilized log values of all the data:
+rdl_all <- assay(rlog(dds, blind=FALSE))
+
+#Subset just the changing genes:
+changing_lrt_rdl <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_genes))
+dim(changing_lrt_rdl)
+head(changing_lrt_rdl)
+
+changing_diet <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_diet))
+changing_exposure <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_exposure))
+
+# Make sure it is in matrix form:
+class(changing_lrt_rdl)
+class(changing_diet)
+class(changing_exposure)
+
+
+# save plot as a .png
+png("03_output/intestine/Heatmap - diet.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
+p.diet <- pheatmap(changing_diet, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         Rowv = NA,
+         Colv = NA,
+         show_rownames = FALSE)
+dev.off()
+
+
+# save plot as a .png
+png("03_output/intestine/Heatmap - exposure.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
+p.exposure <- pheatmap(changing_exposure, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         Rowv = NA,
+         Colv = NA,
+         show_rownames = FALSE)
+
+dev.off()
+```
+
+
 
 
