@@ -85,7 +85,7 @@ Now make the sample information table, which we will name coldata.
 diet <- c('CeMbio','CeMbio','OP50','OP50','CeMbio','CeMbio','OP50','OP50','CeMbio','CeMbio','OP50','OP50')
 exposure <- c('no','yes','no','yes','no','yes','no','yes','no','yes','no','yes')
 rep <- c('rep1','rep1','rep1','rep1','rep2', 'rep2', 'rep2', 'rep2','rep3', 'rep3', 'rep3', 'rep3')
-group <- c('CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes')
+#group <- c('CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes')
 sampleID <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine','Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine','Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine')
   
 coldata <- data.frame(sampleID, diet, exposure, group, rep)
@@ -100,20 +100,15 @@ Create an ddsHTSeq object out of counts and coldata.
 This will set a base design for your experiment.
 Load the counts data and to attach it/them to the metadata.
 ```{r}
-# design 1 - we can use the following approach to obtain the exposure effect for diet
+# design 1 - (genotype + condition) the exposure effect represents the overall effect controlling for differences due to diet
 dds <- DESeqDataSetFromMatrix(countData = counts_int,
-                              colData = coldata,
-                              design = ~ group)
-
-# design 2 - (genotype + condition) the exposure effect represents the overall effect controlling for differences due to diet
-dds1 <- DESeqDataSetFromMatrix(countData = counts_int,
                               colData = coldata,
                               design = ~ diet + exposure)
 
-# design 3 - (genotype:condition) the main condition effect only represents the effect of condition for the reference level of genotype (I, or whichever level was defined by the user as the reference level).
-dds2 <- DESeqDataSetFromMatrix(countData = counts_int,
+# design 2 - (genotype:condition) the main condition effect only represents the effect of condition for the reference level of genotype (I, or whichever level was defined by the user as the reference level).
+dds1 <- DESeqDataSetFromMatrix(countData = counts_int,
                               colData = coldata,
-                              design = ~ diet + exposure + exposure:diet)
+                              design = ~ diet + exposure + diet:exposure)
 
 
 # how many genes do we have?
@@ -141,9 +136,6 @@ dim(dds) # 18265
 
 keep <- rowSums(counts(dds1)) >= 10
 dds1 <- dds1[keep,]
-
-keep <- rowSums(counts(dds2)) >= 10
-dds2 <- dds2[keep,]
 ```
 
 Visualize read count distribution
@@ -162,13 +154,6 @@ dds$exposure <- factor(dds$exposure, levels = c("no", "yes")) # this sets no as 
 
 dds1$diet <- factor(dds1$diet, levels = c("OP50", "CeMbio")) 
 dds1$exposure <- factor(dds1$exposure, levels = c("no", "yes"))
-
-dds2$diet <- factor(dds2$diet, levels = c("OP50", "CeMbio")) 
-dds2$exposure <- factor(dds2$exposure, levels = c("no", "yes"))
-#######################
-
-dds$diet <- relevel(dds$diet, ref = "OP50")
-dds$exposure <- relevel(dds$exposure, ref = "no")
 ```
 
 
@@ -181,7 +166,6 @@ dim(dds)
 plotDispEsts(dds)
 
 dds1 <- DESeq(dds1)
-dds2 <- DESeq(dds2)
 
 # Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
 dds$sizeFactor
@@ -223,73 +207,41 @@ results(dds, name="genotypeII.conditionB")
 extract results 
 ```{r}
 #calculate the statistically significant differences between CeMbio and OP50 diets
-res1 <- results(dds,
-                    lfc = 0.5,
-                    contrast=c("group", "OP50_yes", "OP50_no"))
-summary(res1)
 
-res2 <- results(dds,
-                    lfc = 0.5,
-                    contrast=c("group", "CeMbio_yes", "CeMbio_no"))
-summary(res2)
-
-res3 <- results(dds,
-                    lfc = 0.5,
-                    contrast=c("group", "CeMbio_yes", "OP50_yes"))
-summary(res3)
-
-res4 <- results(dds,
-                    lfc = 0.5,
-                    contrast=c("group", "CeMbio_no", "OP50_no"))
-summary(res4)
-```
-
-```{r}
-res_diet <- results(dds1,
+res_diet <- results(dds,
                     lfc = 0.5,
                     contrast=c("diet", "CeMbio", "OP50"))
 summary(res_diet)
 
-res_exposure <- results(dds1,
+res_exposure <- results(dds,
                     lfc = 0.5,
                     contrast=c("exposure", "yes", "no"))
-summary(res_exposure)
+`summary(res_exposure)
 ```
 
 ```{r}
-res_diet2 <- results(dds2,
+res_diet1 <- results(dds1,
                     lfc = 0.5,
                     contrast=c("diet", "CeMbio", "OP50")) # the diet effect for no exposure
-summary(res_diet2)
+summary(res_diet1)
 
-res_exposure2 <- results(dds2,
+res_exposure1 <- results(dds1,
                     lfc = 0.5,
                     contrast=c("exposure", "yes", "no")) # the exposure effect for OP50
-summary(res_exposure2)
+summary(res_exposure1)
 
-res_interaction2 <- results(dds2,
+res_interaction1 <- results(dds1,
                             lfc = 0.5,
                             contrast=list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes"))) # the exposure effect for CeMbio
-summary(res_interaction2)
+summary(res_interaction1)
 ```
 
 ```{r}
 resultsNames(dds)
 resultsNames(dds1)
-resultsNames(dds2)
 ```
 
 perform log fold change shrinkage for visualization
-```{r}
-res1LFC <- lfcShrink(dds, contrast = c("group", "OP50_yes", "OP50_no"), type="ashr")
-
-res2LFC <- lfcShrink(dds, contrast = c("group", "CeMbio_yes", "CeMbio_no"), type="ashr")
-
-res3LFC <- lfcShrink(dds, contrast = c("group", "CeMbio_yes", "OP50_yes"), type="ashr")
-
-res4LFC <- lfcShrink(dds, contrast = c("group", "CeMbio_no", "OP50_no"), type="ashr")
-```
-
 ```{r}
 reslfc_diet <- lfcShrink(dds1, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
   
@@ -297,34 +249,29 @@ reslfc_exposure <- lfcShrink(dds1, contrast = c("exposure", "yes", "no"), type="
 ```
 
 ```{r}
-reslfc_diet2 <- lfcShrink(dds2, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
+reslfc_diet1 <- lfcShrink(dds2, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
   
-reslfc_exposure2 <- lfcShrink(dds2, contrast = c("exposure", "yes", "no"), type="ashr")  
+reslfc_exposure1 <- lfcShrink(dds2, contrast = c("exposure", "yes", "no"), type="ashr")  
 
-reslfc_interaction2 <- lfcShrink(dds2, contrast = list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes")), type="ashr")
+reslfc_interaction1 <- lfcShrink(dds2, contrast = list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes")), type="ashr")
 ```
 
 
 Exploring and exporting results
 MA plot
 ```{r}
-res1LFC # "OP50_yes", "OP50_no"
-res2LFC # "CeMbio_yes", "CeMbio_no"
-res3LFC # "CeMbio_yes", "OP50_yes"
-res4LFC # "CeMbio_no", "OP50_no"
-
 reslfc_diet # "CeMbio", "OP50"
 reslfc_exposure # "yes", "no"
 
-reslfc_diet2 # "CeMbio", "OP50"
-reslfc_exposure2 # "yes", "no"
-reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+reslfc_diet1 # "CeMbio", "OP50"
+reslfc_exposure1 # "yes", "no"
+reslfc_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
 
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # create the plot
 #check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
-plotMA(reslfc_interaction2, ylim = c(-7,7), 
+plotMA(reslfc_interaction1, ylim = c(-7,7), main = "...", 
        ylab = "log fold change (ratio of normalized ... / ...)",
        xlab = "means of normalized counts")
 # Increase the font size of the axis labels
@@ -337,25 +284,35 @@ Sample distance matrix
 rld <- rlog(dds, blind=FALSE)
 new.rld <- assay(rld)
 
+rld1 <- rlog(dds1, blind=FALSE)
+new.rld1 <- assay(rld1)
+
 rld.CeMbio <- new.rld[, grep("CeMbio", colnames(new.rld))]
 rld.OP50 <- new.rld[, grep("OP50", colnames(new.rld))]
+
+rld.CeMbio1 <- new.rld1[, grep("CeMbio", colnames(new.rld1))]
+rld.OP501 <- new.rld1[, grep("OP50", colnames(new.rld1))]
 
 
 # Calculate the distances between each sample
 #sampleDists <- dist(t(assay(rld))) # original code, not using
-sampleDists <- dist(t(new.rld))
+#sampleDists <- dist(t(new.rld))
 sampleDists.CeMbio <- dist(t(rld.CeMbio))
 sampleDists.OP50 <- dist(t(rld.OP50))
+sampleDists.CeMbio1 <- dist(t(rld.CeMbio1))
+sampleDists.OP501 <- dist(t(rld.OP501))
 
 # Convert from data.frame to matrix
-sampleDistMatrix <- as.matrix(sampleDists) 
+#sampleDistMatrix <- as.matrix(sampleDists) 
 sampleDistMatrix.CeMbio <- as.matrix(sampleDists.CeMbio)
 sampleDistMatrix.OP50 <- as.matrix(sampleDists.OP50)
+sampleDistMatrix.CeMbio1 <- as.matrix(sampleDists.CeMbio1)
+sampleDistMatrix.OP501 <- as.matrix(sampleDists.OP501)
 
 # Add some labels
-rownames(sampleDistMatrix) <- colnames(new.rld)
-colnames(sampleDistMatrix) <- NULL
-colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+#rownames(sampleDistMatrix) <- colnames(new.rld)
+#colnames(sampleDistMatrix) <- NULL
+#colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
 rownames(sampleDistMatrix.CeMbio) <- colnames(rld.CeMbio)
 colnames(sampleDistMatrix.CeMbio) <- NULL
@@ -364,6 +321,16 @@ colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 rownames(sampleDistMatrix.OP50) <- colnames(rld.OP50)
 colnames(sampleDistMatrix.OP50) <- NULL
 colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.CeMbio1) <- colnames(rld.CeMbio1)
+colnames(sampleDistMatrix.CeMbio1) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+rownames(sampleDistMatrix.OP501) <- colnames(rld.OP501)
+colnames(sampleDistMatrix.OP501) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+
+
 
 # Draw the heatmap
 p.CeMbio <- pheatmap(sampleDistMatrix.CeMbio,
@@ -374,6 +341,16 @@ p.CeMbio <- pheatmap(sampleDistMatrix.CeMbio,
 p.OP50 <- pheatmap(sampleDistMatrix.OP50,
          clustering_distance_rows=sampleDists.OP50,
          clustering_distance_cols=sampleDists.OP50,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+p.CeMbio1 <- pheatmap(sampleDistMatrix.CeMbio1,
+         clustering_distance_rows=sampleDists.CeMbio1,
+         clustering_distance_cols=sampleDists.CeMbio1,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+p.OP501 <- pheatmap(sampleDistMatrix.OP501,
+         clustering_distance_rows=sampleDists.OP501,
+         clustering_distance_cols=sampleDists.OP501,
          col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
 ```
 
@@ -392,16 +369,40 @@ significant_points_to_plot.diet <-reslfc_diet[which(rownames(reslfc_diet) %in% r
 significantLFC.exposure <- rbind(subset(reslfc_exposure, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_exposure, padj < 0.1 & log2FoldChange < -0.5))
 
 significant_points_to_plot.exposure <-reslfc_exposure[which(rownames(reslfc_exposure) %in% rownames(significantLFC.exposure)),] 
+########################################
+
+significantLFC.diet1 <- rbind(subset(reslfc_diet1, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_diet1, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.diet1 <-reslfc_diet1[which(rownames(reslfc_diet1) %in% rownames(significantLFC.diet1)),] 
+
+
+
+significantLFC.exposure1 <- rbind(subset(reslfc_exposure1, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_exposure1, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.exposure1 <-reslfc_exposure1[which(rownames(reslfc_exposure1) %in% rownames(significantLFC.exposure1)),] 
+
+
+
+significantLFC.interaction1 <- rbind(subset(reslfc_interaction1, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_interaction1, padj < 0.1 & log2FoldChange < -0.5))
+
+significant_points_to_plot.interaction1 <-reslfc_interaction1[which(rownames(reslfc_interaction1) %in% rownames(significantLFC.interaction1)),] 
+########################################
+
+
 
 
 # We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
 maxedout.diet <- subset(reslfc_diet, padj < 10e-100)
 maxedout.exposure <- subset(reslfc_exposure, padj < 10e-100)
 
+maxedout.diet1 <- subset(reslfc_diet1, padj < 10e-100)
+maxedout.exposure1 <- subset(reslfc_exposure, padj < 10e-100)
+maxedout.interaction1 <- subset(reslfc_interaction1, padj < 10e-100)
+
 
 
 plot(reslfc_diet$log2FoldChange, -log10(reslfc_diet$padj),
-     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-6,6), col = "#00000030")
+     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
 # Add points
 points(maxedout.diet$log2FoldChange, rep(102, length(maxedout.diet$log2FoldChange)), 
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
@@ -430,6 +431,58 @@ abline(v=0.5, col = "blue", lty = "dashed")
 abline(v=-0.5, col = "blue", lty = "dashed")
 abline(h=-log10(0.1), col = "blue", lty = "dashed")
 ```
+
+```{r}
+plot(reslfc_diet1$log2FoldChange, -log10(reslfc_diet1$padj),
+     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
+# Add points
+points(maxedout.diet1$log2FoldChange, rep(102, length(maxedout.diet1$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+points(significant_points_to_plot.diet1$log2FoldChange, -log10(significant_points_to_plot.diet1$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+
+
+
+plot(reslfc_exposure1$log2FoldChange, -log10(reslfc_exposure1$padj),
+       main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+# Add points
+points(maxedout.exposure1$log2FoldChange, rep(102, length(maxedout.exposure1$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+
+points(significant_points_to_plot.exposure1$log2FoldChange, -log10(significant_points_to_plot.exposure1$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+
+
+
+plot(reslfc_interaction1$log2FoldChange, -log10(reslfc_interaction1$padj),
+       main="Volcano plot - interaction (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+# Add points
+points(maxedout.interaction1$log2FoldChange, rep(102, length(maxedout.interaction1$log2FoldChange)), 
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+
+points(significant_points_to_plot.interaction1$log2FoldChange, -log10(significant_points_to_plot.interaction1$padj),
+       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
+# Add lines
+abline(v=0, col = "blue")
+abline(v=0.5, col = "blue", lty = "dashed")
+abline(v=-0.5, col = "blue", lty = "dashed")
+abline(h=-log10(0.1), col = "blue", lty = "dashed")
+```
+
+
+
 
 ```{r}
 plotPCA(rld, intgroup=c("diet", "exposure", "rep"))
