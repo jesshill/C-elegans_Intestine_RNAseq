@@ -116,14 +116,6 @@ dim(dds) #20447
 ```
 
 
-interaction example: 
-'TreatmentTreat.timet1' relates to the time effect for TreatmentTreat Versus TreatmentUnTreat. That is, it tests whether the effect of time is different between treated and untreated. Another way to look at it:
-
-'time_t1_vs_t0' relates to timet1 versus timet0 for TreatmentUntreat. If you re-level Treatment to have Treat as the reference level, then 'time_t1_vs_t0' would relate to timet1 versus timet0 for TreatmentTreat. This would tell you if treated and untreated change in the same way independently at the 2 time-points.
-
-
-
-
 pre-filtering (filter for present genes). 
 Not necessary, but helps keep things fast. 
 ```{r}
@@ -176,11 +168,6 @@ head(counts(dds, normalized = TRUE))
 #head(counts(dds, normalized = FALSE))
 ```
 
-
-Results tables are generated using the function results, which extracts a results table with log2 fold changes, p values and adjusted p values. With no additional arguments to results, the log2 fold change and Wald test p value will be for the last variable in the design formula, and if this is a factor, the comparison will be the last level of this variable over the reference level (see previous note on factor levels). However, the order of the variables of the design do not matter so long as the user specifies the comparison to build a results table for, using the name or contrast arguments of results.
-
-Contrast: a character vector with exactly three elements: the name of a factor in the design formula, the name of the numerator level for the fold change, and the name of the denominator level for the fold change (simplest case)
-
 --- (see ?results())
 # Example 2: two conditions, two genotypes, with an interaction term
 
@@ -191,15 +178,17 @@ design(dds) <- ~ genotype + condition + genotype:condition
 dds <- DESeq(dds) 
 resultsNames(dds)
 
+# the genotype effect for condition A (the main effect)
+results(dds, contrast=c("genotype","I","II"))
+
 # the condition effect for genotype I (the main effect)
 results(dds, contrast=c("condition","B","A"))
 
 # the condition effect for genotype II
-# this is, by definition, the main effect *plus* the interaction term
-# (the extra condition effect in genotype II compared to genotype I).
+# this is, by definition, the main effect plus the interaction term (the extra condition effect in genotype II compared to genotype I).
 results(dds, list( c("condition_B_vs_A","genotypeII.conditionB") ))
 
-# the interaction term, answering: is the condition effect *different* across genotypes?
+# the interaction term, answering: is the condition effect different across genotypes?
 results(dds, name="genotypeII.conditionB")
 ---
 
@@ -482,12 +471,11 @@ abline(h=-log10(0.1), col = "blue", lty = "dashed")
 ```
 
 
-
-
 ```{r}
 plotPCA(rld, intgroup=c("diet", "exposure", "rep"))
-```
 
+plotPCA(rld1, intgroup=c("diet", "exposure", "rep"))
+```
 
 
 Check contamination
@@ -508,46 +496,84 @@ Check contamination
 # hlh-2 = WBGene00001949
 # rab-3 = WBGene00004267
 
-plotCounts(dds2, gene=which(rownames(reslfc_diet2) == "WBGene00003515"), intgroup="diet")
-
-reslfc_diet2 # "CeMbio", "OP50"
-reslfc_exposure2 # "yes", "no"
-reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
-```
-
-
-
-Get list of significantly changing genes
-```{r}
-# We will use the set of significantly changing genes from our variance shrunken analysis
-res1LFC # "OP50_yes", "OP50_no"
-res2LFC # "CeMbio_yes", "CeMbio_no"
-res3LFC # "CeMbio_yes", "OP50_yes"
-res4LFC # "CeMbio_no", "OP50_no"
+plotCounts(dds1, gene=which(rownames(reslfc_diet1) == "WBGene00003515"), intgroup="diet")
 
 reslfc_diet # "CeMbio", "OP50"
 reslfc_exposure # "yes", "no"
 
-reslfc_diet2 # "CeMbio", "OP50"
-reslfc_exposure2 # "yes", "no"
-reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+reslfc_diet1 # "CeMbio", "OP50"
+reslfc_exposure1 # "yes", "no"
+reslfc_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+```
 
+
+Get list of significantly changing genes
+We will use the set of significantly changing genes from our variance shrunken analysis
+```{r}
+# reference levels = diet: OP50, and exposure: no
+reslfc_diet # "CeMbio", "OP50" = the diet effect for 'no' exposure
+reslfc_exposure # "yes", "no" = the exposure effect for 'OP50' diet
+
+reslfc_diet1 # "CeMbio", "OP50" = the diet effect for 'no' exposure
+reslfc_exposure1 # "yes", "no" = the exposure effect for 'OP50' diet
+reslfc_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes" = the exposure effect for 'CeMbio' diet 
 
 
 # Select the significant subset of genes that are up-regulated and down-regulated
-Up_OP50.yes.vs.OP50.no <- subset(res1LFC, padj < 0.1 & log2FoldChange > 0.5)
-Up_OP50.yes.vs.OP50.no <- Up_OP50.yes.vs.OP50.no[order(Up_OP50.yes.vs.OP50.no$padj),]
 
-Down_OP50.yes.vs.OP50.no <- subset(res1LFC, padj < 0.1 & log2FoldChange > -0.5)
-Down_OP50.yes.vs.OP50.no <- Down_OP50.yes.vs.OP50.no[order(Down_OP50.yes.vs.OP50.no$padj),]
+#counts_int <- counts[, grep("intestine", colnames(counts))] example
+
+Up_diet_effect <- subset(reslfc_diet, padj < 0.1 & log2FoldChange > 0.5)
+Up_diet_effect <- Up_diet_effect[order(Up_diet_effect$padj),]
+
+Down_diet_effect <- subset(reslfc_diet, padj < 0.1 & log2FoldChange > -0.5)
+Down_diet_effect <- Down_diet_effect[order(Down_diet_effect$padj),]
 
 
+Up_exposure_effect <- subset(reslfc_exposure, padj < 0.1 & log2FoldChange > 0.5)
+Up_exposure_effect <- Up_exposure_effect[order(Up_exposure_effect$padj),]
+
+Down_exposure_effect <- subset(reslfc_exposure, padj < 0.1 & log2FoldChange > -0.5)
+Down_exposure_effect <- Down_exposure_effect[order(Down_exposure_effect$padj),]
+#################################
+Up_diet_effect1 <- subset(reslfc_diet1, padj < 0.1 & log2FoldChange > 0.5)
+Up_diet_effect1 <- Up_diet_effect1[order(Up_diet_effect1$padj),]
+
+Down_diet_effect1 <- subset(reslfc_diet1, padj < 0.1 & log2FoldChange > -0.5)
+Down_diet_effect1 <- Down_diet_effect1[order(Down_diet_effect1$padj),]
+
+
+Up_exposure_effect1 <- subset(reslfc_exposure1, padj < 0.1 & log2FoldChange > 0.5)
+Up_exposure_effect1 <- Up_exposure_effect1[order(Up_exposure_effect1$padj),]
+
+Down_exposure_effect1 <- subset(reslfc_exposure1, padj < 0.1 & log2FoldChange > -0.5)
+Down_exposure_effect1 <- Down_exposure_effect1[order(Down_exposure_effect1$padj),]
+
+
+Up_interaction_effect1 <- subset(reslfc_interaction1, padj < 0.1 & log2FoldChange > 0.5)
+Up_interaction_effect1 <- Up_interaction_effect1[order(Up_interaction_effect1$padj),]
+
+Down_interaction_effect1 <- subset(reslfc_interaction1, padj < 0.1 & log2FoldChange > -0.5)
+Down_interaction_effect1 <- Down_interaction_effect1[order(Down_interaction_effect1$padj),]
 ```
 
 
 Save these lists to output files
 ```{r}
-write(rownames(Up_OP50.yes.vs.OP50.no), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_diet_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Down_diet_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+
+write(rownames(Up_exposure_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Down_exposure_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+###############################
+write(rownames(Up_diet_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Down_diet_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+
+write(rownames(Up_exposure_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Down_exposure_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+
+write(rownames(Up_interaction_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Down_interaction_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
 ```
 
 
@@ -555,18 +581,12 @@ write(rownames(Up_OP50.yes.vs.OP50.no), file = "03_output/intestine/Genes Up in 
 make hierarchically clustered heatmaps of all changing genes 
 ```{r}
 # get differentially expressed genes
-
-res1 # "OP50_yes", "OP50_no"
-res2 # "CeMbio_yes", "CeMbio_no"
-res3 # "CeMbio_yes", "OP50_yes"
-res4 # "CeMbio_no", "OP50_no"
-
 res_diet # "CeMbio", "OP50"
 res_exposure # "yes", "no"
 
-res_diet2 # "CeMbio", "OP50"
-res_exposure2 # "yes", "no"
-res_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+res_diet1 # "CeMbio", "OP50"
+res_exposure1 # "yes", "no"
+res_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
 
 
 #Subset each results table for just the differentially expressed genes:
@@ -574,30 +594,49 @@ sign_diet <- subset(res_diet, padj < 0.05)
 dim(subset(res_diet, padj < 0.1))
 sign_exposure <- subset(res_exposure, padj < 0.05)
 dim(subset(res_exposure, padj < 0.1))
+####################################################
+sign_diet1 <- subset(res_diet1, padj < 0.05)
+dim(subset(res_diet1, padj < 0.1))
+sign_exposure1 <- subset(res_exposure1, padj < 0.05)
+dim(subset(res_exposure1, padj < 0.1))
+sign_interaction1 <- subset(res_interaction1, padj < 0.05)
+dim(subset(res_interaction1, padj < 0.1))
 
 
 #Determine how many genes were captured and merge them:
 changing_genes <- rbind(sign_diet, sign_exposure)
+changing_genes1 <- rbind(sign_diet1, sign_exposure1)
+changing_genes2 <- rbind(sign_diet1, sign_exposure1, sign_interaction1)
+
 
 dim(changing_genes)
 length(unique(rownames(changing_genes)))
 
 # Get all r-stabilized log values of all the data:
 rdl_all <- assay(rlog(dds, blind=FALSE))
+rdl_all1 <- assay(rlog(dds1, blind=FALSE))
 
 #Subset just the changing genes:
 changing_lrt_rdl <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_genes))
-dim(changing_lrt_rdl)
-head(changing_lrt_rdl)
-
 changing_diet <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_diet))
 changing_exposure <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_exposure))
+#########################################
+changing_lrt_rdl1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(changing_genes1))
+changing_lrt_rdl2 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(changing_genes2))
+changing_diet1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(sign_diet1))
+changing_exposure1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(sign_exposure1))
+changing_interaction1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(sign_interaction1))
+
 
 # Make sure it is in matrix form:
 class(changing_lrt_rdl)
 class(changing_diet)
 class(changing_exposure)
-
+```
+```{r}
+changing_genes
+changing_diet
+changing_exposure
 
 # save plot as a .png
 png("03_output/intestine/Heatmap - diet.png")
@@ -612,9 +651,10 @@ p.diet <- pheatmap(changing_diet,
          cluster_cols=TRUE, 
          clustering_distance_rows = "euclidean", 
          clustering_method = "complete",
-         Rowv = NA,
-         Colv = NA,
+         #Rowv = NA,
+         #Colv = NA,
          show_rownames = FALSE)
+
 dev.off()
 
 
@@ -631,12 +671,80 @@ p.exposure <- pheatmap(changing_exposure,
          cluster_cols=TRUE, 
          clustering_distance_rows = "euclidean", 
          clustering_method = "complete",
-         Rowv = NA,
-         Colv = NA,
+         #Rowv = NA,
+         #Colv = NA,
          show_rownames = FALSE)
 
 dev.off()
 ```
+```{r}
+changing_genes1
+changing_genes2
+changing_diet1
+changing_exposure1
+changing_interaction1
+
+# save plot as a .png
+png("03_output/intestine/Heatmap - diet1.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
+p.diet1 <- pheatmap(changing_diet1, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         #Rowv = NA,
+         #Colv = NA,
+         show_rownames = FALSE)
+
+dev.off()
+
+
+# save plot as a .png
+png("03_output/intestine/Heatmap - exposure1.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
+p.exposure1 <- pheatmap(changing_exposure1, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         #Rowv = NA,
+         #Colv = NA,
+         show_rownames = FALSE)
+
+dev.off()
+
+
+# save plot as a .png
+png("03_output/intestine/Heatmap - exposure1.png")
+# Reset parameters
+par(mfrow=c(1,1))
+# Draw a heat map
+# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
+p.interaction1 <- pheatmap(changing_interaction1, 
+         scale="row", 
+         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
+         cluster_rows=FALSE, 
+         cluster_cols=TRUE, 
+         clustering_distance_rows = "euclidean", 
+         clustering_method = "complete",
+         #Rowv = NA,
+         #Colv = NA,
+         show_rownames = FALSE)
+
+dev.off()
+```
+
+
 
 
 *stopped editing here 

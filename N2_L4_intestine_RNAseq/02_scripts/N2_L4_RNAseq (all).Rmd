@@ -337,3 +337,28 @@ ggplot(pcaData, aes(PC1, PC2, color=diet, shape=exposure)) +
 
 
 
+
+Check contamination
+```{r}
+## positive intestine controls
+# elt-2 = WBGene00001250
+# elt-7 = WBGene00015981
+# ges-1 = WBGene00001578
+
+## germline
+# glh-1 = WBGene00001598
+# nos-2 = WBGene00003784 
+
+## muscle
+# myo-3 = WBGene00003515
+
+## neuron
+# hlh-2 = WBGene00001949
+# rab-3 = WBGene00004267
+
+plotCounts(dds2, gene=which(rownames(reslfc_diet2) == "WBGene00003515"), intgroup="diet")
+
+reslfc_diet2 # "CeMbio", "OP50"
+reslfc_exposure2 # "yes", "no"
+reslfc_interaction2 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+```
