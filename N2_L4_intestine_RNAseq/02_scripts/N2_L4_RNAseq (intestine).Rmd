@@ -999,12 +999,12 @@ head(clec_IDs)
 ```
 ```{r}
 # Save the plot
-png("03_output/intestine/MA plot - CeMbio.yes_CeMbio.no_clecs.png")
+png("03_output/intestine/MA plot - CeMbio.no_OP50.no_clecs.png")
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # plot the data
-ggmaplot(reslfc_CeMbio.yes_CeMbio.no_data_sets, 
-         main = "CeMbio.yes vs CeMbio.no",
+ggmaplot(reslfc_OP50.yes_OP50.no_data_sets, 
+         main = "OP50.yes vs OP50.no",
    fdr = 0.05, fc = 1.5, size = 0.4,
    palette = c("#B31B21", "#1465AC", "darkgray"),
    genenames = NULL,
@@ -1013,7 +1013,7 @@ ggmaplot(reslfc_CeMbio.yes_CeMbio.no_data_sets,
    font.legend = "bold",
    font.main = "bold",
    ggtheme = ggplot2::theme_minimal(),
-   top = 0) + geom_label_repel(data = subset(reslfc_CeMbio.yes_CeMbio.no_data_sets, wikigene_name %in% clec_IDs$Gene_name), #max.overlaps = getOption("ggrepel.max.overlaps", default = 10),
+   top = 0) + geom_label_repel(data = subset(reslfc_OP50.yes_OP50.no_data_sets, wikigene_name %in% clec_IDs$Gene_name), #max.overlaps = getOption("ggrepel.max.overlaps", default = 10),
                mapping = aes(label = as.vector(wikigene_name),
                              x = log2(baseMean),
                              y = log2FoldChange),
@@ -1022,9 +1022,7 @@ ggmaplot(reslfc_CeMbio.yes_CeMbio.no_data_sets,
                force = 1,
                fontface = "bold",
                size = 10/3)
-
 dev.off()
-
 ```
 
 
