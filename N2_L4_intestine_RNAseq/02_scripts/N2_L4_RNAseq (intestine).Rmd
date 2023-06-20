@@ -486,7 +486,6 @@ We will use the set of significantly changing genes from our variance shrunken a
 ```{r}
 # reference levels = diet: OP50, and exposure: no
 # Select the significant subset of genes that are up-regulated and down-regulated
-
 reslfc_CeMbio.yes_CeMbio.no
 reslfc_CeMbio.yes_OP50.yes
 reslfc_CeMbio.no_OP50.no
@@ -719,22 +718,44 @@ Up_CeMbio.no_OP50.no
 Down_CeMbio.no_OP50.no
 Up_OP50.yes_OP50.no
 Down_OP50.yes_OP50.no
+
+######################### also do these, need for later on
+reslfc_CeMbio.yes_CeMbio.no
+reslfc_CeMbio.yes_OP50.yes
+reslfc_CeMbio.no_OP50.no
+reslfc_OP50.yes_OP50.no 
+
+WBgeneID <- rownames(reslfc_CeMbio.yes_CeMbio.no)
+reslfc_CeMbio.yes_CeMbio.no_data <- cbind(reslfc_CeMbio.yes_CeMbio.no, WBgeneID)
+reslfc_CeMbio.yes_CeMbio.no_data <- as.data.frame(reslfc_CeMbio.yes_CeMbio.no_data)
+
+WBgeneID <- rownames(reslfc_CeMbio.yes_OP50.yes)
+reslfc_CeMbio.yes_OP50.yes_data <- cbind(reslfc_CeMbio.yes_OP50.yes, WBgeneID)
+reslfc_CeMbio.yes_OP50.yes_data <- as.data.frame(reslfc_CeMbio.yes_OP50.yes_data)
+
+WBgeneID <- rownames(reslfc_CeMbio.no_OP50.no)
+reslfc_CeMbio.no_OP50.no_data <- cbind(reslfc_CeMbio.no_OP50.no, WBgeneID)
+reslfc_CeMbio.no_OP50.no_data <- as.data.frame(reslfc_CeMbio.no_OP50.no_data)
+
+WBgeneID <- rownames(reslfc_OP50.yes_OP50.no)
+reslfc_OP50.yes_OP50.no_data <- cbind(reslfc_OP50.yes_OP50.no, WBgeneID)
+reslfc_OP50.yes_OP50.no_data <- as.data.frame(reslfc_OP50.yes_OP50.no_data)
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
-sign_OP50.yes_OP50.no <- biomaRt::getBM(
+reslfc_OP50.yes_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
-  value = sign_OP50.yes_OP50.no$WBgeneID,
+  value = reslfc_OP50.yes_OP50.no_data$WBgeneID,
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(sign_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+) %>% right_join(reslfc_OP50.yes_OP50.no_data, by = c("wbps_gene_id" = "WBgeneID"))
 
-sign_OP50.yes_OP50.no <- sign_OP50.yes_OP50.no %>% rename(WBgeneID = "wbps_gene_id")
+reslfc_OP50.yes_OP50.no_data <- reslfc_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
-write_csv(sign_OP50.yes_OP50.no, file = "03_output/intestine/sign_OP50.yes_OP50.no_sets.csv")
+write_csv(reslfc_OP50.yes_OP50.no_data, file = "03_output/intestine/reslfc_OP50.yes_OP50.no_data_sets.csv")
 ```
 
 
@@ -953,71 +974,54 @@ MA plot
 library(ggpubr)
 #install.packages("readxl")
 library(readxl)
+#install.packages("ggrepel")
+library(ggrepel)
+```
+```{r}
+# read in the data and convert to a dataframe
+reslfc_CeMbio.yes_CeMbio.no_data_sets <- read_delim("03_output/intestine/reslfc_CeMbio.yes_CeMbio.no_data_sets.csv", delim = ",", col_names = TRUE)
+reslfc_CeMbio.yes_CeMbio.no_data_sets <- as.data.frame(reslfc_CeMbio.yes_CeMbio.no_data_sets)
 
-reslfc_CeMbio.yes_CeMbio.no
-reslfc_CeMbio.yes_OP50.yes
-reslfc_CeMbio.no_OP50.no 
-reslfc_OP50.yes_OP50.no
+reslfc_CeMbio.yes_OP50.yes_data_sets <- read_delim("03_output/intestine/reslfc_CeMbio.yes_OP50.yes_data_sets.csv", delim = ",", col_names = TRUE)
+reslfc_CeMbio.yes_OP50.yes_data_sets <- as.data.frame(reslfc_CeMbio.yes_OP50.yes_data_sets)
 
+reslfc_CeMbio.no_OP50.no_data_sets <- read_delim("03_output/intestine/reslfc_CeMbio.no_OP50.no_data_sets.csv", delim = ",", col_names = TRUE)
+reslfc_CeMbio.no_OP50.no_data_sets <- as.data.frame(reslfc_CeMbio.no_OP50.no_data_sets)
 
-write.csv(resLFC_exposure.intestine, file = "03_output/resLFC_exposure.intestine.csv")
-
-write.csv(resLFC_diet.intestine, file = "03_output/resLFC_diet.intestine.csv")
-clec_IDs <- read_excel("03_output/clec_WBgeneIDs.xlsx", sheet=3)
+reslfc_OP50.yes_OP50.no_data_sets <- read_delim("03_output/intestine/reslfc_OP50.yes_OP50.no_data_sets.csv", delim = ",", col_names = TRUE)
+reslfc_OP50.yes_OP50.no_data_sets <- as.data.frame(reslfc_OP50.yes_OP50.no_data_sets)
+```
+```{r}
+clec_IDs <- read_excel("03_output/intestine/clec_WBgeneIDs.xlsx", col_names = TRUE, sheet = 2)
+class(clec_IDs)
 clec_IDs <- as.data.frame(clec_IDs)
-headers <- c("WBgeneID", "GeneName")
-colnames(clec_IDs) <- headers
-clec_WBgeneIDs <- clec_IDs[1]
-rows <- clec_WBgeneIDs$WBgeneID
-row.names(clec_WBgeneIDs) <- rows
-clec_WBgeneIDs
-
-
-
+```
+```{r}
 # Save the plot
-png("03_output/MA plot - exposure shrunken (int).png")
+png("03_output/intestine/MA plot - CeMbio.yes_CeMbio.no_clecs.png")
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
-# create the plot
-plotMA(resLFC_exposure.intestine, main="CeMbio v. OP50 \nintestine", ylim = c(-7,7), 
-       ylab = "log fold change (ratio of normalized CeMbio / OP50)",
-       xlab = "means of normalized counts")
-text(x=resLFC_exposure.intestine$baseMean, y=resLFC_exposure.intestine$log2FoldChange, label=(row.names(resLFC_exposure.intestine) %in% row.names(clec_WBgeneIDs)), cex=0.3)
-
-
-
-plotMA(resLFC_exposure.intestine.data, main="Exposed to PA14 v. not \nintestine", ylim = c(-7,7), 
-       ylab = "log fold change (ratio of normalized Exposed / Unexposed)",
-       xlab = "means of normalized counts")
-# Increase the font size of the axis labels
-par(cex.lab=2)
-# to stop saving plots and display the plot on the screen 
-dev.off() 
-
-
-
-ggmaplot(
-  resLFC_exposure.intestine,
-  fdr = 0.05,
-  fc = 1.5,
-  genenames = NULL,
-  detection_call = NULL,
-  size = NULL,
-  alpha = 1,
-  seed = 42,
-  font.label = c(12, "plain", "black"),
-  label.rectangle = FALSE,
-  palette = c("#B31B21", "#1465AC", "darkgray"),
-  top = 15,
-  select.top.method = c("padj", "fc"),
-  label.select = NULL,
-  main = NULL,
-  xlab = "Log2 mean expression",
-  ylab = "Log2 fold change",
-  ggtheme = theme_classic(),
-  ...
-)
+# plot the data
+ggmaplot(reslfc_CeMbio.yes_CeMbio.no_data_sets, 
+   fdr = 0.05, fc = 1.5, size = 0.4,
+   palette = c("#B31B21", "#1465AC", "darkgray"),
+   genenames = NULL,
+   legend = "top",
+   font.label = c("bold", 11),
+   font.legend = "bold",
+   font.main = "bold",
+   ggtheme = ggplot2::theme_minimal(),
+   top = 0) + geom_label_repel(data = subset(reslfc_CeMbio.yes_CeMbio.no_data_sets, wikigene_name %in% clec_IDs$GeneName), 
+               mapping = aes(label = as.vector(wikigene_name),
+                             x = log2(baseMean),
+                             y = log2FoldChange),
+               box.padding = unit(0.35, "lines"),
+               point.padding = unit(0.3, "lines"),
+               force = 1,
+               fontface = "bold",
+               size = 10/3)
 ```
+
 
 Volcano plots
 ```{r}
@@ -1056,26 +1060,5 @@ abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
 dev.off()
 ```
-
-text(x=resLFC_diet.intestine$log2FoldChange, y=-log10(resLFC_diet.intestine$pvalue), label=(row.names(resLFC_diet.intestine) %in% row.names(clec_WBgeneIDs)), cex=0.3)
-
-
-text(x=resLFC_exposure.intestine$log2FoldChange, y=-log10(resLFC_exposure.intestine$pvalue), label=rownames(resLFC_exposure.intestine %in% clec_WBgeneIDs), cex=0.3)
-
-
-
-plot(resLFC_exposure.intestine$log2FoldChange, -log10(resLFC_exposure.intestine$padj),
-     main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-10,10), col = "#00000030")
-# Add points and labels
-points(maxedout.exposure.int$log2FoldChange, rep(102, length(maxedout.exposure.int$log2FoldChange)), 
-       pch=20, cex = 0.75, ylim = c(0, 100), col = "green")
-points(significant_points_to_plot.exposure.int$log2FoldChange, -log10(significant_points_to_plot.exposure.int$padj),
-       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-labels = rownames(resLFC_exposure.intestine)[rownames(resLFC_exposure.intestine) %in% clec_WBgeneIDs]
-# Add lines
-abline(v=0, col = "blue")
-abline(v=0.5, col = "blue", lty = "dashed")
-abline(v=-0.5, col = "blue", lty = "dashed")
-abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
 
