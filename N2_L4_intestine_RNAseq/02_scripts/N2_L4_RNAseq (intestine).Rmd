@@ -294,44 +294,29 @@ dev.off()
 
 
 
-
-
-
-
 Sample distance matrix
 ```{r}
 rld <- rlog(dds, blind=FALSE)
 new.rld <- assay(rld)
 
-rld1 <- rlog(dds1, blind=FALSE)
-new.rld1 <- assay(rld1)
-
 rld.CeMbio <- new.rld[, grep("CeMbio", colnames(new.rld))]
 rld.OP50 <- new.rld[, grep("OP50", colnames(new.rld))]
 
-rld.CeMbio1 <- new.rld1[, grep("CeMbio", colnames(new.rld1))]
-rld.OP501 <- new.rld1[, grep("OP50", colnames(new.rld1))]
-
-
 # Calculate the distances between each sample
 #sampleDists <- dist(t(assay(rld))) # original code, not using
-#sampleDists <- dist(t(new.rld))
+sampleDists <- dist(t(new.rld))
 sampleDists.CeMbio <- dist(t(rld.CeMbio))
 sampleDists.OP50 <- dist(t(rld.OP50))
-sampleDists.CeMbio1 <- dist(t(rld.CeMbio1))
-sampleDists.OP501 <- dist(t(rld.OP501))
 
 # Convert from data.frame to matrix
-#sampleDistMatrix <- as.matrix(sampleDists) 
+sampleDistMatrix <- as.matrix(sampleDists) 
 sampleDistMatrix.CeMbio <- as.matrix(sampleDists.CeMbio)
 sampleDistMatrix.OP50 <- as.matrix(sampleDists.OP50)
-sampleDistMatrix.CeMbio1 <- as.matrix(sampleDists.CeMbio1)
-sampleDistMatrix.OP501 <- as.matrix(sampleDists.OP501)
 
 # Add some labels
-#rownames(sampleDistMatrix) <- colnames(new.rld)
-#colnames(sampleDistMatrix) <- NULL
-#colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
+rownames(sampleDistMatrix) <- colnames(new.rld)
+colnames(sampleDistMatrix) <- NULL
+colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
 rownames(sampleDistMatrix.CeMbio) <- colnames(rld.CeMbio)
 colnames(sampleDistMatrix.CeMbio) <- NULL
@@ -341,38 +326,29 @@ rownames(sampleDistMatrix.OP50) <- colnames(rld.OP50)
 colnames(sampleDistMatrix.OP50) <- NULL
 colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
 
-rownames(sampleDistMatrix.CeMbio1) <- colnames(rld.CeMbio1)
-colnames(sampleDistMatrix.CeMbio1) <- NULL
-colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
-
-rownames(sampleDistMatrix.OP501) <- colnames(rld.OP501)
-colnames(sampleDistMatrix.OP501) <- NULL
-colors <- colorRampPalette(rev(brewer.pal(9, "Blues")))(255)
-
-
 
 # Draw the heatmap
-p.CeMbio <- pheatmap(sampleDistMatrix.CeMbio,
+png("03_output/intestine/HeatMap - all.png")
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+
+# save plot as a .png
+png("03_output/intestine/HeatMap - CeMbio.png")
+pheatmap(sampleDistMatrix.CeMbio,
          clustering_distance_rows=sampleDists.CeMbio,
          clustering_distance_cols=sampleDists.CeMbio,
          col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
 
-p.OP50 <- pheatmap(sampleDistMatrix.OP50,
+png("03_output/intestine/HeatMap - OP50.png")
+pheatmap(sampleDistMatrix.OP50,
          clustering_distance_rows=sampleDists.OP50,
          clustering_distance_cols=sampleDists.OP50,
          col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
 
-p.CeMbio1 <- pheatmap(sampleDistMatrix.CeMbio1,
-         clustering_distance_rows=sampleDists.CeMbio1,
-         clustering_distance_cols=sampleDists.CeMbio1,
-         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
-
-p.OP501 <- pheatmap(sampleDistMatrix.OP501,
-         clustering_distance_rows=sampleDists.OP501,
-         clustering_distance_cols=sampleDists.OP501,
-         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+dev.off()
 ```
-
 
 
 Volcano plots
