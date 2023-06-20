@@ -158,30 +158,6 @@ head(counts(dds, normalized = TRUE))
 #head(counts(dds, normalized = FALSE))
 ```
 
---- (see ?results())
-# Example 2: two conditions, two genotypes, with an interaction term
-
-dds <- makeExampleDESeqDataSet(n=100,m=12)
-dds$genotype <- factor(rep(rep(c("I","II"),each=3),2))
-
-design(dds) <- ~ genotype + condition + genotype:condition
-dds <- DESeq(dds) 
-resultsNames(dds)
-
-# the genotype effect for condition A (the main effect)
-results(dds, contrast=c("genotype","I","II"))
-
-# the condition effect for genotype I (the main effect)
-results(dds, contrast=c("condition","B","A"))
-
-# the condition effect for genotype II
-# this is, by definition, the main effect plus the interaction term (the extra condition effect in genotype II compared to genotype I).
-results(dds, list( c("condition_B_vs_A","genotypeII.conditionB") ))
-
-# the interaction term, answering: is the condition effect different across genotypes?
-results(dds, name="genotypeII.conditionB")
----
-
 
 extract results 
 ```{r}
@@ -256,20 +232,70 @@ reslfc_CeMbio.yes_OP50.yes
 reslfc_CeMbio.no_OP50.no
 reslfc_OP50.yes_OP50.no
 
-#reslfc_diet1 
-#reslfc_exposure1 
-#reslfc_interaction1 
-
+# save plot as a .png
+png("03_output/intestine/MA plot - CeMbio.yes.vs.CeMbio.no.png")
+# Reset parameters
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # create the plot
-#check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
-plotMA(reslfc_CeMbio.yes_CeMbio.no, ylim = c(-7,7), main = "...", 
-       ylab = "log fold change (ratio of normalized CeMbio.yes / CeMbio.no)",
-       xlab = "means of normalized counts")
+plotMA(reslfc_CeMbio.yes_CeMbio.no, ylim = c(-7,7), main = "Effect of exposure to PA14 on CeMbio fed worms", 
+       ylab = "log fold change" # (ratio of normalized CeMbio.yes / CeMbio.no)
+       , xlab = "means of normalized counts")
 # Increase the font size of the axis labels
 par(cex.lab=2)
+
+dev.off()
 ```
+```{r}
+# save plot as a .png
+png("03_output/intestine/MA plot - CeMbio.yes.vs.OP50.yes.png")
+# Reset parameters
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+plotMA(reslfc_CeMbio.yes_OP50.yes, ylim = c(-7,7), main = "Effect of diet during exposure to PA14", 
+       ylab = "log fold change" # (ratio of normalized CeMbio.yes / OP50.yes)
+       , xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+
+dev.off()
+```
+```{r}
+# save plot as a .png
+png("03_output/intestine/MA plot - CeMbio.no.vs.OP50.no.png")
+# Reset parameters
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+plotMA(reslfc_CeMbio.no_OP50.no, ylim = c(-7,7), main = "Effect of diet (CeMbio vs OP50)", 
+       ylab = "log fold change" # (ratio of normalized CeMbio.no / OP50.no)
+       , xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+
+dev.off()
+```
+```{r}
+# save plot as a .png
+png("03_output/intestine/MA plot - OP50.yes.vs.OP50.no.png")
+# Reset parameters
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# create the plot
+plotMA(reslfc_OP50.yes_OP50.no, ylim = c(-7,7), main = "Effect of exposure to PA14 on OP50 fed worms", 
+       ylab = "log fold change" # (ratio of normalized OP50.yes / OP50.no)
+       , xlab = "means of normalized counts")
+# Increase the font size of the axis labels
+par(cex.lab=2)
+
+dev.off()
+```
+
+
+
+
+
 
 
 Sample distance matrix
