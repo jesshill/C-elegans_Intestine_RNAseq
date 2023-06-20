@@ -332,27 +332,30 @@ png("03_output/intestine/HeatMap - all.png")
 pheatmap(sampleDistMatrix,
          clustering_distance_rows=sampleDists,
          clustering_distance_cols=sampleDists,
-         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20,
+         legend = FALSE)
 
 # save plot as a .png
 png("03_output/intestine/HeatMap - CeMbio.png")
 pheatmap(sampleDistMatrix.CeMbio,
          clustering_distance_rows=sampleDists.CeMbio,
          clustering_distance_cols=sampleDists.CeMbio,
-         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20,
+         legend = FALSE)
 
 png("03_output/intestine/HeatMap - OP50.png")
 pheatmap(sampleDistMatrix.OP50,
          clustering_distance_rows=sampleDists.OP50,
          clustering_distance_cols=sampleDists.OP50,
-         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20)
+         col=colors, fontsize = 10, treeheight_col = 20, treeheight_row = 20,
+         legend = FALSE)
 
 dev.off()
 ```
 
 
 Volcano plots
-Nice ways of displaying the fold change against the p-value.
+Display the fold change against the p-value
 ```{r}
 #Identify significantly changing genes
 significantLFC.diet <- rbind(subset(reslfc_diet, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_diet, padj < 0.1 & log2FoldChange < -0.5))
