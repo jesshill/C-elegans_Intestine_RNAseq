@@ -693,10 +693,14 @@ changing_exposure_genes <- cbind(changing_exposure_genes, WBgeneID)
 changing_exposure_genes <- as.data.frame(changing_exposure_genes)
 
 #####################
+WBgeneID <- rownames(changing_exposure_genes)
+changing_exposure_genes <- cbind(changing_exposure_genes, WBgeneID)
+changing_exposure_genes <- as.data.frame(changing_exposure_genes)
 
-changing_genes <- rbind(sign_CeMbio.yes_CeMbio.no, sign_CeMbio.yes_OP50.yes, sign_CeMbio.no_OP50.no, sign_OP50.yes_OP50.no)
-changing_exposure <- rbind(sign_CeMbio.yes_CeMbio.no, sign_OP50.yes_OP50.no)
-changing_diet <- rbind(sign_CeMbio.no_OP50.no, sign_CeMbio.yes_OP50.yes)
+sign_CeMbio.yes_CeMbio.no
+sign_CeMbio.yes_OP50.yes
+sign_CeMbio.no_OP50.no
+sign_OP50.yes_OP50.no
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
