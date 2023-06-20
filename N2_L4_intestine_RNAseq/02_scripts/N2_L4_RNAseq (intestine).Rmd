@@ -85,7 +85,7 @@ Now make the sample information table, which we will name coldata.
 diet <- c('CeMbio','CeMbio','OP50','OP50','CeMbio','CeMbio','OP50','OP50','CeMbio','CeMbio','OP50','OP50')
 exposure <- c('no','yes','no','yes','no','yes','no','yes','no','yes','no','yes')
 rep <- c('rep1','rep1','rep1','rep1','rep2', 'rep2', 'rep2', 'rep2','rep3', 'rep3', 'rep3', 'rep3')
-#group <- c('CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes')
+group <- c('CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes','CeMbio_no','CeMbio_yes','OP50_no','OP50_yes')
 sampleID <- c('Rep1.CeMbio.intestine','Rep1.CeMbio.to.PA14.intestine','Rep1.OP50.intestine', 'Rep1.OP50.to.PA14.intestine','Rep2.CeMbio.intestine', 'Rep2.CeMbio.to.PA14.intestine', 'Rep2.OP50.intestine', 'Rep2.OP50.to.PA14.intestine','Rep3.CeMbio.intestine','Rep3.CeMbio.to.PA14.intestine','Rep3.OP50.intestine', 'Rep3.OP50.to.PA14.intestine')
   
 coldata <- data.frame(sampleID, diet, exposure, group, rep)
@@ -103,12 +103,12 @@ Load the counts data and to attach it/them to the metadata.
 # design 1 - (genotype + condition) the exposure effect represents the overall effect controlling for differences due to diet
 dds <- DESeqDataSetFromMatrix(countData = counts_int,
                               colData = coldata,
-                              design = ~ diet + exposure)
+                              design = ~ group)
 
 # design 2 - (genotype:condition) the main condition effect only represents the effect of condition for the reference level of genotype (I, or whichever level was defined by the user as the reference level).
-dds1 <- DESeqDataSetFromMatrix(countData = counts_int,
-                              colData = coldata,
-                              design = ~ diet + exposure + diet:exposure)
+#dds1 <- DESeqDataSetFromMatrix(countData = counts_int,
+#                              colData = coldata,
+#                              design = ~ diet + exposure + diet:exposure)
 
 
 # how many genes do we have?
@@ -124,16 +124,12 @@ keep <- rowSums(counts(dds)) >= 10
 dds <- dds[keep,]
 #How many are we left with?
 dim(dds) # 18265
-
-
-keep <- rowSums(counts(dds1)) >= 10
-dds1 <- dds1[keep,]
 ```
 
 Visualize read count distribution
 ```{r}
 raw_count_threshold <- 10
-hist(log10(rowSums(counts(dds2))), breaks = 50)
+hist(log10(rowSums(counts(dds))), breaks = 50)
 abline(v = log10(raw_count_threshold), col = "red", lty = 2)
 ```
 
@@ -142,10 +138,6 @@ Organize the categories into an order that makes sense
 ```{r}
 dds$diet <- factor(dds$diet, levels = c("OP50", "CeMbio")) # this sets OP50 as the reference levels
 dds$exposure <- factor(dds$exposure, levels = c("no", "yes")) # this sets no as the reference levels
-
-
-dds1$diet <- factor(dds1$diet, levels = c("OP50", "CeMbio")) 
-dds1$exposure <- factor(dds1$exposure, levels = c("no", "yes"))
 ```
 
 
@@ -156,8 +148,6 @@ Perform DESEQ2 analysis
 dds <- DESeq(dds)
 dim(dds)
 plotDispEsts(dds)
-
-dds1 <- DESeq(dds1)
 
 # Here is a demonstration of the size Factor scaling that was calculated (sizeFactor):
 dds$sizeFactor
@@ -196,72 +186,86 @@ results(dds, name="genotypeII.conditionB")
 extract results 
 ```{r}
 #calculate the statistically significant differences between CeMbio and OP50 diets
+res_CeMbio.yes_CeMbio.no <- results(dds, 
+                                    lfc = 0.5,
+                                    contrast = c("group", "CeMbio_yes", "CeMbio_no"))
+summary(res_CeMbio.yes_CeMbio.no)
 
-res_diet <- results(dds,
-                    lfc = 0.5,
-                    contrast=c("diet", "CeMbio", "OP50"))
-summary(res_diet)
+res_CeMbio.yes_OP50.yes <- results(dds, 
+                                    lfc = 0.5,
+                                    contrast = c("group", "CeMbio_yes", "OP50_yes"))
+summary(res_CeMbio.yes_OP50.yes)
 
-res_exposure <- results(dds,
-                    lfc = 0.5,
-                    contrast=c("exposure", "yes", "no"))
-`summary(res_exposure)
+res_CeMbio.no_OP50.no <- results(dds, 
+                                    lfc = 0.5,
+                                    contrast = c("group", "CeMbio_no", "OP50_no"))
+summary(res_CeMbio.no_OP50.no)
+
+res_OP50.yes_OP50.no <- results(dds, 
+                                    lfc = 0.5,
+                                    contrast = c("group", "OP50_yes", "OP50_no"))
+summary(res_OP50.yes_OP50.no)
 ```
 
 ```{r}
-res_diet1 <- results(dds1,
-                    lfc = 0.5,
-                    contrast=c("diet", "CeMbio", "OP50")) # the diet effect for no exposure
-summary(res_diet1)
+#res_diet1 <- results(dds1,
+#                    lfc = 0.5,
+#                    contrast=c("diet", "CeMbio", "OP50")) # the diet effect for no exposure
+#summary(res_diet1)
 
-res_exposure1 <- results(dds1,
-                    lfc = 0.5,
-                    contrast=c("exposure", "yes", "no")) # the exposure effect for OP50
-summary(res_exposure1)
+#res_exposure1 <- results(dds1,
+#                    lfc = 0.5,
+#                    contrast=c("exposure", "yes", "no")) # the exposure effect for OP50
+#summary(res_exposure1)
 
-res_interaction1 <- results(dds1,
-                            lfc = 0.5,
-                            contrast=list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes"))) # the exposure effect for CeMbio
-summary(res_interaction1)
+#res_interaction1 <- results(dds1,
+#                            lfc = 0.5,
+#                            contrast=list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes"))) # the exposure effect for CeMbio
+#summary(res_interaction1)
 ```
 
 ```{r}
 resultsNames(dds)
-resultsNames(dds1)
 ```
 
 perform log fold change shrinkage for visualization
 ```{r}
-reslfc_diet <- lfcShrink(dds1, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
-  
-reslfc_exposure <- lfcShrink(dds1, contrast = c("exposure", "yes", "no"), type="ashr")
+reslfc_CeMbio.yes_CeMbio.no <- lfcShrink(dds, contrast = c("group", "CeMbio_yes", "CeMbio_no"), type="ashr")
+
+reslfc_CeMbio.yes_OP50.yes <- lfcShrink(dds, contrast = c("group", "CeMbio_yes", "OP50_yes"), type="ashr")  
+
+reslfc_CeMbio.no_OP50.no <- lfcShrink(dds, contrast = c("group", "CeMbio_no", "OP50_no"), type="ashr")
+
+reslfc_OP50.yes_OP50.no <- lfcShrink(dds, contrast = c("group", "OP50_yes", "OP50_no"), type="ashr")
 ```
 
 ```{r}
-reslfc_diet1 <- lfcShrink(dds2, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
+#reslfc_diet1 <- lfcShrink(dds2, contrast = c("diet", "CeMbio", "OP50"), type="ashr")
   
-reslfc_exposure1 <- lfcShrink(dds2, contrast = c("exposure", "yes", "no"), type="ashr")  
+#reslfc_exposure1 <- lfcShrink(dds2, contrast = c("exposure", "yes", "no"), type="ashr")  
 
-reslfc_interaction1 <- lfcShrink(dds2, contrast = list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes")), type="ashr")
+#reslfc_interaction1 <- lfcShrink(dds2, contrast = list(c("exposure_yes_vs_no", "dietCeMbio.exposureyes")), type="ashr")
 ```
 
 
 Exploring and exporting results
 MA plot
 ```{r}
-reslfc_diet # "CeMbio", "OP50"
-reslfc_exposure # "yes", "no"
+reslfc_CeMbio.yes_CeMbio.no 
+reslfc_CeMbio.yes_OP50.yes
+reslfc_CeMbio.no_OP50.no
+reslfc_OP50.yes_OP50.no
 
-reslfc_diet1 # "CeMbio", "OP50"
-reslfc_exposure1 # "yes", "no"
-reslfc_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+#reslfc_diet1 
+#reslfc_exposure1 
+#reslfc_interaction1 
 
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # create the plot
 #check out both the unshrunken (res_diet) and shrunken (resLFC_diet) plots 
-plotMA(reslfc_interaction1, ylim = c(-7,7), main = "...", 
-       ylab = "log fold change (ratio of normalized ... / ...)",
+plotMA(reslfc_CeMbio.yes_CeMbio.no, ylim = c(-7,7), main = "...", 
+       ylab = "log fold change (ratio of normalized CeMbio.yes / CeMbio.no)",
        xlab = "means of normalized counts")
 # Increase the font size of the axis labels
 par(cex.lab=2)
@@ -560,22 +564,21 @@ Down_interaction_effect1 <- Down_interaction_effect1[order(Down_interaction_effe
 
 Save these lists to output files
 ```{r}
-write(rownames(Up_diet_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
-write(rownames(Down_diet_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_diet_effect), file = "03_output/intestine/Up_diet_effect.txt", sep = "\n")
+write(rownames(Down_diet_effect), file = "03_output/intestine/Down_diet_effect.txt", sep = "\n")
 
-write(rownames(Up_exposure_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
-write(rownames(Down_exposure_effect), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_exposure_effect), file = "03_output/intestine/Up_exposure_effect.txt", sep = "\n")
+write(rownames(Down_exposure_effect), file = "03_output/intestine/Down_exposure_effect.txt", sep = "\n")
 ###############################
-write(rownames(Up_diet_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
-write(rownames(Down_diet_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_diet_effect1), file = "03_output/intestine/Up_diet_effect1.txt", sep = "\n")
+write(rownames(Down_diet_effect1), file = "03_output/intestine/Down_diet_effect1.txt", sep = "\n")
 
-write(rownames(Up_exposure_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
-write(rownames(Down_exposure_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_exposure_effect1), file = "03_output/intestine/Up_exposure_effect1.txt", sep = "\n")
+write(rownames(Down_exposure_effect1), file = "03_output/intestine/Down_exposure_effect1.txt", sep = "\n")
 
-write(rownames(Up_interaction_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
-write(rownames(Down_interaction_effect1), file = "03_output/intestine/Genes Up in OP50.yes vs OP50.no.txt", sep = "\n")
+write(rownames(Up_interaction_effect1), file = "03_output/intestine/Up_interaction_effect1.txt", sep = "\n")
+write(rownames(Down_interaction_effect1), file = "03_output/intestine/Down_interaction_effect1.txt", sep = "\n")
 ```
-
 
 
 make hierarchically clustered heatmaps of all changing genes 
@@ -753,11 +756,11 @@ dev.off()
 
 Install Libraries
 ```{r}
-install.packages("tidyverse")
-if (!require("BiocManager", quietly = TRUE))
-     install.packages("BiocManager")
-BiocManager::install(version = "3.14")
-BiocManager::install("InterMineR")
+#install.packages("tidyverse")
+#if (!require("BiocManager", quietly = TRUE))
+#     install.packages("BiocManager")
+#BiocManager::install(version = "3.14")
+#BiocManager::install("InterMineR")
 ```
 
 Load Libraries
@@ -777,44 +780,20 @@ changing_diet <- as.data.frame(changing_diet)
 WBgeneID <- rownames(changing_exposure)
 changing_exposure <- cbind(changing_exposure, WBgeneID)
 changing_exposure <- as.data.frame(changing_exposure)
-
 ##########################################
-WBgeneID <- rownames(Up_in_Yes.int.CeMbio)
-Up_in_Yes.int.CeMbio <- cbind(Up_in_Yes.int.CeMbio, WBgeneID)
-Up_in_Yes.int.CeMbio <- as.data.frame(Up_in_Yes.int.CeMbio)
+WBgeneID <- rownames(changing_diet1)
+changing_diet1 <- cbind(changing_diet1, WBgeneID)
+changing_diet1 <- as.data.frame(changing_diet1)
 
-WBgeneID <- rownames(Down_in_Yes.int.CeMbio)
-Down_in_Yes.int.CeMbio <- cbind(Down_in_Yes.int.CeMbio, WBgeneID)
-Down_in_Yes.int.CeMbio <- as.data.frame(Down_in_Yes.int.CeMbio)
+WBgeneID <- rownames(changing_exposure1)
+changing_exposure1 <- cbind(changing_exposure1, WBgeneID)
+changing_exposure1 <- as.data.frame(changing_exposure1)
 
-WBgeneID <- rownames(Up_in_Yes.int.OP50)
-Up_in_Yes.int.OP50 <- cbind(Up_in_Yes.int.OP50, WBgeneID)
-Up_in_Yes.int.OP50 <- as.data.frame(Up_in_Yes.int.OP50)
+WBgeneID <- rownames(changing_interaction1)
+changing_interaction1 <- cbind(changing_interaction1, WBgeneID)
+changing_interaction1 <- as.data.frame(changing_interaction1)
 
-WBgeneID <- rownames(Down_in_Yes.int.OP50)
-Down_in_Yes.int.OP50 <- cbind(Down_in_Yes.int.OP50, WBgeneID)
-Down_in_Yes.int.OP50 <- as.data.frame(Down_in_Yes.int.OP50)
-
-##########################################
-WBgeneID <- rownames(Up_in_CeMbio.int.No)
-Up_in_CeMbio.int.No <- cbind(Up_in_CeMbio.int.No, WBgeneID)
-Up_in_CeMbio.int.No <- as.data.frame(Up_in_CeMbio.int.No)
-
-WBgeneID <- rownames(Up_in_CeMbio.int.Yes)
-Up_in_CeMbio.int.Yes <- cbind(Up_in_CeMbio.int.Yes, WBgeneID)
-Up_in_CeMbio.int.Yes <- as.data.frame(Up_in_CeMbio.int.Yes)
-
-WBgeneID <- rownames(Down_in_CeMbio.int.No)
-Down_in_CeMbio.int.No <- cbind(Down_in_CeMbio.int.No, WBgeneID)
-Down_in_CeMbio.int.No <- as.data.frame(Down_in_CeMbio.int.No)
-
-WBgeneID <- rownames(Down_in_CeMbio.int.Yes)
-Down_in_CeMbio.int.Yes <- cbind(Down_in_CeMbio.int.Yes, WBgeneID)
-Down_in_CeMbio.int.Yes <- as.data.frame(Down_in_CeMbio.int.Yes)
-```
-
-Get filternames from https://parasite.wormbase.org/biomart/martview
-```{r}
+########################################## (old names)
 Up_in_Yes.int.CeMbio
 Up_in_Yes.int.OP50
 Down_in_Yes.int.CeMbio
@@ -824,20 +803,34 @@ Up_in_CeMbio.int.Yes
 Up_in_CeMbio.int.No
 Down_in_CeMbio.int.Yes
 Down_in_CeMbio.int.No
+```
+
+Get filternames from https://parasite.wormbase.org/biomart/martview
+```{r}
+changing_diet
+changing_exposure
+
+changing_diet1
+changing_exposure1
+changing_interaction1
+
 
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
-Down_in_CeMbio.int.No <- biomaRt::getBM(
+changing_interaction1 <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
-  value = Down_in_CeMbio.int.No$WBgeneID,
+  value = changing_interaction1$WBgeneID,
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(Down_in_CeMbio.int.No, by = c("wbps_gene_id" = "WBgeneID"))
+) %>% right_join(changing_interaction1, by = c("wbps_gene_id" = "WBgeneID"))
 
-Down_in_CeMbio.int.No <- Down_in_CeMbio.int.No %>% rename(WBgeneID = "wbps_gene_id")
+changing_interaction1 <- changing_interaction1 %>% rename(WBgeneID = "wbps_gene_id")
 
-write_csv(Down_in_CeMbio.int.No, file = "03_output/Down_in_CeMbio.int.No_sets.csv")
+write_csv(changing_interaction1, file = "03_output/intestine/changing_interaction1_sets.csv")
 ```
+
+
+##### havent updated #####
 
 Perform gene ontology
 ```{r}
@@ -1000,24 +993,37 @@ library(UpSetR)
 library(ComplexHeatmap)
 
 
-Up_in_Yes.int.CeMbio <- read.csv2("03_output/Up_in_Yes.int.CeMbio_sets.csv", header = TRUE, sep = ",")
-Up_in_Yes.int.OP50 <- read.csv2("03_output/Up_in_Yes.int.OP50_sets.csv", header = TRUE, sep = ",")
-Down_in_Yes.int.CeMbio <- read.csv2("03_output/Down_in_Yes.int.CeMbio_sets.csv", header = TRUE, sep = ",")
-Down_in_Yes.int.OP50 <- read.csv2("03_output/Down_in_Yes.int.OP50_sets.csv", header = TRUE, sep = ",")
+changing_diet
+changing_exposure
 
-Up_in_CeMbio.int.Yes <- read.csv2("03_output/Up_in_CeMbio.int.Yes_sets.csv", header = TRUE, sep = ",")
-Up_in_CeMbio.int.No <- read.csv2("03_output/Up_in_CeMbio.int.No_sets.csv", header = TRUE, sep = ",")
-Down_in_CeMbio.int.Yes <- read.csv2("03_output/Down_in_CeMbio.int.Yes_sets.csv", header = TRUE, sep = ",")
-Down_in_CeMbio.int.No <- read.csv2("03_output/Down_in_CeMbio.int.No_sets.csv", header = TRUE, sep = ",")
+changing_diet1
+changing_exposure1
+changing_interaction1
+
+
+changing_diet <- read.csv2("03_output/intestine/changing_diet_sets.csv", header = TRUE, sep = ",")
+
+changing_exposure <- read.csv2("03_output/intestine/changing_exposure_sets.csv", header = TRUE, sep = ",")
+
+changing_diet1 <- read.csv2("03_output/intestine/changing_diet1_sets.csv", header = TRUE, sep = ",")
+
+changing_exposure1 <- read.csv2("03_output/intestine/changing_exposure1_sets.csv", header = TRUE, sep = ",")
+
+changing_interaction1 <- read.csv2("03_output/intestine/changing_interaction1_sets.csv", header = TRUE, sep = ",")
 ```
 ```{r}
-Up_in_CeMbio.int
-Down_in_CeMbio.int
-Up_in_Yes.int
-Down_in_Yes.int
-```
-```{r}
-lt <- list(Up_in_Yes.int.CeMbio = Up_in_Yes.int.CeMbio$WBgeneID, Up_in_Yes.int.OP50 = Up_in_Yes.int.OP50$WBgeneID, Down_in_Yes.int.CeMbio = Down_in_Yes.int.CeMbio$WBgeneID, Down_in_Yes.int.OP50 = Down_in_Yes.int.OP50$WBgeneID)
+lt <- list(changing_diet = changing_diet$WBgeneID, 
+           changing_exposure = changing_exposure$WBgeneID, 
+           changing_diet1 = changing_diet1$WBgeneID, 
+           changing_exposure1 = changing_exposure1$WBgeneID, 
+           changing_interaction1 = changing_interaction1$WBgeneID)
+
+lt <- list(changing_diet = changing_diet$WBgeneID, 
+           changing_diet1 = changing_diet1$WBgeneID)
+
+lt <- list(changing_exposure = changing_exposure$WBgeneID, 
+           changing_exposure1 = changing_exposure1$WBgeneID)
+
 
 lt <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
 
