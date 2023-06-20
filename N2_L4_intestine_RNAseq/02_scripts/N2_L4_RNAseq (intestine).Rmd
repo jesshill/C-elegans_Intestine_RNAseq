@@ -692,39 +692,49 @@ WBgeneID <- rownames(changing_exposure_genes)
 changing_exposure_genes <- cbind(changing_exposure_genes, WBgeneID)
 changing_exposure_genes <- as.data.frame(changing_exposure_genes)
 
-#####################
-WBgeneID <- rownames(changing_exposure_genes)
-changing_exposure_genes <- cbind(changing_exposure_genes, WBgeneID)
-changing_exposure_genes <- as.data.frame(changing_exposure_genes)
+####################
+WBgeneID <- rownames(sign_CeMbio.yes_CeMbio.no)
+sign_CeMbio.yes_CeMbio.no <- cbind(sign_CeMbio.yes_CeMbio.no, WBgeneID)
+sign_CeMbio.yes_CeMbio.no <- as.data.frame(sign_CeMbio.yes_CeMbio.no)
 
-sign_CeMbio.yes_CeMbio.no
-sign_CeMbio.yes_OP50.yes
-sign_CeMbio.no_OP50.no
-sign_OP50.yes_OP50.no
+WBgeneID <- rownames(sign_CeMbio.yes_OP50.yes)
+sign_CeMbio.yes_OP50.yes <- cbind(sign_CeMbio.yes_OP50.yes, WBgeneID)
+sign_CeMbio.yes_OP50.yes <- as.data.frame(sign_CeMbio.yes_OP50.yes)
+
+WBgeneID <- rownames(sign_CeMbio.no_OP50.no)
+sign_CeMbio.no_OP50.no <- cbind(sign_CeMbio.no_OP50.no, WBgeneID)
+sign_CeMbio.no_OP50.no <- as.data.frame(sign_CeMbio.no_OP50.no)
+
+WBgeneID <- rownames(sign_OP50.yes_OP50.no)
+sign_OP50.yes_OP50.no <- cbind(sign_OP50.yes_OP50.no, WBgeneID)
+sign_OP50.yes_OP50.no <- as.data.frame(sign_OP50.yes_OP50.no)
+
+####################
+# make these too?
+Up_CeMbio.yes_CeMbio.no
+Down_CeMbio.yes_CeMbio.no
+Up_CeMbio.yes_OP50.yes
+Down_CeMbio.yes_OP50.yes
+Up_CeMbio.no_OP50.no
+Down_CeMbio.no_OP50.no
+Up_OP50.yes_OP50.no
+Down_OP50.yes_OP50.no
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
-changing_diet
-changing_exposure
-
-changing_diet1
-changing_exposure1
-changing_interaction1
-
-
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
-changing_interaction1 <- biomaRt::getBM(
+changing_all_genes <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
-  value = changing_interaction1$WBgeneID,
+  value = changing_all_genes$WBgeneID,
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(changing_interaction1, by = c("wbps_gene_id" = "WBgeneID"))
+) %>% right_join(changing_all_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
-changing_interaction1 <- changing_interaction1 %>% rename(WBgeneID = "wbps_gene_id")
+changing_all_genes <- changing_all_genes %>% rename(WBgeneID = "wbps_gene_id")
 
-write_csv(changing_interaction1, file = "03_output/intestine/changing_interaction1_sets.csv")
+write_csv(changing_all_genes, file = "03_output/intestine/changing_all_genes_sets.csv")
 ```
 
 
