@@ -725,20 +725,18 @@ Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
-changing_all_genes <- biomaRt::getBM(
+sign_OP50.yes_OP50.no <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
-  value = changing_all_genes$WBgeneID,
+  value = sign_OP50.yes_OP50.no$WBgeneID,
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(changing_all_genes, by = c("wbps_gene_id" = "WBgeneID"))
+) %>% right_join(sign_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-changing_all_genes <- changing_all_genes %>% rename(WBgeneID = "wbps_gene_id")
+sign_OP50.yes_OP50.no <- sign_OP50.yes_OP50.no %>% rename(WBgeneID = "wbps_gene_id")
 
-write_csv(changing_all_genes, file = "03_output/intestine/changing_all_genes_sets.csv")
+write_csv(sign_OP50.yes_OP50.no, file = "03_output/intestine/sign_OP50.yes_OP50.no_sets.csv")
 ```
 
-
-##### havent updated #####
 
 Perform gene ontology
 ```{r}
@@ -759,32 +757,27 @@ phenotype = ea.fetch_dictionary('phenotype')
 go = ea.fetch_dictionary('go')
 ```
 ```{python}
-Up_in_Yes_int_CeMbio = pd.read_csv('03_output/Up_in_Yes.int.CeMbio_sets.csv')
-Up_in_Yes_int_OP50 = pd.read_csv('03_output/Up_in_Yes.int.OP50_sets.csv')
-Down_in_Yes_int_CeMbio = pd.read_csv('03_output/Down_in_Yes.int.CeMbio_sets.csv')
-Down_in_Yes_int_OP50 = pd.read_csv('03_output/Down_in_Yes.int.OP50_sets.csv')
+changing_all_genes=pd.read_csv('03_output/intestine/changing_all_genes_sets.csv')
+changing_diet_genes=pd.read_csv('03_output/intestine/changing_diet_genes_sets.csv')
+changing_exposure_genes=pd.read_csv('03_output/intestine/changing_exposure_genes_sets.csv')
 
-Up_in_CeMbio_int_Yes = pd.read_csv('03_output/Up_in_CeMbio.int.Yes_sets.csv')
-Up_in_CeMbio_int_No = pd.read_csv('03_output/Up_in_CeMbio.int.No_sets.csv')
-Down_in_CeMbio_int_Yes = pd.read_csv('03_output/Down_in_CeMbio.int.Yes_sets.csv')
-Down_in_CeMbio_int_No = pd.read_csv('03_output/Down_in_CeMbio.int.No_sets.csv')
+###############################
+sign_CeMbio_yes_CeMbio_no=pd.read_csv('03_output/intestine/sign_CeMbio.yes_CeMbio.no_sets.csv')
+sign_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/sign_CeMbio.yes_OP50.yes_sets.csv')
+sign_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/sign_CeMbio.no_OP50.no_sets.csv')
+sign_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/sign_OP50.yes_OP50.no_sets.csv')
 ```
 ```{python}
-one = Up_in_Yes_int_CeMbio['WBgeneID']
-two = Up_in_Yes_int_OP50['WBgeneID']
-three = Down_in_Yes_int_CeMbio['WBgeneID']
-four = Down_in_Yes_int_OP50['WBgeneID']
-PA14_background_set = pd.DataFrame(pd.concat([one, two, three, four], ignore_index=True))
+one = sign_OP50_yes_OP50_no['WBgeneID']
+two = sign_CeMbio_yes_CeMbio_no['WBgeneID']
+PA14_background_set = pd.DataFrame(pd.concat([one, two], ignore_index=True))
+PA14_background_set.to_csv('03_output/intestine/PA14_background_set.csv', index=False)
 
-PA14_background_set.to_csv('03_output/PA14_background_set.csv', index=False)
 
-five = Up_in_CeMbio_int_Yes['WBgeneID']
-six = Up_in_CeMbio_int_No['WBgeneID']
-seven = Down_in_CeMbio_int_Yes['WBgeneID'] 
-eight = Down_in_CeMbio_int_No['WBgeneID']
-Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([five, six, seven, eight], ignore_index=True)})
-
-Diet_background_set.to_csv('03_output/Diet_background_set.csv', index=False)
+three = sign_CeMbio_no_OP50_no['WBgeneID']
+four = sign_CeMbio_yes_OP50_yes['WBgeneID']
+Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([three, four], ignore_index=True)})
+Diet_background_set.to_csv('03_output/intestine/Diet_background_set.csv', index=False)
 ```
 ```{python}
 frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
@@ -792,25 +785,27 @@ frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
 PA14_background_set
 Diet_background_set
 
-Up_in_Yes_int_CeMbio
-Up_in_Yes_int_OP50
-Down_in_Yes_int_CeMbio
-Down_in_Yes_int_OP50
+changing_all_genes
+changing_diet_genes
+changing_exposure_genes
 
-Up_in_CeMbio_int_Yes
-Up_in_CeMbio_int_No
-Down_in_CeMbio_int_Yes
-Down_in_CeMbio_int_No
+sign_CeMbio_yes_CeMbio_no
+sign_CeMbio_yes_OP50_yes
+sign_CeMbio_no_OP50_no
+sign_OP50_yes_OP50_no
 ###############################
-
+# original code
 result = {}
 for analysis, dictionary in frames.items():
-  result[analysis] = ea.enrichment_analysis(Up_in_Yes_int_CeMbio.WBgeneID, dictionary[dictionary.wbid.isin(PA14_background_set.WBgeneID)], show=True, alpha=10**-1)
+  result[analysis] = ea.enrichment_analysis(changing_exposure_genes.WBgeneID, dictionary, show=True, alpha=10**-1)
+
+
+# compare to the generated background set 
+#result = {}
+#for analysis, dictionary in frames.items():
+#  result[analysis] = ea.enrichment_analysis(sign_CeMbio_yes_CeMbio_no.WBgeneID, dictionary[dictionary.wbid.isin(PA14_background_set.WBgeneID)], show=True, alpha=10**-1)
   
-result = {}
-for analysis, dictionary in frames.items():
-  result[analysis] = ea.enrichment_analysis(Up_in_CeMbio_int_No.WBgeneID, dictionary[dictionary.wbid.isin(Diet_background_set.WBgeneID)], show=True, alpha=10**-1)  
-
+  
 # make the figure in the paper:
 fig, ax = plt.subplots(nrows=3, figsize=(8, 10), facecolor='white')
 i= 0
@@ -836,54 +831,44 @@ for t, r in result.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/Up_in_Yes_int_CeMbio_Enrichment_Results-background.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results = result["go"]
-results.to_csv('03_output/Results-Up_in_Yes_int_CeMbio-comparison.csv', index=False)
+results.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison.csv', index=False)
 ```
-
 
 Read in GO results from the comparisons within groups
 ```{r}
-# GO results
-Down.in.CeMbio.int.No_comparison <- read.csv2("03_output/Results-Down_in_CeMbio_int_No-comparison.csv", header = TRUE, sep = ",") %>% arrange(logQ)
-
-Down.in.CeMbio.int.Yes_comparison <- read.csv2("03_output/Results-Down_in_CeMbio_int_Yes-comparison.csv", header = TRUE, sep = ",")
-
-Up.in.CeMbio.int.No_comparison <- read.csv2("03_output/Results-Up_in_CeMbio_int_No-comparison.csv", header = TRUE, sep = ",")
-
-Up.in.CeMbio.int.Yes_comparison <- read.csv2("03_output/Results-Up_in_CeMbio_int_Yes-comparison.csv", header = TRUE, sep = ",")
+sign_CeMbio_yes_CeMbio_no
+sign_CeMbio_yes_OP50_yes
+sign_CeMbio_no_OP50_no
+sign_OP50_yes_OP50_no
 
 
 # GO results
-Down.in.Yes.int.CeMbio_comparison <- read.csv2("03_output/Results-Down_in_Yes_int_CeMbio-comparison.csv", header = TRUE, sep = ",")
+sign_CeMbio_yes_CeMbio_no_comparison <- read.csv2("03_output/intestine/Results-sign_CeMbio_yes_CeMbio_no-comparison.csv", header = TRUE, sep = ",") %>% arrange(logQ)
 
-Down.in.Yes.int.OP50_comparison <- read.csv2("03_output/Results-Down_in_Yes_int_OP50-comparison.csv", header = TRUE, sep = ",")
+sign_CeMbio_yes_OP50_yes_comparison <- read.csv2("03_output/intestine/Results-sign_CeMbio_yes_OP50_yes-comparison.csv", header = TRUE, sep = ",") %>% arrange(logQ)
 
-Up.in.Yes.int.CeMbio_comparison <- read.csv2("03_output/Results-Up_in_Yes_int_CeMbio-comparison.csv", header = TRUE, sep = ",")
+sign_CeMbio_no_OP50_no_comparison <- read.csv2("03_output/intestine/Results-sign_CeMbio_no_OP50_no-comparison.csv", header = TRUE, sep = ",") %>% arrange(logQ)
 
-Up.in.Yes.int.OP50_comparison <- read.csv2("03_output/Results-Up_in_Yes_int_OP50-comparison.csv", header = TRUE, sep = ",")
+sign_OP50_yes_OP50_no_comparison <- read.csv2("03_output/intestine/Results-sign_OP50_yes_OP50_no-comparison.csv", header = TRUE, sep = ",") %>% arrange(logQ)
 ```
 
+### this still needs tweaking ###
 Plot the GO comparisons
 ```{r}
 library(ggplot2)
 
-Down.in.CeMbio.int.No_comparison
-Down.in.CeMbio.int.Yes_comparison
-Up.in.CeMbio.int.No_comparison
-Up.in.CeMbio.int.Yes_comparison
-
-Down.in.Yes.int.CeMbio_comparison
-Down.in.Yes.int.OP50_comparison
-Up.in.Yes.int.CeMbio_comparison
-Up.in.Yes.int.OP50_comparison
-
+sign_CeMbio_yes_CeMbio_no_comparison
+sign_CeMbio_yes_OP50_yes_comparison
+sign_CeMbio_no_OP50_no_comparison
+sign_OP50_yes_OP50_no_comparison
 
 # save plot as a .png
-png("03_output/GO_Up.in.Yes.int.OP50_comparison.png")
-Up.in.Yes.int.OP50_comparison %>% top_n(10, logQ) %>%
+png("03_output/intestine/GO_Usign_CeMbio_yes_CeMbio_no_comparison.png")
+sign_CeMbio_yes_CeMbio_no_comparison %>% top_n(10, logQ) %>%
 ggplot(aes(x = reorder(Term, desc(logQ)), y = logQ)) +
   geom_bar(stat = "identity", fill = "#808080") +
   coord_flip() +
@@ -900,46 +885,37 @@ creat an upset plot
 library(UpSetR)
 library(ComplexHeatmap)
 
+changing_all_genes
+changing_diet_genes
+changing_exposure_genes
 
-changing_diet
-changing_exposure
+changing_all_genes <- read.csv2("03_output/intestine/changing_all_genes_sets.csv", header = TRUE, sep = ",")
+changing_diet_genes <- read.csv2("03_output/intestine/changing_diet_genes_sets.csv", header = TRUE, sep = ",")
+changing_exposure_genes <- read.csv2("03_output/intestine/changing_exposure_genes_sets.csv", header = TRUE, sep = ",")
+########################
 
-changing_diet1
-changing_exposure1
-changing_interaction1
+sign_CeMbio.yes_CeMbio.no
+sign_CeMbio.yes_OP50.yes
+sign_CeMbio.no_OP50.no
+sign_OP50.yes_OP50.no
 
+sign_CeMbio.yes_CeMbio.no <- read.csv2("03_output/intestine/sign_CeMbio.yes_CeMbio.no_sets.csv", header = TRUE, sep = ",")
 
-changing_diet <- read.csv2("03_output/intestine/changing_diet_sets.csv", header = TRUE, sep = ",")
+sign_CeMbio.yes_OP50.yes <- read.csv2("03_output/intestine/sign_CeMbio.yes_OP50.yes_sets.csv", header = TRUE, sep = ",")
 
-changing_exposure <- read.csv2("03_output/intestine/changing_exposure_sets.csv", header = TRUE, sep = ",")
+sign_CeMbio.no_OP50.no <- read.csv2("03_output/intestine/sign_CeMbio.no_OP50.no_sets.csv", header = TRUE, sep = ",")
 
-changing_diet1 <- read.csv2("03_output/intestine/changing_diet1_sets.csv", header = TRUE, sep = ",")
-
-changing_exposure1 <- read.csv2("03_output/intestine/changing_exposure1_sets.csv", header = TRUE, sep = ",")
-
-changing_interaction1 <- read.csv2("03_output/intestine/changing_interaction1_sets.csv", header = TRUE, sep = ",")
+sign_OP50.yes_OP50.no <- read.csv2("03_output/intestine/sign_OP50.yes_OP50.no_sets.csv", header = TRUE, sep = ",")
 ```
 ```{r}
-lt <- list(changing_diet = changing_diet$WBgeneID, 
-           changing_exposure = changing_exposure$WBgeneID, 
-           changing_diet1 = changing_diet1$WBgeneID, 
-           changing_exposure1 = changing_exposure1$WBgeneID, 
-           changing_interaction1 = changing_interaction1$WBgeneID)
+lt <- list(changing_all_genes = changing_all_genes$WBgeneID, 
+           changing_diet_genes = changing_diet_genes$WBgeneID, 
+           changing_exposure_genes = changing_exposure_genes$WBgeneID)
 
-lt <- list(changing_diet = changing_diet$WBgeneID, 
-           changing_diet1 = changing_diet1$WBgeneID)
-
-lt <- list(changing_exposure = changing_exposure$WBgeneID, 
-           changing_exposure1 = changing_exposure1$WBgeneID)
-
-
-lt <- list(Up_in_CeMbio.int.No = Up_in_CeMbio.int.No$WBgeneID, Up_in_CeMbio.int.Yes = Up_in_CeMbio.int.Yes$WBgeneID, Down_in_CeMbio.int.No = Down_in_CeMbio.int.No$WBgeneID, Down_in_CeMbio.int.Yes = Down_in_CeMbio.int.Yes$WBgeneID)
-
-
-lt <- list(Up_in_CeMbio.int = Up_in_CeMbio.int$WBgeneID, 
-           Down_in_CeMbio.int = Down_in_CeMbio.int$WBgeneID, 
-           Up_in_Yes.int = Up_in_Yes.int$WBgeneID, 
-           Down_in_Yes.int = Down_in_Yes.int$WBgeneID)
+lt <- list(CeMbio.yes_CeMbio.no = sign_CeMbio.yes_CeMbio.no$WBgeneID, 
+           CeMbio.yes_OP50.yes = sign_CeMbio.yes_OP50.yes$WBgeneID,
+           CeMbio.no_OP50.no = sign_CeMbio.no_OP50.no$WBgeneID,
+           OP50.yes_OP50.no = sign_OP50.yes_OP50.no$WBgeneID)
 
 str(lt)
 list_to_matrix(lt)
@@ -962,26 +938,30 @@ plot_t <- UpSet(m1,
       comb_col = c("blue", "lightblue", "black")[comb_degree(m1)],
       left_annotation = upset_left_annotation(m1))
 
+# save plot as a .png
+png("03_output/intestine/Upset_plot_group_comparisons.png")
 plot_t
-```
 
-GO analysis 
-```{r}
-BiocManager::install("PANTHER.db")
-
-browseVignettes("PANTHER.db")
+dev.off()
 ```
 
 -----------------------------------------------------
 
 MA plot
 ```{r}
-install.packages("readxl")
+#install.packages("ggpubr")
+library(ggpubr)
+#install.packages("readxl")
 library(readxl)
 
-#When plotMA is called with a data.frame, plotMA expects the data frame to have 3 columns, two numeric ones for mean and log fold change, and a logical one for significance.
+reslfc_CeMbio.yes_CeMbio.no
+reslfc_CeMbio.yes_OP50.yes
+reslfc_CeMbio.no_OP50.no 
+reslfc_OP50.yes_OP50.no
+
 
 write.csv(resLFC_exposure.intestine, file = "03_output/resLFC_exposure.intestine.csv")
+
 write.csv(resLFC_diet.intestine, file = "03_output/resLFC_diet.intestine.csv")
 clec_IDs <- read_excel("03_output/clec_WBgeneIDs.xlsx", sheet=3)
 clec_IDs <- as.data.frame(clec_IDs)
