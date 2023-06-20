@@ -227,11 +227,6 @@ reslfc_OP50.yes_OP50.no <- lfcShrink(dds, contrast = c("group", "OP50_yes", "OP5
 Exploring and exporting results
 MA plot
 ```{r}
-reslfc_CeMbio.yes_CeMbio.no 
-reslfc_CeMbio.yes_OP50.yes
-reslfc_CeMbio.no_OP50.no
-reslfc_OP50.yes_OP50.no
-
 # save plot as a .png
 png("03_output/intestine/MA plot - CeMbio.yes.vs.CeMbio.no.png")
 # Reset parameters
@@ -291,7 +286,6 @@ par(cex.lab=2)
 
 dev.off()
 ```
-
 
 
 Sample distance matrix
@@ -358,53 +352,38 @@ Volcano plots
 Display the fold change against the p-value
 ```{r}
 #Identify significantly changing genes
-significantLFC.diet <- rbind(subset(reslfc_diet, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_diet, padj < 0.1 & log2FoldChange < -0.5))
+significantLFC.1 <- rbind(subset(reslfc_CeMbio.yes_CeMbio.no, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_CeMbio.yes_CeMbio.no, padj < 0.1 & log2FoldChange < -0.5))
 
-significant_points_to_plot.diet <-reslfc_diet[which(rownames(reslfc_diet) %in% rownames(significantLFC.diet)),] 
+significantLFC.2 <- rbind(subset(reslfc_CeMbio.yes_OP50.yes, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_CeMbio.yes_OP50.yes, padj < 0.1 & log2FoldChange < -0.5))
 
+significantLFC.3 <- rbind(subset(reslfc_CeMbio.no_OP50.no, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_CeMbio.no_OP50.no, padj < 0.1 & log2FoldChange < -0.5))
 
+significantLFC.4 <- rbind(subset(reslfc_OP50.yes_OP50.no, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_OP50.yes_OP50.no, padj < 0.1 & log2FoldChange < -0.5))
 
-significantLFC.exposure <- rbind(subset(reslfc_exposure, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_exposure, padj < 0.1 & log2FoldChange < -0.5))
+############################
+significant_points_to_plot.1 <-reslfc_CeMbio.yes_CeMbio.no[which(rownames(reslfc_CeMbio.yes_CeMbio.no) %in% rownames(significantLFC.1)),] 
 
-significant_points_to_plot.exposure <-reslfc_exposure[which(rownames(reslfc_exposure) %in% rownames(significantLFC.exposure)),] 
-########################################
+significant_points_to_plot.2 <-reslfc_CeMbio.yes_OP50.yes[which(rownames(reslfc_CeMbio.yes_OP50.yes) %in% rownames(significantLFC.2)),]
 
-significantLFC.diet1 <- rbind(subset(reslfc_diet1, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_diet1, padj < 0.1 & log2FoldChange < -0.5))
+significant_points_to_plot.3 <-reslfc_CeMbio.no_OP50.no[which(rownames(reslfc_CeMbio.no_OP50.no) %in% rownames(significantLFC.3)),]
 
-significant_points_to_plot.diet1 <-reslfc_diet1[which(rownames(reslfc_diet1) %in% rownames(significantLFC.diet1)),] 
-
-
-
-significantLFC.exposure1 <- rbind(subset(reslfc_exposure1, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_exposure1, padj < 0.1 & log2FoldChange < -0.5))
-
-significant_points_to_plot.exposure1 <-reslfc_exposure1[which(rownames(reslfc_exposure1) %in% rownames(significantLFC.exposure1)),] 
-
-
-
-significantLFC.interaction1 <- rbind(subset(reslfc_interaction1, padj < 0.1 & log2FoldChange > 0.5), subset(reslfc_interaction1, padj < 0.1 & log2FoldChange < -0.5))
-
-significant_points_to_plot.interaction1 <-reslfc_interaction1[which(rownames(reslfc_interaction1) %in% rownames(significantLFC.interaction1)),] 
-########################################
-
-
+significant_points_to_plot.4 <-reslfc_OP50.yes_OP50.no[which(rownames(reslfc_OP50.yes_OP50.no) %in% rownames(significantLFC.4)),]
 
 
 # We will set the top limit of the plot as 100. Need to find all the points that exceed that measure
-maxedout.diet <- subset(reslfc_diet, padj < 10e-100)
-maxedout.exposure <- subset(reslfc_exposure, padj < 10e-100)
-
-maxedout.diet1 <- subset(reslfc_diet1, padj < 10e-100)
-maxedout.exposure1 <- subset(reslfc_exposure, padj < 10e-100)
-maxedout.interaction1 <- subset(reslfc_interaction1, padj < 10e-100)
+maxedout.1 <- subset(reslfc_CeMbio.yes_CeMbio.no, padj < 10e-100)
+maxedout.2 <- subset(reslfc_CeMbio.yes_OP50.yes, padj < 10e-100)
+maxedout.3 <- subset(reslfc_CeMbio.no_OP50.no, padj < 10e-100)
+maxedout.4 <- subset(reslfc_OP50.yes_OP50.no, padj < 10e-100)
 
 
-
-plot(reslfc_diet$log2FoldChange, -log10(reslfc_diet$padj),
-     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
+png("03_output/intestine/Volcano plot - CeMbio.yes_CeMbio.no.png")
+plot(reslfc_CeMbio.yes_CeMbio.no$log2FoldChange, -log10(reslfc_CeMbio.yes_CeMbio.no$padj),
+     main="Effect of exposure to PA14 on CeMbio fed worms", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
 # Add points
-points(maxedout.diet$log2FoldChange, rep(102, length(maxedout.diet$log2FoldChange)), 
+points(maxedout.1$log2FoldChange, rep(102, length(maxedout.1$log2FoldChange)),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-points(significant_points_to_plot.diet$log2FoldChange, -log10(significant_points_to_plot.diet$padj),
+points(significant_points_to_plot.1$log2FoldChange, -log10(significant_points_to_plot.1$padj),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
 # Add lines
 abline(v=0, col = "blue")
@@ -412,31 +391,16 @@ abline(v=0.5, col = "blue", lty = "dashed")
 abline(v=-0.5, col = "blue", lty = "dashed")
 abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
-
-
-
-plot(reslfc_exposure$log2FoldChange, -log10(reslfc_exposure$padj),
-       main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
-# Add points
-points(maxedout.exposure$log2FoldChange, rep(102, length(maxedout.exposure$log2FoldChange)), 
-       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-
-points(significant_points_to_plot.exposure$log2FoldChange, -log10(significant_points_to_plot.exposure$padj),
-       pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-# Add lines
-abline(v=0, col = "blue")
-abline(v=0.5, col = "blue", lty = "dashed")
-abline(v=-0.5, col = "blue", lty = "dashed")
-abline(h=-log10(0.1), col = "blue", lty = "dashed")
+dev.off()
 ```
-
 ```{r}
-plot(reslfc_diet1$log2FoldChange, -log10(reslfc_diet1$padj),
-     main="Volcano plot - diet (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
+png("03_output/intestine/Volcano plot - CeMbio.yes_OP50.yes.png")
+plot(reslfc_CeMbio.yes_OP50.yes$log2FoldChange, -log10(reslfc_CeMbio.yes_OP50.yes$padj),
+     main="Effect of diet during exposure to PA14", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
 # Add points
-points(maxedout.diet1$log2FoldChange, rep(102, length(maxedout.diet1$log2FoldChange)), 
+points(maxedout.2$log2FoldChange, rep(102, length(maxedout.2$log2FoldChange)),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-points(significant_points_to_plot.diet1$log2FoldChange, -log10(significant_points_to_plot.diet1$padj),
+points(significant_points_to_plot.2$log2FoldChange, -log10(significant_points_to_plot.2$padj),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
 # Add lines
 abline(v=0, col = "blue")
@@ -444,16 +408,16 @@ abline(v=0.5, col = "blue", lty = "dashed")
 abline(v=-0.5, col = "blue", lty = "dashed")
 abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
-
-
-
-plot(reslfc_exposure1$log2FoldChange, -log10(reslfc_exposure1$padj),
-       main="Volcano plot - exposure (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+dev.off()
+```
+```{r}
+png("03_output/intestine/Volcano plot - CeMbio.no_OP50.no.png")
+plot(reslfc_CeMbio.no_OP50.no$log2FoldChange, -log10(reslfc_CeMbio.no_OP50.no$padj),
+     main="Effect of diet (CeMbio vs OP50)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
 # Add points
-points(maxedout.exposure1$log2FoldChange, rep(102, length(maxedout.exposure1$log2FoldChange)), 
+points(maxedout.3$log2FoldChange, rep(102, length(maxedout.3$log2FoldChange)),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-
-points(significant_points_to_plot.exposure1$log2FoldChange, -log10(significant_points_to_plot.exposure1$padj),
+points(significant_points_to_plot.3$log2FoldChange, -log10(significant_points_to_plot.3$padj),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
 # Add lines
 abline(v=0, col = "blue")
@@ -461,29 +425,32 @@ abline(v=0.5, col = "blue", lty = "dashed")
 abline(v=-0.5, col = "blue", lty = "dashed")
 abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
-
-
-
-plot(reslfc_interaction1$log2FoldChange, -log10(reslfc_interaction1$padj),
-       main="Volcano plot - interaction (int)", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 100), xlim = c(-15,15), col = "#00000030")
+dev.off()
+```
+```{r}
+png("03_output/intestine/Volcano plot - OP50.yes_OP50.no.png")
+plot(reslfc_OP50.yes_OP50.no$log2FoldChange, -log10(reslfc_OP50.yes_OP50.no$padj),
+     main="Effect of exposure to PA14 on OP50 fed worms", xlab="Effect size: log2(fold-change)", ylab="-log10(adjusted p-value)", pch=20, cex = 0.75, ylim = c(0, 20), xlim = c(-15,15), col = "#00000030")
 # Add points
-points(maxedout.interaction1$log2FoldChange, rep(102, length(maxedout.interaction1$log2FoldChange)), 
+points(maxedout.4$log2FoldChange, rep(102, length(maxedout.4$log2FoldChange)),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
-
-points(significant_points_to_plot.interaction1$log2FoldChange, -log10(significant_points_to_plot.interaction1$padj),
+points(significant_points_to_plot.4$log2FoldChange, -log10(significant_points_to_plot.4$padj),
        pch=20, cex = 0.75, ylim = c(0, 100), col = "red")
 # Add lines
 abline(v=0, col = "blue")
 abline(v=0.5, col = "blue", lty = "dashed")
 abline(v=-0.5, col = "blue", lty = "dashed")
 abline(h=-log10(0.1), col = "blue", lty = "dashed")
+
+dev.off()
 ```
 
 
 ```{r}
+png("03_output/intestine/PCA.png")
 plotPCA(rld, intgroup=c("diet", "exposure", "rep"))
 
-plotPCA(rld1, intgroup=c("diet", "exposure", "rep"))
+dev.off()
 ```
 
 
@@ -505,14 +472,12 @@ Check contamination
 # hlh-2 = WBGene00001949
 # rab-3 = WBGene00004267
 
-plotCounts(dds1, gene=which(rownames(reslfc_diet1) == "WBGene00003515"), intgroup="diet")
+reslfc_CeMbio.yes_CeMbio.no
+reslfc_CeMbio.yes_OP50.yes
+reslfc_CeMbio.no_OP50.no
+reslfc_OP50.yes_OP50.no 
 
-reslfc_diet # "CeMbio", "OP50"
-reslfc_exposure # "yes", "no"
-
-reslfc_diet1 # "CeMbio", "OP50"
-reslfc_exposure1 # "yes", "no"
-reslfc_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+plotCounts(dds, gene=which(rownames(reslfc_CeMbio.yes_CeMbio.no) == "WBGene00003515"), intgroup="group")
 ```
 
 
@@ -520,101 +485,97 @@ Get list of significantly changing genes
 We will use the set of significantly changing genes from our variance shrunken analysis
 ```{r}
 # reference levels = diet: OP50, and exposure: no
-reslfc_diet # "CeMbio", "OP50" = the diet effect for 'no' exposure
-reslfc_exposure # "yes", "no" = the exposure effect for 'OP50' diet
-
-reslfc_diet1 # "CeMbio", "OP50" = the diet effect for 'no' exposure
-reslfc_exposure1 # "yes", "no" = the exposure effect for 'OP50' diet
-reslfc_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes" = the exposure effect for 'CeMbio' diet 
-
-
 # Select the significant subset of genes that are up-regulated and down-regulated
 
-#counts_int <- counts[, grep("intestine", colnames(counts))] example
-
-Up_diet_effect <- subset(reslfc_diet, padj < 0.1 & log2FoldChange > 0.5)
-Up_diet_effect <- Up_diet_effect[order(Up_diet_effect$padj),]
-
-Down_diet_effect <- subset(reslfc_diet, padj < 0.1 & log2FoldChange > -0.5)
-Down_diet_effect <- Down_diet_effect[order(Down_diet_effect$padj),]
+reslfc_CeMbio.yes_CeMbio.no
+reslfc_CeMbio.yes_OP50.yes
+reslfc_CeMbio.no_OP50.no
+reslfc_OP50.yes_OP50.no 
 
 
-Up_exposure_effect <- subset(reslfc_exposure, padj < 0.1 & log2FoldChange > 0.5)
-Up_exposure_effect <- Up_exposure_effect[order(Up_exposure_effect$padj),]
+Up_CeMbio.yes_CeMbio.no <- subset(reslfc_CeMbio.yes_CeMbio.no, padj < 0.1 & log2FoldChange > 0.5)
+Up_CeMbio.yes_CeMbio.no <- Up_CeMbio.yes_CeMbio.no[order(Up_CeMbio.yes_CeMbio.no$padj),]
 
-Down_exposure_effect <- subset(reslfc_exposure, padj < 0.1 & log2FoldChange > -0.5)
-Down_exposure_effect <- Down_exposure_effect[order(Down_exposure_effect$padj),]
+Down_CeMbio.yes_CeMbio.no <- subset(reslfc_CeMbio.yes_CeMbio.no, padj < 0.1 & log2FoldChange > -0.5)
+Down_CeMbio.yes_CeMbio.no <- Down_CeMbio.yes_CeMbio.no[order(Down_CeMbio.yes_CeMbio.no$padj),]
+
 #################################
-Up_diet_effect1 <- subset(reslfc_diet1, padj < 0.1 & log2FoldChange > 0.5)
-Up_diet_effect1 <- Up_diet_effect1[order(Up_diet_effect1$padj),]
+Up_CeMbio.yes_OP50.yes <- subset(reslfc_CeMbio.yes_OP50.yes, padj < 0.1 & log2FoldChange > 0.5)
+Up_CeMbio.yes_OP50.yes <- Up_CeMbio.yes_OP50.yes[order(Up_CeMbio.yes_OP50.yes$padj),]
 
-Down_diet_effect1 <- subset(reslfc_diet1, padj < 0.1 & log2FoldChange > -0.5)
-Down_diet_effect1 <- Down_diet_effect1[order(Down_diet_effect1$padj),]
+Down_CeMbio.yes_OP50.yes <- subset(reslfc_CeMbio.yes_OP50.yes, padj < 0.1 & log2FoldChange > -0.5)
+Down_CeMbio.yes_OP50.yes <- Down_CeMbio.yes_OP50.yes[order(Down_CeMbio.yes_OP50.yes$padj),]
 
+#################################
+Up_CeMbio.no_OP50.no <- subset(reslfc_CeMbio.no_OP50.no, padj < 0.1 & log2FoldChange > 0.5)
+Up_CeMbio.no_OP50.no <- Up_CeMbio.no_OP50.no[order(Up_CeMbio.no_OP50.no$padj),]
 
-Up_exposure_effect1 <- subset(reslfc_exposure1, padj < 0.1 & log2FoldChange > 0.5)
-Up_exposure_effect1 <- Up_exposure_effect1[order(Up_exposure_effect1$padj),]
+Down_CeMbio.no_OP50.no <- subset(reslfc_CeMbio.no_OP50.no, padj < 0.1 & log2FoldChange > -0.5)
+Down_CeMbio.no_OP50.no <- Down_CeMbio.no_OP50.no[order(Down_CeMbio.no_OP50.no$padj),]
 
-Down_exposure_effect1 <- subset(reslfc_exposure1, padj < 0.1 & log2FoldChange > -0.5)
-Down_exposure_effect1 <- Down_exposure_effect1[order(Down_exposure_effect1$padj),]
+#################################
+Up_OP50.yes_OP50.no <- subset(reslfc_OP50.yes_OP50.no, padj < 0.1 & log2FoldChange > 0.5)
+Up_OP50.yes_OP50.no <- Up_OP50.yes_OP50.no[order(Up_OP50.yes_OP50.no$padj),]
 
-
-Up_interaction_effect1 <- subset(reslfc_interaction1, padj < 0.1 & log2FoldChange > 0.5)
-Up_interaction_effect1 <- Up_interaction_effect1[order(Up_interaction_effect1$padj),]
-
-Down_interaction_effect1 <- subset(reslfc_interaction1, padj < 0.1 & log2FoldChange > -0.5)
-Down_interaction_effect1 <- Down_interaction_effect1[order(Down_interaction_effect1$padj),]
+Down_OP50.yes_OP50.no <- subset(reslfc_OP50.yes_OP50.no, padj < 0.1 & log2FoldChange > -0.5)
+Down_OP50.yes_OP50.no <- Down_OP50.yes_OP50.no[order(Down_OP50.yes_OP50.no$padj),]
 ```
 
 
 Save these lists to output files
 ```{r}
-write(rownames(Up_diet_effect), file = "03_output/intestine/Up_diet_effect.txt", sep = "\n")
-write(rownames(Down_diet_effect), file = "03_output/intestine/Down_diet_effect.txt", sep = "\n")
+Up_CeMbio.yes_CeMbio.no
+Down_CeMbio.yes_CeMbio.no
+Up_CeMbio.yes_OP50.yes
+Down_CeMbio.yes_OP50.yes
+Up_CeMbio.no_OP50.no
+Down_CeMbio.no_OP50.no
+Up_OP50.yes_OP50.no
+Down_OP50.yes_OP50.no
 
-write(rownames(Up_exposure_effect), file = "03_output/intestine/Up_exposure_effect.txt", sep = "\n")
-write(rownames(Down_exposure_effect), file = "03_output/intestine/Down_exposure_effect.txt", sep = "\n")
-###############################
-write(rownames(Up_diet_effect1), file = "03_output/intestine/Up_diet_effect1.txt", sep = "\n")
-write(rownames(Down_diet_effect1), file = "03_output/intestine/Down_diet_effect1.txt", sep = "\n")
+write(rownames(Up_CeMbio.yes_CeMbio.no), file = "03_output/intestine/Up_CeMbio.yes_CeMbio.no.txt", sep = "\n")
+write(rownames(Down_CeMbio.yes_CeMbio.no), file = "03_output/intestine/Down_CeMbio.yes_CeMbio.no.txt", sep = "\n")
 
-write(rownames(Up_exposure_effect1), file = "03_output/intestine/Up_exposure_effect1.txt", sep = "\n")
-write(rownames(Down_exposure_effect1), file = "03_output/intestine/Down_exposure_effect1.txt", sep = "\n")
+write(rownames(Up_CeMbio.yes_OP50.yes), file = "03_output/intestine/Up_CeMbio.yes_OP50.yes.txt", sep = "\n")
+write(rownames(Down_CeMbio.yes_OP50.yes), file = "03_output/intestine/Down_CeMbio.yes_OP50.yes.txt", sep = "\n")
 
-write(rownames(Up_interaction_effect1), file = "03_output/intestine/Up_interaction_effect1.txt", sep = "\n")
-write(rownames(Down_interaction_effect1), file = "03_output/intestine/Down_interaction_effect1.txt", sep = "\n")
+write(rownames(Up_CeMbio.no_OP50.no), file = "03_output/intestine/Up_CeMbio.no_OP50.no.txt", sep = "\n")
+write(rownames(Down_CeMbio.no_OP50.no), file = "03_output/intestine/Down_CeMbio.no_OP50.no.txt", sep = "\n")
+
+write(rownames(Up_OP50.yes_OP50.no), file = "03_output/intestine/Up_OP50.yes_OP50.no.txt", sep = "\n")
+write(rownames(Down_OP50.yes_OP50.no), file = "03_output/intestine/Down_OP50.yes_OP50.no.txt", sep = "\n")
 ```
 
 
 make hierarchically clustered heatmaps of all changing genes 
 ```{r}
 # get differentially expressed genes
-res_diet # "CeMbio", "OP50"
-res_exposure # "yes", "no"
-
-res_diet1 # "CeMbio", "OP50"
-res_exposure1 # "yes", "no"
-res_interaction1 # "exposure_yes_vs_no", "dietCeMbio.exposureyes"
+res_CeMbio.yes_CeMbio.no
+res_CeMbio.yes_OP50.yes
+res_CeMbio.no_OP50.no
+res_OP50.yes_OP50.no
 
 
 #Subset each results table for just the differentially expressed genes:
-sign_diet <- subset(res_diet, padj < 0.05)
-dim(subset(res_diet, padj < 0.1))
-sign_exposure <- subset(res_exposure, padj < 0.05)
-dim(subset(res_exposure, padj < 0.1))
-####################################################
-sign_diet1 <- subset(res_diet1, padj < 0.05)
-dim(subset(res_diet1, padj < 0.1))
-sign_exposure1 <- subset(res_exposure1, padj < 0.05)
-dim(subset(res_exposure1, padj < 0.1))
-sign_interaction1 <- subset(res_interaction1, padj < 0.05)
-dim(subset(res_interaction1, padj < 0.1))
+sign_CeMbio.yes_CeMbio.no <- subset(res_CeMbio.yes_CeMbio.no, padj < 0.05)
+dim(subset(res_CeMbio.yes_CeMbio.no, padj < 0.1))
+
+sign_CeMbio.yes_OP50.yes <- subset(res_CeMbio.yes_OP50.yes, padj < 0.05)
+dim(subset(res_CeMbio.yes_OP50.yes, padj < 0.1))
+
+sign_CeMbio.no_OP50.no <- subset(res_CeMbio.no_OP50.no, padj < 0.05)
+dim(subset(res_CeMbio.no_OP50.no, padj < 0.1))
+
+sign_OP50.yes_OP50.no <- subset(res_OP50.yes_OP50.no, padj < 0.05)
+dim(subset(res_OP50.yes_OP50.no, padj < 0.1))
 
 
 #Determine how many genes were captured and merge them:
-changing_genes <- rbind(sign_diet, sign_exposure)
-changing_genes1 <- rbind(sign_diet1, sign_exposure1)
-changing_genes2 <- rbind(sign_diet1, sign_exposure1, sign_interaction1)
+changing_genes <- rbind(sign_CeMbio.yes_CeMbio.no, sign_CeMbio.yes_OP50.yes, sign_CeMbio.no_OP50.no, sign_OP50.yes_OP50.no)
+
+changing_exposure <- rbind(sign_CeMbio.yes_CeMbio.no, sign_OP50.yes_OP50.no)
+
+changing_diet <- rbind(sign_CeMbio.no_OP50.no, sign_CeMbio.yes_OP50.yes)
 
 
 dim(changing_genes)
@@ -622,57 +583,28 @@ length(unique(rownames(changing_genes)))
 
 # Get all r-stabilized log values of all the data:
 rdl_all <- assay(rlog(dds, blind=FALSE))
-rdl_all1 <- assay(rlog(dds1, blind=FALSE))
 
 #Subset just the changing genes:
-changing_lrt_rdl <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_genes))
-changing_diet <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_diet))
-changing_exposure <- subset(rdl_all, rownames(rdl_all) %in% rownames(sign_exposure))
-#########################################
-changing_lrt_rdl1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(changing_genes1))
-changing_lrt_rdl2 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(changing_genes2))
-changing_diet1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(sign_diet1))
-changing_exposure1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(sign_exposure1))
-changing_interaction1 <- subset(rdl_all1, rownames(rdl_all1) %in% rownames(sign_interaction1))
+changing_all_genes <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_genes))
+
+changing_exposure_genes <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_exposure))
+
+changing_diet_genes <- subset(rdl_all, rownames(rdl_all) %in% rownames(changing_diet))
 
 
 # Make sure it is in matrix form:
-class(changing_lrt_rdl)
-class(changing_diet)
-class(changing_exposure)
+class(changing_all_genes)
+class(changing_diet_genes)
+class(changing_exposure_genes)
 ```
 ```{r}
-changing_genes
-changing_diet
-changing_exposure
-
 # save plot as a .png
-png("03_output/intestine/Heatmap - diet.png")
+png("03_output/intestine/Heatmap - all genes.png")
 # Reset parameters
 par(mfrow=c(1,1))
 # Draw a heat map
 # Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
-p.diet <- pheatmap(changing_diet, 
-         scale="row", 
-         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
-         cluster_rows=FALSE, 
-         cluster_cols=TRUE, 
-         clustering_distance_rows = "euclidean", 
-         clustering_method = "complete",
-         #Rowv = NA,
-         #Colv = NA,
-         show_rownames = FALSE)
-
-dev.off()
-
-
-# save plot as a .png
-png("03_output/intestine/Heatmap - exposure.png")
-# Reset parameters
-par(mfrow=c(1,1))
-# Draw a heat map
-# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
-p.exposure <- pheatmap(changing_exposure, 
+pheatmap(changing_all_genes, 
          scale="row", 
          color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
          cluster_rows=FALSE, 
@@ -686,19 +618,13 @@ p.exposure <- pheatmap(changing_exposure,
 dev.off()
 ```
 ```{r}
-changing_genes1
-changing_genes2
-changing_diet1
-changing_exposure1
-changing_interaction1
-
 # save plot as a .png
-png("03_output/intestine/Heatmap - diet1.png")
+png("03_output/intestine/Heatmap - exposure genes.png")
 # Reset parameters
 par(mfrow=c(1,1))
 # Draw a heat map
 # Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
-p.diet1 <- pheatmap(changing_diet1, 
+pheatmap(changing_exposure_genes, 
          scale="row", 
          color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
          cluster_rows=FALSE, 
@@ -710,35 +636,15 @@ p.diet1 <- pheatmap(changing_diet1,
          show_rownames = FALSE)
 
 dev.off()
-
-
+```
+```{r}
 # save plot as a .png
-png("03_output/intestine/Heatmap - exposure1.png")
+png("03_output/intestine/Heatmap - diet genes.png")
 # Reset parameters
 par(mfrow=c(1,1))
 # Draw a heat map
 # Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
-p.exposure1 <- pheatmap(changing_exposure1, 
-         scale="row", 
-         color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
-         cluster_rows=FALSE, 
-         cluster_cols=TRUE, 
-         clustering_distance_rows = "euclidean", 
-         clustering_method = "complete",
-         #Rowv = NA,
-         #Colv = NA,
-         show_rownames = FALSE)
-
-dev.off()
-
-
-# save plot as a .png
-png("03_output/intestine/Heatmap - exposure1.png")
-# Reset parameters
-par(mfrow=c(1,1))
-# Draw a heat map
-# Scale by row, listed below as scale = "row". This is really important. It sets the mean of every row to 0 and the standard deviation of every row to 1:
-p.interaction1 <- pheatmap(changing_interaction1, 
+pheatmap(changing_diet_genes, 
          scale="row", 
          color = colorRampPalette(c("blue", "white", "red"), space = "Lab")(100),
          cluster_rows=FALSE, 
@@ -752,10 +658,6 @@ p.interaction1 <- pheatmap(changing_interaction1,
 dev.off()
 ```
 
-
-
-
-*stopped editing here 
 
 ############################ GO Analysis 
 
@@ -778,36 +680,23 @@ library(biomaRt)
 
 ```{r}
 # need to add a column of the WbGeneIDs 
-WBgeneID <- rownames(changing_diet)
-changing_diet <- cbind(changing_diet, WBgeneID)
-changing_diet <- as.data.frame(changing_diet)
+WBgeneID <- rownames(changing_all_genes)
+changing_all_genes <- cbind(changing_all_genes, WBgeneID)
+changing_all_genes <- as.data.frame(changing_all_genes)
 
-WBgeneID <- rownames(changing_exposure)
-changing_exposure <- cbind(changing_exposure, WBgeneID)
-changing_exposure <- as.data.frame(changing_exposure)
-##########################################
-WBgeneID <- rownames(changing_diet1)
-changing_diet1 <- cbind(changing_diet1, WBgeneID)
-changing_diet1 <- as.data.frame(changing_diet1)
+WBgeneID <- rownames(changing_diet_genes)
+changing_diet_genes <- cbind(changing_diet_genes, WBgeneID)
+changing_diet_genes <- as.data.frame(changing_diet_genes)
 
-WBgeneID <- rownames(changing_exposure1)
-changing_exposure1 <- cbind(changing_exposure1, WBgeneID)
-changing_exposure1 <- as.data.frame(changing_exposure1)
+WBgeneID <- rownames(changing_exposure_genes)
+changing_exposure_genes <- cbind(changing_exposure_genes, WBgeneID)
+changing_exposure_genes <- as.data.frame(changing_exposure_genes)
 
-WBgeneID <- rownames(changing_interaction1)
-changing_interaction1 <- cbind(changing_interaction1, WBgeneID)
-changing_interaction1 <- as.data.frame(changing_interaction1)
+#####################
 
-########################################## (old names)
-Up_in_Yes.int.CeMbio
-Up_in_Yes.int.OP50
-Down_in_Yes.int.CeMbio
-Down_in_Yes.int.OP50
-
-Up_in_CeMbio.int.Yes
-Up_in_CeMbio.int.No
-Down_in_CeMbio.int.Yes
-Down_in_CeMbio.int.No
+changing_genes <- rbind(sign_CeMbio.yes_CeMbio.no, sign_CeMbio.yes_OP50.yes, sign_CeMbio.no_OP50.no, sign_OP50.yes_OP50.no)
+changing_exposure <- rbind(sign_CeMbio.yes_CeMbio.no, sign_OP50.yes_OP50.no)
+changing_diet <- rbind(sign_CeMbio.no_OP50.no, sign_CeMbio.yes_OP50.yes)
 ```
 
 Get filternames from https://parasite.wormbase.org/biomart/martview
