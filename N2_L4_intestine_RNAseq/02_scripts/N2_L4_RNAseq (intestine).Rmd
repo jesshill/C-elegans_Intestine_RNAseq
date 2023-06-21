@@ -999,7 +999,7 @@ head(clec_IDs)
 ```
 ```{r}
 # Save the plot
-png("03_output/intestine/MA plot - CeMbio.no_OP50.no_clecs.png")
+png("03_output/intestine/MA plot - OP50.yes_OP50.no_clecs.png")
 # Reset plotting parameters to their default values
 par(mfrow=c(1,1))
 # plot the data
@@ -1024,7 +1024,30 @@ ggmaplot(reslfc_OP50.yes_OP50.no_data_sets,
                size = 10/3)
 dev.off()
 ```
+```{r}
+reslfc_CeMbio.yes_CeMbio.no_data_sets
+reslfc_CeMbio.yes_OP50.yes_data_sets
+reslfc_CeMbio.no_OP50.no_data_sets
+reslfc_OP50.yes_OP50.no_data_sets
 
+# Save the plot
+png("03_output/intestine/MA plot - CeMbio.yes_CeMbio.no_top20.png")
+# Reset plotting parameters to their default values
+par(mfrow=c(1,1))
+# plot the data
+ggmaplot(reslfc_CeMbio.yes_CeMbio.no_data_sets, 
+         main = "CeMbio.yes vs CeMbio.no",
+   fdr = 0.05, fc = 1.5, size = 0.4,
+   palette = c("#B31B21", "#1465AC", "darkgray"),
+   genenames = reslfc_CeMbio.yes_CeMbio.no_data_sets$wikigene_name,
+   top = 20,
+   font.label = c("bold", 11),
+   font.legend = "bold",
+   font.main = "bold",
+   ggtheme = ggplot2::theme_minimal()) 
+
+dev.off()
+```
 
 Volcano plots
 ```{r}
