@@ -881,6 +881,7 @@ sign_OP50_yes_OP50_no_comparison <- read.csv2("03_output/intestine/Results-sign_
 Plot the GO comparisons
 ```{r}
 library(ggplot2)
+library(forcats)
 
 sign_CeMbio_yes_CeMbio_no_comparison
 sign_CeMbio_yes_OP50_yes_comparison
@@ -889,7 +890,7 @@ sign_OP50_yes_OP50_no_comparison
 
 # save plot as a .png
 png("03_output/intestine/GO_Usign_CeMbio_yes_CeMbio_no_comparison.png")
-sign_CeMbio_yes_CeMbio_no_comparison %>% top_n(10, logQ) %>%
+sign_CeMbio_yes_CeMbio_no_comparison %>% top_n(10, logQ) %>% arrange(logQ) %>%
 ggplot(aes(x = reorder(Term, desc(logQ)), y = logQ)) +
   geom_bar(stat = "identity", fill = "#808080") +
   coord_flip() +
@@ -899,7 +900,7 @@ ggplot(aes(x = reorder(Term, desc(logQ)), y = logQ)) +
 dev.off()
 ```
 
-creat an upset plot
+create an upset plot
 ```{r}
 #install.packages("UpSetR")
 #BiocManager::install("ComplexHeatmap")
