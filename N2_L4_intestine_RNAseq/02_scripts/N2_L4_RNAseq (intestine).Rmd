@@ -1049,7 +1049,7 @@ ggmaplot(reslfc_CeMbio.yes_CeMbio.no_data_sets,
 dev.off()
 ```
 
-Volcano plots
+Volcano plots (need to update - havent fixed yet!)
 ```{r}
 #Identify significantly changing genes
 significantLFC.diet.int <- rbind(subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange > 0.5), subset(resLFC_diet.intestine, padj < 0.1 & log2FoldChange < -0.5))
@@ -1066,7 +1066,7 @@ maxedout.diet.int <- subset(resLFC_diet.intestine, padj < 10e-100)
 maxedout.exposure.int <- subset(resLFC_exposure.intestine, padj < 10e-100)
 
 
-png("03_output/volcano plot - diet (int).png")
+png("03_output/intestine/volcano plot - ... .png")
 # Reset parameters
 par(mfrow=c(1,1))
 # Draw the plot
@@ -1086,5 +1086,3 @@ abline(h=-log10(0.1), col = "blue", lty = "dashed")
 
 dev.off()
 ```
-
-
