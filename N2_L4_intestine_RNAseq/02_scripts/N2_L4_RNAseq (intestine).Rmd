@@ -771,6 +771,7 @@ import tissue_enrichment_analysis as ea
 import matplotlib.pyplot as plt
 import seaborn as sns
 import csv
+import openpyxl
 ```
 ```{python}
 tissue = ea.fetch_dictionary('tissue')
@@ -787,6 +788,12 @@ sign_CeMbio_yes_CeMbio_no=pd.read_csv('03_output/intestine/sign_CeMbio.yes_CeMbi
 sign_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/sign_CeMbio.yes_OP50.yes_sets.csv')
 sign_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/sign_CeMbio.no_OP50.no_sets.csv')
 sign_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/sign_OP50.yes_OP50.no_sets.csv')
+
+###############################
+unique_to_CeMbio_no_vs_OP50_no=pd.read_csv('03_output/intestine/unique_genes_venn_diagram.xlsx')
+unique_to_CeMbio_no_vs_OP50_no['Sheet1']
+
+
 ```
 ```{python}
 one = sign_OP50_yes_OP50_no['WBgeneID']
