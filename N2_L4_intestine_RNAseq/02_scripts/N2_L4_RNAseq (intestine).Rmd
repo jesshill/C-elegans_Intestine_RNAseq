@@ -472,12 +472,13 @@ Check contamination
 # hlh-2 = WBGene00001949
 # rab-3 = WBGene00004267
 
+# clec-47 = WBGene00011668
 reslfc_CeMbio.yes_CeMbio.no
 reslfc_CeMbio.yes_OP50.yes
 reslfc_CeMbio.no_OP50.no
 reslfc_OP50.yes_OP50.no 
 
-plotCounts(dds, gene=which(rownames(reslfc_CeMbio.yes_CeMbio.no) == "WBGene00003515"), intgroup="group")
+plotCounts(dds, gene=which(rownames(reslfc_CeMbio.no_OP50.no) == "WBGene00011668"), intgroup="group", pch = 20, cex = 3)
 ```
 
 
