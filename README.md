@@ -37,6 +37,8 @@ The directionality of this library is:
     - -U 
     - --umi_loc=index1
 
+Illumina kits: Dual-indexed libraries—Adds Index 1 (i7) and Index 2 (i5) sequences to generate uniquely tagged libraries.
+
 - hisat2_array.sbatch 
   - Specify the RNA strandedness
   - Use options: 
