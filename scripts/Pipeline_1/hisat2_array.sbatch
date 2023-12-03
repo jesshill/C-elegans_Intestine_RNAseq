@@ -83,16 +83,3 @@ eval $cmd
 echo -e "\n>>> VERSIONS:"
 echo -e "\n>>> HISAT2 VERSION:"
 hisat2 --version
-
-
-
-
-
-
-# hisat2 verion used for this analysis was: 
-#64-bit
-#Built on fv-az212-765
-#Wed Feb 23 05:52:46 UTC 2022
-#Compiler: collect2: error: ld returned 1 exit status
-#Options: -O3 -m64 -msse2 -funroll-loops -g3 -DPOPCNT_CAPABILITY -std=c++11
-#Sizeof {int, long, long long, void*, size_t, off_t}: {4, 8, 8, 8, 8, 8}
