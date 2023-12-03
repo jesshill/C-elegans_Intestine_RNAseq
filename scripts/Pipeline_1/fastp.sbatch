@@ -55,6 +55,3 @@ done
 echo -e "\n>>> VERSIONS:"
 echo -e "\n>>> FASTP VERSION:"
 fastp --version
-
-
-# final version used for analaysis is --> fastp 0.23.2
