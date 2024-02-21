@@ -18,24 +18,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 install packages
 ```{r}
-# If you don't have bioconductor, install it. This version works with R version 4.1. Use "3.11" for R version 4.0
+if (!requireNamespace("BiocManager", quietly = TRUE))
+        install.packages("BiocManager")
 
-#if (!require("BiocManager", quietly = TRUE))
-#        install.packages("BiocManager")
-#BiocManager::install(version = "3.16")
+BiocManager::version() #3.18
+BiocManager::valid()
+BiocManager::valid()$too_new 
+BiocManager::valid()$out_of_date
 
-#if (!requireNamespace("BiocManager", quietly = TRUE))
-#        install.packages("BiocManager")
+BiocManager::install(c("DESeq2", "apeglm", "topGO"))
 
-#BiocManager::install("DESeq2")
-#BiocManager::install("apeglm")
-#install.packages("corrplot")
-#install.packages("pheatmap")
-#install.packages("RColorBrewer")
-#BiocManager::install("topGO")
-
-#install.packages("calibrate")
-#install.packages('ashr')
+install.packages(c("corrplot", "pheatmap", "RColorBrewer", "calibrate", 'ashr', "tidyverse"))
 ```
 
 load packages
@@ -61,7 +54,7 @@ Prepare our input data for analysis.
 We read in a count matrix, which we will name counts, and the sample information table, which we will name coldata.
 Generate a table called "counts" out of the countsData table.
 ```{r}
-colnames(data)
+colnames(data) 
 
 counts <- as.matrix(data[,6:28]) # we should remove Rep3 OP50 whole worm because it is a shitty sample
 
