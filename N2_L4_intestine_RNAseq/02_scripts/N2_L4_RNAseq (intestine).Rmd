@@ -18,17 +18,17 @@ knitr::opts_chunk$set(echo = TRUE)
 
 install packages
 ```{r}
-if (!requireNamespace("BiocManager", quietly = TRUE))
-        install.packages("BiocManager")
+#if (!requireNamespace("BiocManager", quietly = TRUE))
+#        install.packages("BiocManager")
 
-BiocManager::version() #3.18
-BiocManager::valid()
-BiocManager::valid()$too_new 
-BiocManager::valid()$out_of_date
+#BiocManager::version() #3.18
+#BiocManager::valid()
+#BiocManager::valid()$too_new 
+#BiocManager::valid()$out_of_date
 
-BiocManager::install(c("DESeq2", "apeglm", "topGO"))
+#BiocManager::install(c("DESeq2", "apeglm", "topGO"))
 
-install.packages(c("corrplot", "pheatmap", "RColorBrewer", "calibrate", 'ashr', "tidyverse"))
+#install.packages(c("corrplot", "pheatmap", "RColorBrewer", "calibrate", 'ashr', "tidyverse"))
 ```
 
 load packages
@@ -679,6 +679,10 @@ library(biomaRt)
 
 ```{r}
 # need to add a column of the WbGeneIDs 
+changing_all_genes
+changing_diet_genes
+changing_exposure_genes
+
 WBgeneID <- rownames(changing_all_genes)
 changing_all_genes <- cbind(changing_all_genes, WBgeneID)
 changing_all_genes <- as.data.frame(changing_all_genes)
@@ -692,6 +696,11 @@ changing_exposure_genes <- cbind(changing_exposure_genes, WBgeneID)
 changing_exposure_genes <- as.data.frame(changing_exposure_genes)
 
 ####################
+sign_CeMbio.yes_CeMbio.no
+sign_CeMbio.yes_OP50.yes
+sign_CeMbio.no_OP50.no
+sign_OP50.yes_OP50.no
+
 WBgeneID <- rownames(sign_CeMbio.yes_CeMbio.no)
 sign_CeMbio.yes_CeMbio.no <- cbind(sign_CeMbio.yes_CeMbio.no, WBgeneID)
 sign_CeMbio.yes_CeMbio.no <- as.data.frame(sign_CeMbio.yes_CeMbio.no)
@@ -719,6 +728,38 @@ Down_CeMbio.no_OP50.no
 Up_OP50.yes_OP50.no
 Down_OP50.yes_OP50.no
 
+WBgeneID <- rownames(Up_CeMbio.yes_CeMbio.no)
+Up_CeMbio.yes_CeMbio.no <- cbind(Up_CeMbio.yes_CeMbio.no, WBgeneID)
+Up_CeMbio.yes_CeMbio.no <- as.data.frame(Up_CeMbio.yes_CeMbio.no)
+
+WBgeneID <- rownames(Down_CeMbio.yes_CeMbio.no)
+Down_CeMbio.yes_CeMbio.no <- cbind(Down_CeMbio.yes_CeMbio.no, WBgeneID)
+Down_CeMbio.yes_CeMbio.no <- as.data.frame(Down_CeMbio.yes_CeMbio.no)
+
+WBgeneID <- rownames(Up_CeMbio.yes_OP50.yes)
+Up_CeMbio.yes_OP50.yes <- cbind(Up_CeMbio.yes_OP50.yes, WBgeneID)
+Up_CeMbio.yes_OP50.yes <- as.data.frame(Up_CeMbio.yes_OP50.yes)
+
+WBgeneID <- rownames(Down_CeMbio.yes_OP50.yes)
+Down_CeMbio.yes_OP50.yes <- cbind(Down_CeMbio.yes_OP50.yes, WBgeneID)
+Down_CeMbio.yes_OP50.yes <- as.data.frame(Down_CeMbio.yes_OP50.yes)
+
+WBgeneID <- rownames(Up_CeMbio.no_OP50.no)
+Up_CeMbio.no_OP50.no <- cbind(Up_CeMbio.no_OP50.no, WBgeneID)
+Up_CeMbio.no_OP50.no <- as.data.frame(Up_CeMbio.no_OP50.no)
+
+WBgeneID <- rownames(Down_CeMbio.no_OP50.no)
+Down_CeMbio.no_OP50.no <- cbind(Down_CeMbio.no_OP50.no, WBgeneID)
+Down_CeMbio.no_OP50.no <- as.data.frame(Down_CeMbio.no_OP50.no)
+
+WBgeneID <- rownames(Up_OP50.yes_OP50.no)
+Up_OP50.yes_OP50.no <- cbind(Up_OP50.yes_OP50.no, WBgeneID)
+Up_OP50.yes_OP50.no <- as.data.frame(Up_OP50.yes_OP50.no)
+
+WBgeneID <- rownames(Down_OP50.yes_OP50.no)
+Down_OP50.yes_OP50.no <- cbind(Down_OP50.yes_OP50.no, WBgeneID)
+Down_OP50.yes_OP50.no <- as.data.frame(Down_OP50.yes_OP50.no)
+
 ######################### also do these, need for later on
 reslfc_CeMbio.yes_CeMbio.no
 reslfc_CeMbio.yes_OP50.yes
@@ -742,22 +783,224 @@ reslfc_OP50.yes_OP50.no_data <- cbind(reslfc_OP50.yes_OP50.no, WBgeneID)
 reslfc_OP50.yes_OP50.no_data <- as.data.frame(reslfc_OP50.yes_OP50.no_data)
 ```
 
+
 Get filternames from https://parasite.wormbase.org/biomart/martview
 ```{r}
 paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
 
-reslfc_OP50.yes_OP50.no_data <- biomaRt::getBM(
+changing_all_genes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
-  value = reslfc_OP50.yes_OP50.no_data$WBgeneID,
+  value = changing_all_genes$WBgeneID,
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
-) %>% right_join(reslfc_OP50.yes_OP50.no_data, by = c("wbps_gene_id" = "WBgeneID"))
+) %>% right_join(changing_all_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
-reslfc_OP50.yes_OP50.no_data <- reslfc_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+changing_all_genes_data <- changing_all_genes_data %>% rename(WBgeneID = "wbps_gene_id")
 
-write_csv(reslfc_OP50.yes_OP50.no_data, file = "03_output/intestine/reslfc_OP50.yes_OP50.no_data_sets.csv")
+write_csv(changing_all_genes_data, file = "03_output/intestine/changing_all_genes_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+changing_diet_genes_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = changing_diet_genes$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(changing_diet_genes, by = c("wbps_gene_id" = "WBgeneID"))
+
+changing_diet_genes_data <- changing_diet_genes_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(changing_diet_genes_data, file = "03_output/intestine/changing_diet_genes_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+changing_exposure_genes_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = changing_exposure_genes$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(changing_exposure_genes, by = c("wbps_gene_id" = "WBgeneID"))
+
+changing_exposure_genes_data <- changing_exposure_genes_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(changing_exposure_genes_data, file = "03_output/intestine/changing_exposure_genes_data_sets.csv")
 ```
 
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+sign_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = sign_CeMbio.yes_CeMbio.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(sign_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+sign_CeMbio.yes_CeMbio.no_data <- sign_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(sign_CeMbio.yes_CeMbio.no_data, file = "03_output/intestine/sign_CeMbio.yes_CeMbio.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+sign_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = sign_CeMbio.yes_OP50.yes$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(sign_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
+
+sign_CeMbio.yes_OP50.yes_data <- sign_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(sign_CeMbio.yes_OP50.yes_data, file = "03_output/intestine/sign_CeMbio.yes_OP50.yes_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+sign_CeMbio.no_OP50.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = sign_CeMbio.no_OP50.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(sign_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+sign_CeMbio.no_OP50.no_data <- sign_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(sign_CeMbio.no_OP50.no_data, file = "03_output/intestine/sign_CeMbio.no_OP50.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+sign_OP50.yes_OP50.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = sign_OP50.yes_OP50.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(sign_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+sign_OP50.yes_OP50.no_data <- sign_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(sign_OP50.yes_OP50.no_data, file = "03_output/intestine/sign_OP50.yes_OP50.no_data_sets.csv")
+```
+
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Up_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Up_CeMbio.yes_CeMbio.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Up_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+Up_CeMbio.yes_CeMbio.no_data <- Up_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Up_CeMbio.yes_CeMbio.no_data, file = "03_output/intestine/Up_CeMbio.yes_CeMbio.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Down_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Down_CeMbio.yes_CeMbio.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Down_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+Down_CeMbio.yes_CeMbio.no_data <- Down_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Down_CeMbio.yes_CeMbio.no_data, file = "03_output/intestine/Down_CeMbio.yes_CeMbio.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Up_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Up_CeMbio.yes_OP50.yes$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Up_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
+
+Up_CeMbio.yes_OP50.yes_data <- Up_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Up_CeMbio.yes_OP50.yes_data, file = "03_output/intestine/Up_CeMbio.yes_OP50.yes_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Down_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Down_CeMbio.yes_OP50.yes$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Down_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
+
+Down_CeMbio.yes_OP50.yes_data <- Down_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Down_CeMbio.yes_OP50.yes_data, file = "03_output/intestine/Down_CeMbio.yes_OP50.yes_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Up_CeMbio.no_OP50.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Up_CeMbio.no_OP50.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Up_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+Up_CeMbio.no_OP50.no_data <- Up_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Up_CeMbio.no_OP50.no_data, file = "03_output/intestine/Up_CeMbio.no_OP50.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Down_CeMbio.no_OP50.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Down_CeMbio.no_OP50.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Down_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+Down_CeMbio.no_OP50.no_data <- Down_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Down_CeMbio.no_OP50.no_data, file = "03_output/intestine/Down_CeMbio.no_OP50.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Up_OP50.yes_OP50.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Up_OP50.yes_OP50.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Up_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+Up_OP50.yes_OP50.no_data <- Up_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Up_OP50.yes_OP50.no_data, file = "03_output/intestine/Up_OP50.yes_OP50.no_data_sets.csv")
+```
+```{r}
+paramart <- biomaRt::useMart("parasite_mart", dataset = "wbps_gene", host = "https://parasite.wormbase.org", port = 443)
+
+Down_OP50.yes_OP50.no_data <- biomaRt::getBM(
+  mart = paramart,
+  filter = c("wbps_gene_id"),
+  value = Down_OP50.yes_OP50.no$WBgeneID,
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+) %>% right_join(Down_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
+
+Down_OP50.yes_OP50.no_data <- Down_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+
+write_csv(Down_OP50.yes_OP50.no_data, file = "03_output/intestine/Down_OP50.yes_OP50.no_data_sets.csv")
+```
+
+
+
+---
 
 Perform gene ontology
 ```{r}
@@ -778,15 +1021,21 @@ phenotype = ea.fetch_dictionary('phenotype')
 go = ea.fetch_dictionary('go')
 ```
 ```{python}
-changing_all_genes=pd.read_csv('03_output/intestine/changing_all_genes_sets.csv')
-changing_diet_genes=pd.read_csv('03_output/intestine/changing_diet_genes_sets.csv')
-changing_exposure_genes=pd.read_csv('03_output/intestine/changing_exposure_genes_sets.csv')
+changing_all_genes=pd.read_csv('03_output/intestine/changing_all_genes_data_sets.csv')
+changing_diet_genes=pd.read_csv('03_output/intestine/changing_diet_genes_data_sets.csv')
+changing_exposure_genes=pd.read_csv('03_output/intestine/changing_exposure_genes_data_sets.csv')
 
 ###############################
-sign_CeMbio_yes_CeMbio_no=pd.read_csv('03_output/intestine/sign_CeMbio.yes_CeMbio.no_sets.csv')
-sign_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/sign_CeMbio.yes_OP50.yes_sets.csv')
-sign_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/sign_CeMbio.no_OP50.no_sets.csv')
-sign_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/sign_OP50.yes_OP50.no_sets.csv')
+sign_CeMbio_yes_CeMbio_no=pd.read_csv('03_output/intestine/sign_CeMbio.yes_CeMbio.no_data_sets.csv')
+sign_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/sign_CeMbio.yes_OP50.yes_data_sets.csv')
+sign_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/sign_CeMbio.no_OP50.no_data_sets.csv')
+sign_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/sign_OP50.yes_OP50.no_data_sets.csv')
+
+
+
+
+
+
 
 ############################### (not working!)
 unique_to_CeMbio_no_vs_OP50_no=pd.read_csv('03_output/intestine/unique_genes_venn_diagram.csv')
