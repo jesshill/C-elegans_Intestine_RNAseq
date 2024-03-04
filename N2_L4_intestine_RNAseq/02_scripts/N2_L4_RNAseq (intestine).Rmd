@@ -1050,7 +1050,7 @@ PA14_background_set.to_csv('03_output/intestine/PA14_background_set.csv', index=
 
 three = sign_CeMbio_no_OP50_no['wbps_gene_id']
 four = sign_CeMbio_yes_OP50_yes['wbps_gene_id']
-Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([three, four], ignore_index=True)})
+Diet_background_set = pd.DataFrame(pd.concat([three, four], ignore_index=True))
 Diet_background_set.to_csv('03_output/intestine/Diet_background_set.csv', index=False)
 ```
 
@@ -1114,11 +1114,11 @@ for t, r in result.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/changing_all_genes_Enrichment_Results.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/changing_diet_genes_Enrichment_Results.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results = result["go"]
-results.to_csv('03_output/intestine/Results-changing_all_genes-comparison.csv', index=False)
+results.to_csv('03_output/intestine/Results-changing_diet_genes-comparison.csv', index=False)
 ```
 ```{python}
 # compare to the generated background set 
@@ -1132,7 +1132,7 @@ fig, ax = plt.subplots(nrows=3, figsize=(8, 10), facecolor='white')
 i= 0
 
 # go through the results hash:
-for t, r in result.items():
+for t, r in result_background.items():
     # calculate the negative log of the Q-values and store
     r['logQ'] = -r['Q value'].apply(np.log10)
     # remove np.infinites with np.nan
@@ -1155,9 +1155,34 @@ for t, r in result.items():
 plt.savefig('03_output/intestine/changing_all_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
-results_background = result["go"]
+results_background = result_background["go"]
 results_background.to_csv('03_output/intestine/Results-changing_all_genes-comparison_background.csv', index=False)
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
