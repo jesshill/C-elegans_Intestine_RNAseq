@@ -999,7 +999,6 @@ write_csv(Down_OP50.yes_OP50.no_data, file = "03_output/intestine/Down_OP50.yes_
 ```
 
 
-
 ---
 
 Perform gene ontology
@@ -1031,32 +1030,34 @@ sign_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/sign_CeMbio.yes_OP50.y
 sign_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/sign_CeMbio.no_OP50.no_data_sets.csv')
 sign_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/sign_OP50.yes_OP50.no_data_sets.csv')
 
-
-
-
-
-
-
-############################### (not working!)
-unique_to_CeMbio_no_vs_OP50_no=pd.read_csv('03_output/intestine/unique_genes_venn_diagram.csv')
-unique_to_CeMbio_no_vs_OP50_no['Sheet1']
-
-unique_to_CeMbio_no_vs_OP50_no=openpyxl() ('03_output/intestine/unique_genes_venn_diagram.csv')
+###############################
+Up_CeMbio_yes_CeMbio_no=pd.read_csv('03_output/intestine/Up_CeMbio.yes_CeMbio.no_data_sets.csv')
+Down_CeMbio_yes_CeMbio_no=pd.read_csv('03_output/intestine/Down_CeMbio.yes_CeMbio.no_data_sets.csv')
+Up_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/Up_CeMbio.yes_OP50.yes_data_sets.csv')
+Down_CeMbio_yes_OP50_yes=pd.read_csv('03_output/intestine/Down_CeMbio.yes_OP50.yes_data_sets.csv')
+Up_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/Up_CeMbio.no_OP50.no_data_sets.csv')
+Down_CeMbio_no_OP50_no=pd.read_csv('03_output/intestine/Down_CeMbio.no_OP50.no_data_sets.csv')
+Up_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/Up_OP50.yes_OP50.no_data_sets.csv')
+Down_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/Down_OP50.yes_OP50.no_data_sets.csv')
 ```
+
+
 ```{python}
-one = sign_OP50_yes_OP50_no['WBgeneID']
-two = sign_CeMbio_yes_CeMbio_no['WBgeneID']
+one = sign_OP50_yes_OP50_no['wbps_gene_id']
+two = sign_CeMbio_yes_CeMbio_no['wbps_gene_id']
 PA14_background_set = pd.DataFrame(pd.concat([one, two], ignore_index=True))
 PA14_background_set.to_csv('03_output/intestine/PA14_background_set.csv', index=False)
 
-
-three = sign_CeMbio_no_OP50_no['WBgeneID']
-four = sign_CeMbio_yes_OP50_yes['WBgeneID']
+three = sign_CeMbio_no_OP50_no['wbps_gene_id']
+four = sign_CeMbio_yes_OP50_yes['wbps_gene_id']
 Diet_background_set = pd.DataFrame({'WBgeneID': pd.concat([three, four], ignore_index=True)})
 Diet_background_set.to_csv('03_output/intestine/Diet_background_set.csv', index=False)
 ```
+
+
 ```{python}
 frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
+
 ###############################
 PA14_background_set
 Diet_background_set
@@ -1069,17 +1070,61 @@ sign_CeMbio_yes_CeMbio_no
 sign_CeMbio_yes_OP50_yes
 sign_CeMbio_no_OP50_no
 sign_OP50_yes_OP50_no
+
+Up_CeMbio_yes_CeMbio_no
+Down_CeMbio_yes_CeMbio_no
+Up_CeMbio_yes_OP50_yes
+Down_CeMbio_yes_OP50_yes
+Up_CeMbio_no_OP50_no
+Down_CeMbio_no_OP50_no
+Up_OP50_yes_OP50_no
+Down_OP50_yes_OP50_no
 ###############################
+```
+
+```{python}
 # original code
 result = {}
 for analysis, dictionary in frames.items():
-  result[analysis] = ea.enrichment_analysis(changing_exposure_genes.WBgeneID, dictionary, show=True, alpha=10**-1)
+  result[analysis] = ea.enrichment_analysis(changing_diet_genes.wbps_gene_id, dictionary, show=True, alpha=10**-1)
 
+  
+# make the figure in the paper:
+fig, ax = plt.subplots(nrows=3, figsize=(8, 10), facecolor='white')
+i= 0
 
+# go through the results hash:
+for t, r in result.items():
+    # calculate the negative log of the Q-values and store
+    r['logQ'] = -r['Q value'].apply(np.log10)
+    # remove np.infinites with np.nan
+    r.logQ.replace([np.inf], np.nan, inplace=True)
+    # remove np.nan with 70 (after 10**-64, the hypergeometric function crashes and returns 0)
+    r.logQ.replace(np.nan, 70, inplace=True)
+    
+    # call the plotting function in the Enrichment Suite to plot the results
+    ea.plot_enrichment_results(r, title=t, analysis=t, ax=ax[i], y='logQ', n_bars=10, color=(0.5, 0.5, 0.5))
+
+    # prettify axes
+    ax[i].set_ylabel(t)
+    if i != 2:
+        ax[i].set_xlabel('')
+    else:
+        ax[i].set_xlabel(r'$-\log_{10}{Q}$')
+    i += 1
+
+# save figure
+plt.savefig('03_output/intestine/changing_all_genes_Enrichment_Results.svg', bbox_inches='tight')  
+
+# save the results from GO to a csv
+results = result["go"]
+results.to_csv('03_output/intestine/Results-changing_all_genes-comparison.csv', index=False)
+```
+```{python}
 # compare to the generated background set 
-#result = {}
-#for analysis, dictionary in frames.items():
-#  result[analysis] = ea.enrichment_analysis(sign_CeMbio_yes_CeMbio_no.WBgeneID, dictionary[dictionary.wbid.isin(PA14_background_set.WBgeneID)], show=True, alpha=10**-1)
+result_background = {}
+for analysis, dictionary in frames.items():
+  result_background[analysis] = ea.enrichment_analysis(changing_diet_genes.wbps_gene_id, dictionary[dictionary.wbid.isin(Diet_background_set.wbps_gene_id)], show=True, alpha=10**-1)
   
   
 # make the figure in the paper:
@@ -1107,12 +1152,20 @@ for t, r in result.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/changing_all_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
-results = result["go"]
-results.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison.csv', index=False)
+results_background = result["go"]
+results_background.to_csv('03_output/intestine/Results-changing_all_genes-comparison_background.csv', index=False)
 ```
+
+
+
+
+
+
+
+
 
 Read in GO results from the comparisons within groups
 ```{r}
