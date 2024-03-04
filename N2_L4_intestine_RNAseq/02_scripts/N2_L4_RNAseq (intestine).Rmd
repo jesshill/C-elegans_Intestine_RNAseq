@@ -795,7 +795,7 @@ changing_all_genes_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(changing_all_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
-changing_all_genes_data <- changing_all_genes_data %>% rename(WBgeneID = "wbps_gene_id")
+#changing_all_genes_data <- changing_all_genes_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(changing_all_genes_data, file = "03_output/intestine/changing_all_genes_data_sets.csv")
 ```
@@ -809,7 +809,7 @@ changing_diet_genes_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(changing_diet_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
-changing_diet_genes_data <- changing_diet_genes_data %>% rename(WBgeneID = "wbps_gene_id")
+#changing_diet_genes_data <- changing_diet_genes_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(changing_diet_genes_data, file = "03_output/intestine/changing_diet_genes_data_sets.csv")
 ```
@@ -823,7 +823,7 @@ changing_exposure_genes_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(changing_exposure_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
-changing_exposure_genes_data <- changing_exposure_genes_data %>% rename(WBgeneID = "wbps_gene_id")
+#changing_exposure_genes_data <- changing_exposure_genes_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(changing_exposure_genes_data, file = "03_output/intestine/changing_exposure_genes_data_sets.csv")
 ```
@@ -838,7 +838,7 @@ sign_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(sign_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-sign_CeMbio.yes_CeMbio.no_data <- sign_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#sign_CeMbio.yes_CeMbio.no_data <- sign_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(sign_CeMbio.yes_CeMbio.no_data, file = "03_output/intestine/sign_CeMbio.yes_CeMbio.no_data_sets.csv")
 ```
@@ -852,7 +852,7 @@ sign_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(sign_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
 
-sign_CeMbio.yes_OP50.yes_data <- sign_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
+#sign_CeMbio.yes_OP50.yes_data <- sign_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(sign_CeMbio.yes_OP50.yes_data, file = "03_output/intestine/sign_CeMbio.yes_OP50.yes_data_sets.csv")
 ```
@@ -866,7 +866,7 @@ sign_CeMbio.no_OP50.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(sign_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-sign_CeMbio.no_OP50.no_data <- sign_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#sign_CeMbio.no_OP50.no_data <- sign_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(sign_CeMbio.no_OP50.no_data, file = "03_output/intestine/sign_CeMbio.no_OP50.no_data_sets.csv")
 ```
@@ -880,7 +880,7 @@ sign_OP50.yes_OP50.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(sign_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-sign_OP50.yes_OP50.no_data <- sign_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#sign_OP50.yes_OP50.no_data <- sign_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(sign_OP50.yes_OP50.no_data, file = "03_output/intestine/sign_OP50.yes_OP50.no_data_sets.csv")
 ```
@@ -895,7 +895,7 @@ Up_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Up_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-Up_CeMbio.yes_CeMbio.no_data <- Up_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#Up_CeMbio.yes_CeMbio.no_data <- Up_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Up_CeMbio.yes_CeMbio.no_data, file = "03_output/intestine/Up_CeMbio.yes_CeMbio.no_data_sets.csv")
 ```
@@ -909,7 +909,7 @@ Down_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Down_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-Down_CeMbio.yes_CeMbio.no_data <- Down_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#Down_CeMbio.yes_CeMbio.no_data <- Down_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Down_CeMbio.yes_CeMbio.no_data, file = "03_output/intestine/Down_CeMbio.yes_CeMbio.no_data_sets.csv")
 ```
@@ -923,7 +923,7 @@ Up_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Up_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
 
-Up_CeMbio.yes_OP50.yes_data <- Up_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
+#Up_CeMbio.yes_OP50.yes_data <- Up_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Up_CeMbio.yes_OP50.yes_data, file = "03_output/intestine/Up_CeMbio.yes_OP50.yes_data_sets.csv")
 ```
@@ -937,7 +937,7 @@ Down_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Down_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
 
-Down_CeMbio.yes_OP50.yes_data <- Down_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
+#Down_CeMbio.yes_OP50.yes_data <- Down_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Down_CeMbio.yes_OP50.yes_data, file = "03_output/intestine/Down_CeMbio.yes_OP50.yes_data_sets.csv")
 ```
@@ -951,7 +951,7 @@ Up_CeMbio.no_OP50.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Up_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-Up_CeMbio.no_OP50.no_data <- Up_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#Up_CeMbio.no_OP50.no_data <- Up_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Up_CeMbio.no_OP50.no_data, file = "03_output/intestine/Up_CeMbio.no_OP50.no_data_sets.csv")
 ```
@@ -965,7 +965,7 @@ Down_CeMbio.no_OP50.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Down_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-Down_CeMbio.no_OP50.no_data <- Down_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#Down_CeMbio.no_OP50.no_data <- Down_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Down_CeMbio.no_OP50.no_data, file = "03_output/intestine/Down_CeMbio.no_OP50.no_data_sets.csv")
 ```
@@ -979,7 +979,7 @@ Up_OP50.yes_OP50.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Up_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-Up_OP50.yes_OP50.no_data <- Up_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#Up_OP50.yes_OP50.no_data <- Up_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Up_OP50.yes_OP50.no_data, file = "03_output/intestine/Up_OP50.yes_OP50.no_data_sets.csv")
 ```
@@ -993,7 +993,7 @@ Down_OP50.yes_OP50.no_data <- biomaRt::getBM(
   attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
 ) %>% right_join(Down_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
-Down_OP50.yes_OP50.no_data <- Down_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
+#Down_OP50.yes_OP50.no_data <- Down_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
 
 write_csv(Down_OP50.yes_OP50.no_data, file = "03_output/intestine/Down_OP50.yes_OP50.no_data_sets.csv")
 ```
