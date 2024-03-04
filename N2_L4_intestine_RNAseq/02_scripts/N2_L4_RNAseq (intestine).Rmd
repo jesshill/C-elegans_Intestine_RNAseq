@@ -1152,11 +1152,11 @@ for t, r in result_background.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/changing_all_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/changing_diet_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results_background = result_background["go"]
-results_background.to_csv('03_output/intestine/Results-changing_all_genes-comparison_background.csv', index=False)
+results_background.to_csv('03_output/intestine/Results-changing_diet_genes-comparison_background.csv', index=False)
 ```
 
 
