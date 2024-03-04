@@ -517,14 +517,14 @@ Down_OP50.yes_OP50.no <- Down_OP50.yes_OP50.no[order(Down_OP50.yes_OP50.no$padj)
 
 Save these lists to output files
 ```{r}
-Up_CeMbio.yes_CeMbio.no
-Down_CeMbio.yes_CeMbio.no
-Up_CeMbio.yes_OP50.yes
-Down_CeMbio.yes_OP50.yes
-Up_CeMbio.no_OP50.no
-Down_CeMbio.no_OP50.no
-Up_OP50.yes_OP50.no
-Down_OP50.yes_OP50.no
+dim(Up_CeMbio.yes_CeMbio.no)
+dim(Down_CeMbio.yes_CeMbio.no)
+dim(Up_CeMbio.yes_OP50.yes)
+dim(Down_CeMbio.yes_OP50.yes)
+dim(Up_CeMbio.no_OP50.no)
+dim(Down_CeMbio.no_OP50.no)
+dim(Up_OP50.yes_OP50.no)
+dim(Down_OP50.yes_OP50.no)
 
 write(rownames(Up_CeMbio.yes_CeMbio.no), file = "03_output/intestine/Up_CeMbio.yes_CeMbio.no.txt", sep = "\n")
 write(rownames(Down_CeMbio.yes_CeMbio.no), file = "03_output/intestine/Down_CeMbio.yes_CeMbio.no.txt", sep = "\n")
@@ -573,6 +573,12 @@ changing_diet <- rbind(sign_CeMbio.no_OP50.no, sign_CeMbio.yes_OP50.yes)
 
 dim(changing_genes)
 length(unique(rownames(changing_genes)))
+
+dim(changing_exposure)
+length(unique(rownames(changing_exposure)))
+
+dim(changing_diet)
+length(unique(rownames(changing_diet)))
 
 # Get all r-stabilized log values of all the data:
 rdl_all <- assay(rlog(dds, blind=FALSE))
