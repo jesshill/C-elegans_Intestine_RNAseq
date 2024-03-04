@@ -1086,7 +1086,7 @@ Down_OP50_yes_OP50_no
 # original code
 result = {}
 for analysis, dictionary in frames.items():
-  result[analysis] = ea.enrichment_analysis(sign_OP50_yes_OP50_no.wbps_gene_id, dictionary, show=True, alpha=10**-1)
+  result[analysis] = ea.enrichment_analysis(Down_OP50_yes_OP50_no.wbps_gene_id, dictionary, show=True, alpha=10**-1)
 
   
 # make the figure in the paper:
@@ -1114,11 +1114,11 @@ for t, r in result.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/sign_OP50_yes_OP50_no_Enrichment_Results.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/Down_OP50_yes_OP50_no_Enrichment_Results.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results = result["go"]
-results.to_csv('03_output/intestine/Results-sign_OP50_yes_OP50_no-comparison.csv', index=False)
+results.to_csv('03_output/intestine/Results-Down_OP50_yes_OP50_no-comparison.csv', index=False)
 ```
 
 # something is not right here in this comparison - need to work on
