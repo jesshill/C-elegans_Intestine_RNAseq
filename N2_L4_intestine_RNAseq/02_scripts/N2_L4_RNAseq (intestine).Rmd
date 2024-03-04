@@ -1165,35 +1165,6 @@ results_background.to_csv('03_output/intestine/Results-changing_exposure_genes-c
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 Read in GO results from the comparisons within groups
 ```{r}
 sign_CeMbio_yes_CeMbio_no
@@ -1235,12 +1206,26 @@ ggplot(aes(x = reorder(Term, desc(logQ)), y = logQ)) +
 dev.off()
 ```
 
+
+
+
 create an upset plot
 ```{r}
 #install.packages("UpSetR")
 #BiocManager::install("ComplexHeatmap")
 library(UpSetR)
 library(ComplexHeatmap)
+
+
+Up_CeMbio_yes_CeMbio_no
+Down_CeMbio_yes_CeMbio_no
+Up_CeMbio_yes_OP50_yes
+Down_CeMbio_yes_OP50_yes
+Up_CeMbio_no_OP50_no
+Down_CeMbio_no_OP50_no
+Up_OP50_yes_OP50_no
+Down_OP50_yes_OP50_no
+########################
 
 changing_all_genes
 changing_diet_genes
@@ -1256,23 +1241,20 @@ sign_CeMbio.yes_OP50.yes
 sign_CeMbio.no_OP50.no
 sign_OP50.yes_OP50.no
 
-sign_CeMbio.yes_CeMbio.no <- read.csv2("03_output/intestine/sign_CeMbio.yes_CeMbio.no_sets.csv", header = TRUE, sep = ",")
-
-sign_CeMbio.yes_OP50.yes <- read.csv2("03_output/intestine/sign_CeMbio.yes_OP50.yes_sets.csv", header = TRUE, sep = ",")
-
-sign_CeMbio.no_OP50.no <- read.csv2("03_output/intestine/sign_CeMbio.no_OP50.no_sets.csv", header = TRUE, sep = ",")
-
-sign_OP50.yes_OP50.no <- read.csv2("03_output/intestine/sign_OP50.yes_OP50.no_sets.csv", header = TRUE, sep = ",")
+sign_CeMbio.yes_CeMbio.no <- read.csv2("03_output/intestine/sign_CeMbio.yes_CeMbio.no_data_sets.csv", header = TRUE, sep = ",")
+sign_CeMbio.yes_OP50.yes <- read.csv2("03_output/intestine/sign_CeMbio.yes_OP50.yes_data_sets.csv", header = TRUE, sep = ",")
+sign_CeMbio.no_OP50.no <- read.csv2("03_output/intestine/sign_CeMbio.no_OP50.no_data_sets.csv", header = TRUE, sep = ",")
+sign_OP50.yes_OP50.no <- read.csv2("03_output/intestine/sign_OP50.yes_OP50.no_data_sets.csv", header = TRUE, sep = ",")
 ```
 ```{r}
-lt <- list(changing_all_genes = changing_all_genes$WBgeneID, 
-           changing_diet_genes = changing_diet_genes$WBgeneID, 
-           changing_exposure_genes = changing_exposure_genes$WBgeneID)
+lt2 <- list(changing_all_genes = changing_all_genes$wbps_gene_id, 
+           changing_diet_genes = changing_diet_genes$wbps_gene_id, 
+           changing_exposure_genes = changing_exposure_genes$wbps_gene_id)
 
-lt <- list(CeMbio.yes_CeMbio.no = sign_CeMbio.yes_CeMbio.no$WBgeneID, 
-           CeMbio.yes_OP50.yes = sign_CeMbio.yes_OP50.yes$WBgeneID,
-           CeMbio.no_OP50.no = sign_CeMbio.no_OP50.no$WBgeneID,
-           OP50.yes_OP50.no = sign_OP50.yes_OP50.no$WBgeneID)
+lt <- list(CeMbio.yes_CeMbio.no = sign_CeMbio.yes_CeMbio.no$wbps_gene_id, 
+           CeMbio.yes_OP50.yes = sign_CeMbio.yes_OP50.yes$wbps_gene_id,
+           CeMbio.no_OP50.no = sign_CeMbio.no_OP50.no$wbps_gene_id,
+           OP50.yes_OP50.no = sign_OP50.yes_OP50.no$wbps_gene_id)
 
 str(lt)
 list_to_matrix(lt)
