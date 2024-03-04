@@ -1120,6 +1120,8 @@ plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results.svg'
 results = result["go"]
 results.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison.csv', index=False)
 ```
+
+# something is not right here in this comparison - need to work on
 ```{python}
 # compare to the generated background set 
 result_background = {}
