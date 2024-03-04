@@ -1086,7 +1086,7 @@ Down_OP50_yes_OP50_no
 # original code
 result = {}
 for analysis, dictionary in frames.items():
-  result[analysis] = ea.enrichment_analysis(changing_diet_genes.wbps_gene_id, dictionary, show=True, alpha=10**-1)
+  result[analysis] = ea.enrichment_analysis(changing_exposure_genes.wbps_gene_id, dictionary, show=True, alpha=10**-1)
 
   
 # make the figure in the paper:
@@ -1114,17 +1114,17 @@ for t, r in result.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/changing_diet_genes_Enrichment_Results.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results = result["go"]
-results.to_csv('03_output/intestine/Results-changing_diet_genes-comparison.csv', index=False)
+results.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison.csv', index=False)
 ```
 ```{python}
 # compare to the generated background set 
 result_background = {}
 for analysis, dictionary in frames.items():
-  result_background[analysis] = ea.enrichment_analysis(changing_diet_genes.wbps_gene_id, dictionary[dictionary.wbid.isin(Diet_background_set.wbps_gene_id)], show=True, alpha=10**-1)
+  result_background[analysis] = ea.enrichment_analysis(changing_exposure_genes.wbps_gene_id, dictionary[dictionary.wbid.isin(PA14_background_set.wbps_gene_id)], show=True, alpha=10**-1)
   
   
 # make the figure in the paper:
@@ -1152,11 +1152,11 @@ for t, r in result_background.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/changing_diet_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results_background = result_background["go"]
-results_background.to_csv('03_output/intestine/Results-changing_diet_genes-comparison_background.csv', index=False)
+results_background.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison_background.csv', index=False)
 ```
 
 
