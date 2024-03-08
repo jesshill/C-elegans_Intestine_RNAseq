@@ -1,0 +1,251 @@
+Term,Expected,Observed,Enrichment Fold Change,P value,Q value,logQ
+monoatomic anion transport GO:0006820,3.0,3,1.0,0.0,0.0,70.0
+protein complex oligomerization GO:0051259,3.0,3,1.0,0.0,0.0,70.0
+sodium channel activity GO:0005272,2.0,2,1.0,0.0,0.0,70.0
+carbohydrate derivative transport GO:1901264,4.0,4,1.0,0.0,0.0,70.0
+cell projection GO:0042995,30.0,30,1.0,0.0,0.0,70.0
+passive transmembrane transporter activity GO:0022803,7.0,7,1.0,0.0,0.0,70.0
+actin binding GO:0003779,5.0,5,1.0,0.0,0.0,70.0
+ribonucleotide binding GO:0032553,64.0,64,1.0,0.0,0.0,70.0
+establishment of mitotic spindle orientation GO:0000132,3.0,3,1.0,0.0,0.0,70.0
+basal plasma membrane GO:0009925,2.0,2,1.0,0.0,0.0,70.0
+purine nucleoside triphosphate metabolic process GO:0009144,1.0,1,1.0,0.0,0.0,70.0
+GTPase activator activity GO:0005096,2.0,2,1.0,0.0,0.0,70.0
+peptide receptor activity GO:0001653,4.0,4,1.0,0.0,0.0,70.0
+RNA biosynthetic process GO:0032774,23.0,23,1.0,0.0,0.0,70.0
+nucleus localization GO:0051647,1.0,1,1.0,0.0,0.0,70.0
+response to endogenous stimulus GO:0009719,8.0,8,1.0,0.0,0.0,70.0
+ATP synthesis coupled electron transport GO:0042773,3.0,3,1.0,0.0,0.0,70.0
+cellular response to external stimulus GO:0071496,2.0,2,1.0,0.0,0.0,70.0
+organelle membrane fusion GO:0090174,2.0,2,1.0,0.0,0.0,70.0
+ciliary plasm GO:0097014,1.0,1,1.0,0.0,0.0,70.0
+mating behavior GO:0007617,1.0,1,1.0,0.0,0.0,70.0
+embryonic body morphogenesis GO:0010172,1.0,1,1.0,0.0,0.0,70.0
+regulation of synapse structure or activity GO:0050803,3.0,3,1.0,0.0,0.0,70.0
+thioester metabolic process GO:0035383,3.0,3,1.0,0.0,0.0,70.0
+molecular adaptor activity GO:0060090,3.0,3,1.0,0.0,0.0,70.0
+heterocycle metabolic process GO:0046483,71.0,71,1.0,0.0,0.0,70.0
+determination of adult lifespan GO:0008340,10.0,10,1.0,0.0,0.0,70.0
+serine-type endopeptidase inhibitor activity GO:0004867,5.0,5,1.0,0.0,0.0,70.0
+cell part morphogenesis GO:0032990,5.0,5,1.0,0.0,0.0,70.0
+reproductive system development GO:0061458,4.0,4,1.0,0.0,0.0,70.0
+anatomical structure maturation GO:0071695,2.0,2,1.0,0.0,0.0,70.0
+post-transcriptional gene silencing GO:0016441,3.0,3,1.0,0.0,0.0,70.0
+protein localization to mitochondrion GO:0070585,4.0,4,1.0,0.0,0.0,70.0
+guanyl-nucleotide exchange factor activity GO:0005085,4.0,4,1.0,0.0,0.0,70.0
+multicellular organism growth GO:0035264,5.0,5,1.0,0.0,0.0,70.0
+extrinsic component of cytoplasmic side of plasma membrane GO:0031234,1.0,1,1.0,0.0,0.0,70.0
+synaptic signaling GO:0099536,12.0,12,1.0,0.0,0.0,70.0
+transcription regulatory region nucleic acid binding GO:0001067,11.0,11,1.0,0.0,0.0,70.0
+gated channel activity GO:0022836,5.0,5,1.0,0.0,0.0,70.0
+adenyl ribonucleotide binding GO:0032559,53.0,53,1.0,0.0,0.0,70.0
+response to axon injury GO:0048678,2.0,2,1.0,0.0,0.0,70.0
+cellular macromolecule localization GO:0070727,21.0,21,1.0,0.0,0.0,70.0
+single-stranded DNA binding GO:0003697,1.0,1,1.0,0.0,0.0,70.0
+sugar transmembrane transporter activity GO:0051119,7.0,7,1.0,0.0,0.0,70.0
+regulation of extent of cell growth GO:0061387,1.0,1,1.0,0.0,0.0,70.0
+mitochondrial outer membrane GO:0005741,2.0,2,1.0,0.0,0.0,70.0
+myofibril GO:0030016,7.0,7,1.0,0.0,0.0,70.0
+trans-Golgi network GO:0005802,1.0,1,1.0,0.0,0.0,70.0
+protein serine kinase activity GO:0106310,5.0,5,1.0,0.0,0.0,70.0
+steroid hydroxylase activity GO:0008395,9.0,9,1.0,0.0,0.0,70.0
+aminopeptidase activity GO:0004177,2.0,2,1.0,0.0,0.0,70.0
+chemical synaptic transmission postsynaptic GO:0099565,3.0,3,1.0,0.0,0.0,70.0
+transporter complex GO:1990351,4.0,4,1.0,0.0,0.0,70.0
+GTP binding GO:0005525,10.0,10,1.0,0.0,0.0,70.0
+response to nitrogen compound GO:1901698,8.0,8,1.0,0.0,0.0,70.0
+protein serine/threonine phosphatase activity GO:0004722,3.0,3,1.0,0.0,0.0,70.0
+dendritic tree GO:0097447,6.0,6,1.0,0.0,0.0,70.0
+response to biotic stimulus GO:0009607,85.0,85,1.0,0.0,0.0,70.0
+GTPase binding GO:0051020,1.0,1,1.0,0.0,0.0,70.0
+cilium organization GO:0044782,2.0,2,1.0,0.0,0.0,70.0
+calcium ion transport GO:0006816,1.0,1,1.0,0.0,0.0,70.0
+unfolded protein binding GO:0051082,4.0,4,1.0,0.0,0.0,70.0
+Notch signaling pathway GO:0007219,1.0,1,1.0,0.0,0.0,70.0
+actin filament-based process GO:0030029,11.0,11,1.0,0.0,0.0,70.0
+structural constituent of cytoskeleton GO:0005200,3.0,3,1.0,0.0,0.0,70.0
+gonad morphogenesis GO:0035262,1.0,1,1.0,0.0,0.0,70.0
+magnesium ion binding GO:0000287,2.0,2,1.0,0.0,0.0,70.0
+striated muscle dense body GO:0055120,4.0,4,1.0,0.0,0.0,70.0
+ribonucleoprotein granule GO:0035770,12.0,12,1.0,0.0,0.0,70.0
+endoplasmic reticulum subcompartment GO:0098827,12.0,12,1.0,0.0,0.0,70.0
+monocarboxylic acid biosynthetic process GO:0072330,8.0,8,1.0,0.0,0.0,70.0
+muscle system process GO:0003012,4.0,4,1.0,0.0,0.0,70.0
+cGMP metabolic process GO:0046068,1.0,1,1.0,0.0,0.0,70.0
+symporter activity GO:0015293,4.0,4,1.0,0.0,0.0,70.0
+organic acid metabolic process GO:0006082,73.0,73,1.0,0.0,0.0,70.0
+DNA-binding transcription factor binding GO:0140297,2.0,2,1.0,0.0,0.0,70.0
+locomotion involved in locomotory behavior GO:0031987,2.0,2,1.0,0.0,0.0,70.0
+late endosome membrane GO:0031902,3.0,3,1.0,0.0,0.0,70.0
+serine hydrolase activity GO:0017171,1.0,1,1.0,0.0,0.0,70.0
+external encapsulating structure GO:0030312,3.0,3,1.0,0.0,0.0,70.0
+structural constituent of cuticle GO:0042302,16.0,16,1.0,0.0,0.0,70.0
+response to xenobiotic stimulus GO:0009410,9.0,9,1.0,0.0,0.0,70.0
+cellular component assembly involved in morphogenesis GO:0010927,2.0,2,1.0,0.0,0.0,70.0
+canonical Wnt signaling pathway GO:0060070,3.0,3,1.0,0.0,0.0,70.0
+outer membrane GO:0019867,3.0,3,1.0,0.0,0.0,70.0
+transmembrane transport GO:0055085,55.0,55,1.0,0.0,0.0,70.0
+envelope GO:0031975,20.0,20,1.0,0.0,0.0,70.0
+hydrolase activity acting on acid anhydrides GO:0016817,15.0,15,1.0,0.0,0.0,70.0
+lipid oxidation GO:0034440,7.0,7,1.0,0.0,0.0,70.0
+microtubule-based transport GO:0099111,1.0,1,1.0,0.0,0.0,70.0
+methylation GO:0032259,8.0,8,1.0,0.0,0.0,70.0
+spindle localization GO:0051653,3.0,3,1.0,0.0,0.0,70.0
+nucleoside phosphate metabolic process GO:0006753,18.0,18,1.0,0.0,0.0,70.0
+endopeptidase regulator activity GO:0061135,5.0,5,1.0,0.0,0.0,70.0
+motor neuron axon guidance GO:0008045,2.0,2,1.0,0.0,0.0,70.0
+nucleoside-triphosphatase regulator activity GO:0060589,6.0,6,1.0,0.0,0.0,70.0
+sodium ion transport GO:0006814,6.0,6,1.0,0.0,0.0,70.0
+calmodulin binding GO:0005516,1.0,1,1.0,0.0,0.0,70.0
+regulation of postsynaptic membrane potential GO:0060078,2.0,2,1.0,0.0,0.0,70.0
+intracellular receptor signaling pathway GO:0030522,5.0,5,1.0,0.0,0.0,70.0
+kinase binding GO:0019900,4.0,4,1.0,0.0,0.0,70.0
+transporter activity GO:0005215,53.0,53,1.0,0.0,0.0,70.0
+taxis GO:0042330,7.0,7,1.0,0.0,0.0,70.0
+amino acid transport GO:0006865,1.0,1,1.0,0.0,0.0,70.0
+proton transmembrane transport GO:1902600,3.0,3,1.0,0.0,0.0,70.0
+extracellular ligand-gated monoatomic ion channel activity GO:0005230,2.0,2,1.0,0.0,0.0,70.0
+cell death GO:0008219,19.0,19,1.0,0.0,0.0,70.0
+non-motile cilium GO:0097730,1.0,1,1.0,0.0,0.0,70.0
+anterior/posterior pattern specification GO:0009952,2.0,2,1.0,0.0,0.0,70.0
+ABC-type transporter activity GO:0140359,5.0,5,1.0,0.0,0.0,70.0
+identical protein binding GO:0042802,5.0,5,1.0,0.0,0.0,70.0
+reproduction GO:0000003,25.0,25,1.0,0.0,0.0,70.0
+iron ion binding GO:0005506,20.0,20,1.0,0.0,0.0,70.0
+aminoacyltransferase activity GO:0016755,1.0,1,1.0,0.0,0.0,70.0
+Golgi membrane GO:0000139,3.0,3,1.0,0.0,0.0,70.0
+cellular_component GO:0005575,437.0,437,1.0,0.0,0.0,70.0
+double-stranded DNA binding GO:0003690,16.0,16,1.0,0.0,0.0,70.0
+serine-type endopeptidase activity GO:0004252,1.0,1,1.0,0.0,0.0,70.0
+establishment of localization GO:0051234,86.0,86,1.0,0.0,0.0,70.0
+homologous recombination GO:0035825,1.0,1,1.0,0.0,0.0,70.0
+maturation of SSU-rRNA GO:0030490,1.0,1,1.0,0.0,0.0,70.0
+signaling receptor regulator activity GO:0030545,3.0,3,1.0,0.0,0.0,70.0
+lipid catabolic process GO:0016042,22.0,22,1.0,0.0,0.0,70.0
+nuclear outer membrane-endoplasmic reticulum membrane network GO:0042175,14.0,14,1.0,0.0,0.0,70.0
+chromatin organization GO:0006325,5.0,5,1.0,0.0,0.0,70.0
+oocyte differentiation GO:0009994,1.0,1,1.0,0.0,0.0,70.0
+cellular response to monoamine stimulus GO:0071868,3.0,3,1.0,0.0,0.0,70.0
+response to catecholamine GO:0071869,3.0,3,1.0,0.0,0.0,70.0
+SNARE binding GO:0000149,3.0,3,1.0,0.0,0.0,70.0
+supramolecular polymer GO:0099081,19.0,19,1.0,0.0,0.0,70.0
+molecular transducer activity GO:0060089,25.0,25,1.0,0.0,0.0,70.0
+embryonic digestive tract development GO:0048566,1.0,1,1.0,0.0,0.0,70.0
+condensed chromosome centromeric region GO:0000779,2.0,2,1.0,0.0,0.0,70.0
+chemosensory behavior GO:0007635,2.0,2,1.0,0.0,0.0,70.0
+digestive system development GO:0055123,4.0,4,1.0,0.0,0.0,70.0
+neuron development GO:0048666,6.0,6,1.0,0.0,0.0,70.0
+microtubule organizing center organization GO:0031023,2.0,2,1.0,0.0,0.0,70.0
+membrane microdomain GO:0098857,9.0,9,1.0,0.0,0.0,70.0
+purine nucleotide binding GO:0017076,65.0,65,1.0,0.0,0.0,70.0
+immune system process GO:0002376,66.0,66,1.0,0.0,0.0,70.0
+monocarboxylic acid catabolic process GO:0072329,12.0,12,1.0,0.0,0.0,70.0
+negative regulation of gene expression epigenetic GO:0045814,1.0,1,1.0,0.0,0.0,70.0
+carbohydrate transport GO:0008643,8.0,8,1.0,0.0,0.0,70.0
+pharyngeal pumping GO:0043050,5.0,5,1.0,0.0,0.0,70.0
+cellular response to toxic substance GO:0097237,4.0,4,1.0,0.0,0.0,70.0
+vitamin B6 binding GO:0070279,7.0,7,1.0,0.0,0.0,70.0
+IRE1-mediated unfolded protein response GO:0036498,7.0,7,1.0,0.0,0.0,70.0
+macromolecule glycosylation GO:0043413,2.0,2,1.0,0.0,0.0,70.0
+lytic vacuole GO:0000323,15.0,15,1.0,0.0,0.0,70.0
+organic cyclic compound metabolic process GO:1901360,75.0,75,1.0,0.0,0.0,70.0
+cellular aromatic compound metabolic process GO:0006725,72.0,72,1.0,0.0,0.0,70.0
+ATP-dependent activity acting on RNA GO:0008186,3.0,3,1.0,0.0,0.0,70.0
+protein localization to extracellular region GO:0071692,1.0,1,1.0,0.0,0.0,70.0
+chitin binding GO:0008061,2.0,2,1.0,0.0,0.0,70.0
+microbody GO:0042579,6.0,6,1.0,0.0,0.0,70.0
+nematode male tail tip morphogenesis GO:0045138,2.0,2,1.0,0.0,0.0,70.0
+cation binding GO:0043169,94.0,94,1.0,0.0,0.0,70.0
+peptidase inhibitor activity GO:0030414,5.0,5,1.0,0.0,0.0,70.0
+deubiquitinase activity GO:0101005,1.0,1,1.0,0.0,0.0,70.0
+extracellular structure organization GO:0043062,1.0,1,1.0,0.0,0.0,70.0
+recombinational repair GO:0000725,1.0,1,1.0,0.0,0.0,70.0
+organelle GO:0043226,239.0,239,1.0,0.0,0.0,70.0
+egg-laying behavior GO:0018991,3.0,3,1.0,0.0,0.0,70.0
+cellular oxidant detoxification GO:0098869,2.0,2,1.0,0.0,0.0,70.0
+sequence-specific DNA binding GO:0043565,15.0,15,1.0,0.0,0.0,70.0
+translation initiation factor activity GO:0003743,2.0,2,1.0,0.0,0.0,70.0
+RNA localization GO:0006403,1.0,1,1.0,0.0,0.0,70.0
+structural constituent of chromatin GO:0030527,4.0,4,1.0,0.0,0.0,70.0
+defense response GO:0006952,85.0,85,1.0,0.0,0.0,70.0
+defense response to Gram-positive bacterium GO:0050830,17.0,17,1.0,0.0,0.0,70.0
+zinc ion binding GO:0008270,25.0,25,1.0,0.0,0.0,70.0
+collagen trimer GO:0005581,13.0,13,1.0,0.0,0.0,70.0
+liposaccharide metabolic process GO:1903509,2.0,2,1.0,0.0,0.0,70.0
+oxygen binding GO:0019825,1.0,1,1.0,0.0,0.0,70.0
+response to extracellular stimulus GO:0009991,5.0,5,1.0,0.0,0.0,70.0
+sarcomere organization GO:0045214,2.0,2,1.0,0.0,0.0,70.0
+adherens junction GO:0005912,3.0,3,1.0,0.0,0.0,70.0
+molting cycle GO:0042303,5.0,5,1.0,0.0,0.0,70.0
+A band GO:0031672,2.0,2,1.0,0.0,0.0,70.0
+meiotic cell cycle GO:0051321,6.0,6,1.0,0.0,0.0,70.0
+protein heterodimerization activity GO:0046982,2.0,2,1.0,0.0,0.0,70.0
+post-embryonic development GO:0009791,17.0,17,1.0,0.0,0.0,70.0
+embryo development ending in birth or egg hatching GO:0009792,12.0,12,1.0,0.0,0.0,70.0
+embryonic axis specification GO:0000578,2.0,2,1.0,0.0,0.0,70.0
+cell-cell signaling by wnt GO:0198738,2.0,2,1.0,0.0,0.0,70.0
+segmentation GO:0035282,1.0,1,1.0,0.0,0.0,70.0
+transcription coactivator activity GO:0003713,1.0,1,1.0,0.0,0.0,70.0
+organic acid transport GO:0015849,7.0,7,1.0,0.0,0.0,70.0
+exocytic vesicle GO:0070382,5.0,5,1.0,0.0,0.0,70.0
+ribose phosphate metabolic process GO:0019693,14.0,14,1.0,0.0,0.0,70.0
+transferase activity transferring one-carbon groups GO:0016741,10.0,10,1.0,0.0,0.0,70.0
+RNA splicing via transesterification reactions GO:0000375,4.0,4,1.0,0.0,0.0,70.0
+DNA-binding transcription factor activity GO:0003700,15.0,15,1.0,0.0,0.0,70.0
+protein-folding chaperone binding GO:0051087,3.0,3,1.0,0.0,0.0,70.0
+inorganic ion import across plasma membrane GO:0099587,1.0,1,1.0,0.0,0.0,70.0
+oxidoreductase activity acting on CH-OH group of donors GO:0016614,9.0,9,1.0,0.0,0.0,70.0
+cellular developmental process GO:0048869,32.0,32,1.0,0.0,0.0,70.0
+membrane invagination GO:0010324,1.0,1,1.0,0.0,0.0,70.0
+cell projection organization GO:0030030,10.0,10,1.0,0.0,0.0,70.0
+potassium channel activity GO:0005267,1.0,1,1.0,0.0,0.0,70.0
+regeneration GO:0031099,2.0,2,1.0,0.0,0.0,70.0
+development of primary sexual characteristics GO:0045137,3.0,3,1.0,0.0,0.0,70.0
+ciliary basal body GO:0036064,2.0,2,1.0,0.0,0.0,70.0
+postsynaptic membrane GO:0045211,4.0,4,1.0,0.0,0.0,70.0
+neuropeptide signaling pathway GO:0007218,14.0,14,1.0,0.0,0.0,70.0
+NADH dehydrogenase complex GO:0030964,2.0,2,1.0,0.0,0.0,70.0
+extracellular region GO:0005576,47.0,47,1.0,0.0,0.0,70.0
+cytoplasmic side of membrane GO:0098562,1.0,1,1.0,0.0,0.0,70.0
+apical part of cell GO:0045177,5.0,5,1.0,0.0,0.0,70.0
+P-body GO:0000932,1.0,1,1.0,0.0,0.0,70.0
+biological regulation GO:0065007,160.0,160,1.0,0.0,0.0,70.0
+modification-dependent macromolecule catabolic process GO:0043632,5.0,5,1.0,0.0,0.0,70.0
+organic acid binding GO:0043177,7.0,7,1.0,0.0,0.0,70.0
+ATP hydrolysis activity GO:0016887,10.0,10,1.0,0.0,0.0,70.0
+response to topologically incorrect protein GO:0035966,12.0,12,1.0,0.0,0.0,70.0
+biosynthetic process GO:0009058,88.0,88,1.0,0.0,0.0,70.0
+excretion GO:0007588,3.0,3,1.0,0.0,0.0,70.0
+cyclic nucleotide metabolic process GO:0009187,1.0,1,1.0,0.0,0.0,70.0
+metalloendopeptidase activity GO:0004222,2.0,2,1.0,0.0,0.0,70.0
+biological process involved in interspecies interaction between organisms GO:0044419,85.0,85,1.0,0.0,0.0,70.0
+post-embryonic animal organ development GO:0048569,4.0,4,1.0,0.0,0.0,70.0
+detoxification GO:0098754,4.0,4,1.0,0.0,0.0,70.0
+potassium ion transmembrane transport GO:0071805,2.0,2,1.0,0.0,0.0,70.0
+select?qt=standard&fl=idannotation_class_label&version=2.2&wt=json&indent=on&rows=100000&q=id:*&fq=document_category:ontology_class&fq=-is_obsolete:true GO:0090502,3.0,3,1.0,0.0,0.0,70.0
+pharynx development GO:0060465,3.0,3,1.0,0.0,0.0,70.0
+respirasome GO:0070469,3.0,3,1.0,0.0,0.0,70.0
+tetrapyrrole binding GO:0046906,22.0,22,1.0,0.0,0.0,70.0
+structural constituent of ribosome GO:0003735,1.0,1,1.0,0.0,0.0,70.0
+peptide biosynthetic process GO:0043043,12.0,12,1.0,0.0,0.0,70.0
+mRNA binding GO:0003729,14.0,14,1.0,0.0,0.0,70.0
+process utilizing autophagic mechanism GO:0061919,5.0,5,1.0,0.0,0.0,70.0
+cell surface GO:0009986,13.0,13,1.0,0.0,0.0,70.0
+muscle cell development GO:0055001,2.0,2,1.0,0.0,0.0,70.0
+calcium ion binding GO:0005509,8.0,8,1.0,0.0,0.0,70.0
+cell body GO:0044297,12.0,12,1.0,0.0,0.0,70.0
+pole plasm GO:0045495,11.0,11,1.0,0.0,0.0,70.0
+Golgi stack GO:0005795,1.0,1,1.0,0.0,0.0,70.0
+cuticle development GO:0042335,7.0,7,1.0,0.0,0.0,70.0
+protein-DNA complex GO:0032993,16.0,16,1.0,0.0,0.0,70.0
+perikaryon GO:0043204,4.0,4,1.0,0.0,0.0,70.0
+metal cluster binding GO:0051540,2.0,2,1.0,0.0,0.0,70.0
+oxidoreductase activity acting on paired donors with incorporation or reduction of molecular oxygen reduced flavin or flavoprotein as one donor and incorporation of one atom of oxygen GO:0016712,9.0,9,1.0,0.0,0.0,70.0
+membrane-enclosed lumen GO:0031974,25.0,25,1.0,0.0,0.0,70.0
+non-membrane spanning protein tyrosine kinase activity GO:0004715,3.0,3,1.0,0.0,0.0,70.0
+amino acid biosynthetic process GO:0008652,15.0,15,1.0,0.0,0.0,70.0
+nucleoside phosphate binding GO:1901265,82.0,82,1.0,0.0,0.0,70.0
+flavin adenine dinucleotide binding GO:0050660,13.0,13,1.0,0.0,0.0,70.0
+monoatomic ion homeostasis GO:0050801,7.0,7,1.0,0.0,0.0,70.0
+digestion GO:0007586,3.0,3,1.0,0.0,0.0,70.0
+phosphorus metabolic process GO:0006793,68.0,68,1.0,0.0,0.0,70.0

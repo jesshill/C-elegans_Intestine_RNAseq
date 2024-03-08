@@ -1003,6 +1003,72 @@ write_csv(Down_OP50.yes_OP50.no_data, file = "03_output/intestine/Down_OP50.yes_
 
 Perform gene ontology
 ```{r}
+#BiocManager::install("biocLite")
+#biocLite("clusterProfiler")
+
+#devtools::install_github(c("GuangchuangYu/DOSE", "GuangchuangYu/clusterProfiler"))
+BiocManager::install("org.Ce.eg.db")
+library(org.Ce.eg.db)
+library(clusterProfiler)
+
+
+#if (!require("BiocManager", quietly = TRUE))
+#    install.packages("BiocManager")
+#BiocManager::install("topGO", force = TRUE)
+library(topGO)
+```
+```{r}
+changing_all_genes <- read.csv('03_output/intestine/changing_all_genes_data_sets.csv', header = TRUE)
+changing_diet_genes <- read.csv('03_output/intestine/changing_diet_genes_data_sets.csv', header = TRUE)
+changing_exposure_genes <- read.csv('03_output/intestine/changing_exposure_genes_data_sets.csv', header=TRUE)
+
+###############################
+sign_CeMbio_yes_CeMbio_no <- read.csv('03_output/intestine/sign_CeMbio.yes_CeMbio.no_data_sets.csv', header = TRUE)
+sign_CeMbio_yes_OP50_yes <- read.csv('03_output/intestine/sign_CeMbio.yes_OP50.yes_data_sets.csv', header = TRUE)
+sign_CeMbio_no_OP50_no <- read.csv('03_output/intestine/sign_CeMbio.no_OP50.no_data_sets.csv', header = TRUE)
+sign_OP50_yes_OP50_no <- read.csv('03_output/intestine/sign_OP50.yes_OP50.no_data_sets.csv', header = TRUE)
+
+###############################
+Up_CeMbio_yes_CeMbio_no <- read.csv('03_output/intestine/Up_CeMbio.yes_CeMbio.no_data_sets.csv', header = TRUE)
+Down_CeMbio_yes_CeMbio_no <- read.csv('03_output/intestine/Down_CeMbio.yes_CeMbio.no_data_sets.csv', header = TRUE)
+Up_CeMbio_yes_OP50_yes <- read.csv('03_output/intestine/Up_CeMbio.yes_OP50.yes_data_sets.csv', header = TRUE)
+Down_CeMbio_yes_OP50_yes <- read.csv('03_output/intestine/Down_CeMbio.yes_OP50.yes_data_sets.csv', header = TRUE)
+Up_CeMbio_no_OP50_no <- read.csv('03_output/intestine/Up_CeMbio.no_OP50.no_data_sets.csv', header = TRUE)
+Down_CeMbio_no_OP50_no <- read.csv('03_output/intestine/Down_CeMbio.no_OP50.no_data_sets.csv', header = TRUE)
+Up_OP50_yes_OP50_no <- read.csv('03_output/intestine/Up_OP50.yes_OP50.no_data_sets.csv', header = TRUE)
+Down_OP50_yes_OP50_no <- read.csv('03_output/intestine/Down_OP50.yes_OP50.no_data_sets.csv', header = TRUE)
+```
+```{r}
+# ont = "CC"
+# ont = "BP"
+# ont = "MF"
+
+ggo <- groupGO(gene = Up_CeMbio_yes_CeMbio_no, OrgDb = org.Ce.eg.db, ont = "MF", level = 3, readable = TRUE)
+
+
+data(geneList, package="DOSE")
+head(geneList, 3)
+str(geneList)
+dim(geneList)
+summary(geneList)
+gene <- names(geneList)[abs(geneList) > 2]
+head(gene)
+```
+
+
+
+
+
+
+
+
+
+
+
+---
+
+Perform gene ontology
+```{r}
 #install.packages("reticulate")
 library(reticulate)
 ```
@@ -1160,6 +1226,14 @@ plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results_back
 results_background = result_background["go"]
 results_background.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison_background.csv', index=False)
 ```
+
+
+
+
+
+
+
+
 
 
 
