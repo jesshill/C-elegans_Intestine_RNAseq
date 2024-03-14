@@ -792,7 +792,7 @@ changing_all_genes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = changing_all_genes$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(changing_all_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
 #changing_all_genes_data <- changing_all_genes_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -806,7 +806,7 @@ changing_diet_genes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = changing_diet_genes$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(changing_diet_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
 #changing_diet_genes_data <- changing_diet_genes_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -820,7 +820,7 @@ changing_exposure_genes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = changing_exposure_genes$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(changing_exposure_genes, by = c("wbps_gene_id" = "WBgeneID"))
 
 #changing_exposure_genes_data <- changing_exposure_genes_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -835,7 +835,7 @@ sign_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = sign_CeMbio.yes_CeMbio.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(sign_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #sign_CeMbio.yes_CeMbio.no_data <- sign_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -849,7 +849,7 @@ sign_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = sign_CeMbio.yes_OP50.yes$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(sign_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
 
 #sign_CeMbio.yes_OP50.yes_data <- sign_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -863,7 +863,7 @@ sign_CeMbio.no_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = sign_CeMbio.no_OP50.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(sign_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #sign_CeMbio.no_OP50.no_data <- sign_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -877,7 +877,7 @@ sign_OP50.yes_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = sign_OP50.yes_OP50.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(sign_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #sign_OP50.yes_OP50.no_data <- sign_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -892,7 +892,7 @@ Up_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Up_CeMbio.yes_CeMbio.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Up_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Up_CeMbio.yes_CeMbio.no_data <- Up_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -906,7 +906,7 @@ Down_CeMbio.yes_CeMbio.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Down_CeMbio.yes_CeMbio.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Down_CeMbio.yes_CeMbio.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Down_CeMbio.yes_CeMbio.no_data <- Down_CeMbio.yes_CeMbio.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -920,7 +920,7 @@ Up_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Up_CeMbio.yes_OP50.yes$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Up_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Up_CeMbio.yes_OP50.yes_data <- Up_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -934,7 +934,7 @@ Down_CeMbio.yes_OP50.yes_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Down_CeMbio.yes_OP50.yes$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Down_CeMbio.yes_OP50.yes, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Down_CeMbio.yes_OP50.yes_data <- Down_CeMbio.yes_OP50.yes_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -948,7 +948,7 @@ Up_CeMbio.no_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Up_CeMbio.no_OP50.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Up_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Up_CeMbio.no_OP50.no_data <- Up_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -962,7 +962,7 @@ Down_CeMbio.no_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Down_CeMbio.no_OP50.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Down_CeMbio.no_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Down_CeMbio.no_OP50.no_data <- Down_CeMbio.no_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -976,7 +976,7 @@ Up_OP50.yes_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Up_OP50.yes_OP50.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Up_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Up_OP50.yes_OP50.no_data <- Up_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -990,7 +990,7 @@ Down_OP50.yes_OP50.no_data <- biomaRt::getBM(
   mart = paramart,
   filter = c("wbps_gene_id"),
   value = Down_OP50.yes_OP50.no$WBgeneID,
-  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name")
+  attributes = c("wbps_gene_id","wormbase_gseq", "wikigene_name", "entrezgene_id")
 ) %>% right_join(Down_OP50.yes_OP50.no, by = c("wbps_gene_id" = "WBgeneID"))
 
 #Down_OP50.yes_OP50.no_data <- Down_OP50.yes_OP50.no_data %>% rename(WBgeneID = "wbps_gene_id")
@@ -1010,12 +1010,6 @@ Perform gene ontology
 BiocManager::install("org.Ce.eg.db")
 library(org.Ce.eg.db)
 library(clusterProfiler)
-
-
-#if (!require("BiocManager", quietly = TRUE))
-#    install.packages("BiocManager")
-#BiocManager::install("topGO", force = TRUE)
-library(topGO)
 ```
 ```{r}
 changing_all_genes <- read.csv('03_output/intestine/changing_all_genes_data_sets.csv', header = TRUE)
@@ -1038,22 +1032,178 @@ Down_CeMbio_no_OP50_no <- read.csv('03_output/intestine/Down_CeMbio.no_OP50.no_d
 Up_OP50_yes_OP50_no <- read.csv('03_output/intestine/Up_OP50.yes_OP50.no_data_sets.csv', header = TRUE)
 Down_OP50_yes_OP50_no <- read.csv('03_output/intestine/Down_OP50.yes_OP50.no_data_sets.csv', header = TRUE)
 ```
-```{r}
+GO classification
+```
 # ont = "CC"
 # ont = "BP"
 # ont = "MF"
 
-ggo <- groupGO(gene = Up_CeMbio_yes_CeMbio_no, OrgDb = org.Ce.eg.db, ont = "MF", level = 3, readable = TRUE)
+gene_ids <- as.character(sign_CeMbio_yes_CeMbio_no$entrezgene_id)
 
+go_class1 <- groupGO(gene = gene_ids, OrgDb = 'org.Ce.eg.db', ont = "BP", level = 1, readable = TRUE)
 
-data(geneList, package="DOSE")
-head(geneList, 3)
-str(geneList)
-dim(geneList)
-summary(geneList)
-gene <- names(geneList)[abs(geneList) > 2]
-head(gene)
+head(go_class1)
 ```
+GO over-representation analysis
+```{r}
+ego1 <- enrichGO(sign_CeMbio_yes_CeMbio_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+# save plot as a .png
+png("03_output/intestine/GO_overRep_sign_CeMbio_yes_CeMbio_no.png")
+goplot(ego1)
+dev.off()
+
+ego2 <- enrichGO(sign_CeMbio_yes_OP50_yes$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+# save plot as a .png
+png("03_output/intestine/GO_overRep_sign_CeMbio_yes_OP50_yes.png")
+goplot(ego2)
+dev.off()
+
+ego3 <- enrichGO(sign_CeMbio_no_OP50_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+# save plot as a .png
+png("03_output/intestine/GO_overRep_sign_CeMbio_no_OP50_no.png")
+goplot(ego3)
+dev.off()
+
+ego4 <- enrichGO(sign_OP50_yes_OP50_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_sign_OP50_yes_OP50_no.png")
+goplot(ego4)
+dev.off()
+```
+GO gene set enrichment analysis <-- NOT WORKING!
+```
+gene_list <- as.character(sign_CeMbio_yes_CeMbio_no$entrezgene_id)
+gene_list = sort(gene_list, decreasing = TRUE)
+  
+gse1 <- gseGO(gene_list, 'org.Ce.eg.db', ont = "MF", minGSSize = 100, maxGSSize = 500, pvalueCutoff = 0.05)
+
+goplot(gse1)
+```
+```{r}
+library(enrichplot)
+
+sign_CeMbio_yes_CeMbio_no
+sign_CeMbio_yes_OP50_yes
+sign_CeMbio_no_OP50_no
+sign_OP50_yes_OP50_no
+
+p1 <- dotplot(ego1, showCategory = 10, font.size=14)
+#p2 <- dotplot(ego2, showCategory = 10, font.size=14)
+p3 <- dotplot(ego3, showCategory = 10, font.size=14)
+p4 <- dotplot(ego4, showCategory = 10, font.size=14)
+
+png("03_output/intestine/cowplot_sign_CeMbio_yes_CeMbio_no.png")
+cowplot::plot_grid(p1, labels="Response to PA14 in CeMbio worms")
+dev.off()
+
+png("03_output/intestine/cowplot_sign_CeMbio_no_OP50_no.png")
+cowplot::plot_grid(p3, labels="CeMbio vs OP50 fed worms")
+dev.off()
+
+png("03_output/intestine/cowplot_sign_OP50_yes_OP50_no.png")
+cowplot::plot_grid(p4, labels="Response to PA14 in OP50 worms")
+dev.off()
+```
+
+```{r}
+Up_CeMbio_yes_CeMbio_no
+Down_CeMbio_yes_CeMbio_no
+Up_CeMbio_yes_OP50_yes
+Down_CeMbio_yes_OP50_yes
+Up_CeMbio_no_OP50_no
+Down_CeMbio_no_OP50_no
+Up_OP50_yes_OP50_no
+Down_OP50_yes_OP50_no
+
+
+ego5 <- enrichGO(Up_CeMbio_yes_CeMbio_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Up_CeMbio_yes_CeMbio_no.png")
+goplot(ego5)
+dev.off()
+
+ego6 <- enrichGO(Down_CeMbio_yes_CeMbio_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Down_CeMbio_yes_CeMbio_no.png")
+goplot(ego6)
+dev.off()
+
+ego7 <- enrichGO(Up_CeMbio_yes_OP50_yes$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Up_CeMbio_yes_OP50_yes.png")
+goplot(ego7)
+dev.off()
+
+ego8 <- enrichGO(Down_CeMbio_yes_OP50_yes$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Down_CeMbio_yes_OP50_yes.png")
+goplot(ego8)
+dev.off()
+
+ego9 <- enrichGO(Up_CeMbio_no_OP50_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Up_CeMbio_no_OP50_no.png")
+goplot(ego9)
+dev.off()
+
+ego10 <- enrichGO(Down_CeMbio_no_OP50_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Down_CeMbio_no_OP50_no.png")
+goplot(ego10)
+dev.off()
+
+ego11 <- enrichGO(Up_OP50_yes_OP50_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Up_OP50_yes_OP50_no.png")
+goplot(ego11)
+dev.off()
+
+ego12 <- enrichGO(Down_OP50_yes_OP50_no$entrezgene_id, 'org.Ce.eg.db', ont = "BP", pvalueCutoff = 0.05, pAdjustMethod = "BH", qvalueCutoff = 0.2, readable = TRUE)
+png("03_output/intestine/GO_overRep_Down_OP50_yes_OP50_no.png")
+goplot(ego12)
+dev.off()
+
+p5 <- dotplot(ego5, showCategory = 10, font.size=14)
+p6 <- dotplot(ego6, showCategory = 10, font.size=14)
+p7 <- dotplot(ego7, showCategory = 10, font.size=14)
+p8 <- dotplot(ego8, showCategory = 10, font.size=14)
+p9 <- dotplot(ego9, showCategory = 10, font.size=14)
+p10 <- dotplot(ego10, showCategory = 10, font.size=14)
+p11 <- dotplot(ego11, showCategory = 10, font.size=14)
+p12 <- dotplot(ego12, showCategory = 10, font.size=14)
+
+png("03_output/intestine/cowplot_Up_CeMbio_yes_CeMbio_no.png")
+cowplot::plot_grid(p5, labels="Response to PA14 in CeMbio (up genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Down_CeMbio_yes_CeMbio_no.png")
+cowplot::plot_grid(p6, labels="Response to PA14 in CeMbio (down genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Up_CeMbio_yes_OP50_yes.png")
+cowplot::plot_grid(p7, labels="CeMbio vs OP50 during challenge (up genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Down_CeMbio_yes_OP50_yes.png")
+cowplot::plot_grid(p8, labels="CeMbio vs OP50 during challenge (down genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Up_CeMbio_no_OP50_no.png")
+cowplot::plot_grid(p9, labels="CeMbio vs OP50 (up genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Down_CeMbio_no_OP50_no.png")
+cowplot::plot_grid(p10, labels="CeMbio vs OP50 (down genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Up_OP50_yes_OP50_no.png")
+cowplot::plot_grid(p11, labels="Response to PA14 in OP50 (up genes)")
+dev.off()
+
+png("03_output/intestine/cowplot_Down_OP50_yes_OP50_no.png")
+cowplot::plot_grid(p12, labels="Response to PA14 in OP50 (down genes)")
+dev.off()
+```
+
+
+
+
+
+
+
+
 
 
 
@@ -1109,15 +1259,22 @@ Down_OP50_yes_OP50_no=pd.read_csv('03_output/intestine/Down_OP50.yes_OP50.no_dat
 
 
 ```{python}
-one = sign_OP50_yes_OP50_no['wbps_gene_id']
-two = sign_CeMbio_yes_CeMbio_no['wbps_gene_id']
-PA14_background_set = pd.DataFrame(pd.concat([one, two], ignore_index=True))
-PA14_background_set.to_csv('03_output/intestine/PA14_background_set.csv', index=False)
+a = sign_OP50_yes_OP50_no['wbps_gene_id']
+b = sign_CeMbio_yes_CeMbio_no['wbps_gene_id']
+c = sign_CeMbio_no_OP50_no['wbps_gene_id']
+d = sign_CeMbio_yes_OP50_yes['wbps_gene_id']
+all_background_set = pd.DataFrame(pd.concat([a, b, c, d], ignore_index=True))
+all_background_set.to_csv('03_output/intestine/all_background_set.csv', index=False)
 
-three = sign_CeMbio_no_OP50_no['wbps_gene_id']
-four = sign_CeMbio_yes_OP50_yes['wbps_gene_id']
-Diet_background_set = pd.DataFrame(pd.concat([three, four], ignore_index=True))
-Diet_background_set.to_csv('03_output/intestine/Diet_background_set.csv', index=False)
+#one = sign_OP50_yes_OP50_no['wbps_gene_id']
+#two = sign_CeMbio_yes_CeMbio_no['wbps_gene_id']
+#PA14_background_set = pd.DataFrame(pd.concat([one, two], ignore_index=True))
+#PA14_background_set.to_csv('03_output/intestine/PA14_background_set.csv', index=False)
+
+#three = sign_CeMbio_no_OP50_no['wbps_gene_id']
+#four = sign_CeMbio_yes_OP50_yes['wbps_gene_id']
+#Diet_background_set = pd.DataFrame(pd.concat([three, four], ignore_index=True))
+#Diet_background_set.to_csv('03_output/intestine/Diet_background_set.csv', index=False)
 ```
 
 
@@ -1125,8 +1282,9 @@ Diet_background_set.to_csv('03_output/intestine/Diet_background_set.csv', index=
 frames = {'tissue': tissue, 'phenotype': phenotype, 'go': go}
 
 ###############################
-PA14_background_set
-Diet_background_set
+#PA14_background_set
+#Diet_background_set
+all_background_set
 
 changing_all_genes
 changing_diet_genes
@@ -1187,12 +1345,13 @@ results = result["go"]
 results.to_csv('03_output/intestine/Results-Down_OP50_yes_OP50_no-comparison.csv', index=False)
 ```
 
-# something is not right here in this comparison - need to work on
+
+comparison against the background
 ```{python}
 # compare to the generated background set 
 result_background = {}
 for analysis, dictionary in frames.items():
-  result_background[analysis] = ea.enrichment_analysis(changing_exposure_genes.wbps_gene_id, dictionary[dictionary.wbid.isin(PA14_background_set.wbps_gene_id)], show=True, alpha=10**-1)
+  result_background[analysis] = ea.enrichment_analysis(Down_CeMbio_yes_CeMbio_no.wbps_gene_id, dictionary[dictionary.wbid.isin(all_background_set.wbps_gene_id)], show=True, alpha=10**-1)
   
   
 # make the figure in the paper:
@@ -1220,11 +1379,11 @@ for t, r in result_background.items():
     i += 1
 
 # save figure
-plt.savefig('03_output/intestine/changing_exposure_genes_Enrichment_Results_background.svg', bbox_inches='tight')  
+plt.savefig('03_output/intestine/Down_CeMbio_yes_CeMbio_no_Enrichment_Results_background.svg', bbox_inches='tight')  
 
 # save the results from GO to a csv
 results_background = result_background["go"]
-results_background.to_csv('03_output/intestine/Results-changing_exposure_genes-comparison_background.csv', index=False)
+results_background.to_csv('03_output/intestine/Results-Down_CeMbio_yes_CeMbio_no-comparison_background.csv', index=False)
 ```
 
 

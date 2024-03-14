@@ -1,0 +1,2 @@
+Term,Expected,Observed,Enrichment Fold Change,P value,Q value,logQ
+hydrolase activity acting on acid anhydrides GO:0016817,0.13003355704697986,2,15.380645161290323,0.00025024933264279967,0.0713210598031979,1.1467822120017162
