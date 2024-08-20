@@ -23,6 +23,14 @@ The directionality of this library is:
   
 ![](RNA_strandedness_scheme.jpg)
 
+
+**Why perform stranded RNA-seq?**
+
+- Allows researchers to determine the orientation of a transcript and differentiate between the sense (coding) and antisense (complementary) strands of a gene.
+- Can help identify which transcripts are expressed or changing expression levels in experimental systems where genes on opposite DNA strands overlap. 
+- Can help identify non-coding antisense transcripts.
+- Because stranded RNA-seq retains strand information of a read, we can resolve read ambiguity in overlapping genes transcribed from opposite strands, which provides a more accurate quantification of gene expression levels compared with traditional non-stranded RNA-seq.
+
 ---
 
 ## Scripts for RNAseq pipeline on Alpine 
@@ -36,6 +44,7 @@ The directionality of this library is:
   - Use options: 
     - -U 
     - --umi_loc=index1
+    - --umi_len=19
 
 Illumina kits: Dual-indexed libraries—Adds **Index 1 (i7)** and **Index 2 (i5)** sequences to generate uniquely tagged libraries.
 
