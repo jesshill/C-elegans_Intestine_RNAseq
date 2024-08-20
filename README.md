@@ -30,6 +30,9 @@ The directionality of this library is:
 - Can help identify which transcripts are expressed or changing expression levels in experimental systems where genes on opposite DNA strands overlap. 
 - Can help identify non-coding antisense transcripts.
 - Because stranded RNA-seq retains strand information of a read, we can resolve read ambiguity in overlapping genes transcribed from opposite strands, which provides a more accurate quantification of gene expression levels compared with traditional non-stranded RNA-seq.
+- References:
+  - Zhao, S., Zhang, Y., Gordon, W. et al. Comparison of stranded and non-stranded RNA-seq transcriptome profiling and investigation of gene overlap. BMC Genomics 16, 675 (2015). https://doi.org/10.1186/s12864-015-1876-7
+
 
 ---
 
