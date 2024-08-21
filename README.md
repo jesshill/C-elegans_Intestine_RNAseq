@@ -46,7 +46,7 @@ The directionality of this library is:
   - Specify UMI in the read index
   - Use options: 
     - -U 
-    - --umi_loc=index1
+    - --umi_loc=read1
     - --umi_len=19
 
 Illumina kits: Dual-indexed libraries—Adds **Index 1 (i7)** and **Index 2 (i5)** sequences to generate uniquely tagged libraries.
