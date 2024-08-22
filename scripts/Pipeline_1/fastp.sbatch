@@ -20,8 +20,6 @@ conda activate RNAseq
 
 projdir="/pl/active/onishimura_lab/PROJECTS/JessicaH/N2_L4-Stage_Dissected_Intestines_20230301/RNAseq_pipeline_celegans/"
 
-#projdir="/projects/jesshill@colostate.edu/RNAseq_pipeline_celegans/"
-
 
 for R1 in $projdir/01_input/*_R1_001.fastq.gz
 do
