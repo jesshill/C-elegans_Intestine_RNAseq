@@ -2,7 +2,7 @@
 
 #SBATCH --nodes=1
 #SBATCH --ntasks=24
-#SBATCH --time=06:00:00
+#SBATCH --time=10:00:00
 #SBATCH --partition=amilan
 #SBATCH --job-name=fastp
 #SBATCH --output=%x.%j.log
@@ -18,7 +18,9 @@ conda activate RNAseq
 
 # script
 
-projdir="/projects/jesshill@colostate.edu/RNAseq_pipeline_celegans/"
+projdir="/pl/active/onishimura_lab/PROJECTS/JessicaH/N2_L4-Stage_Dissected_Intestines_20230301/RNAseq_pipeline_celegans/"
+
+#projdir="/projects/jesshill@colostate.edu/RNAseq_pipeline_celegans/"
 
 
 for R1 in $projdir/01_input/*_R1_001.fastq.gz
@@ -39,7 +41,8 @@ do
     -j ${root}_report.json \
     --detect_adapter_for_pe \
     -U \
-    --umi_loc=index1 \
+    --umi_loc=read1 \
+    --umi_len=19 \
     --thread $SLURM_NTASKS \
     -g -x -p
 
@@ -55,3 +58,6 @@ done
 echo -e "\n>>> VERSIONS:"
 echo -e "\n>>> FASTP VERSION:"
 fastp --version
+
+
+# final version used for analaysis is --> fastp 0.23.2
