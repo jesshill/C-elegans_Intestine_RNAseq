@@ -18,8 +18,8 @@ This kit contains dUTP in the second strand synthesis buffer that allows labelin
 Paired end sequencing was performed.
 
 The directionality of this library is: 
-  - read 1 is "reverse", so antisense 
-  - read 2 is "forward", so sense
+  - read 1 is "reverse", so antisense (reverse compliment of the RNA molecule) 
+  - read 2 is "forward", so sense (matches the RNA molecule)
   
 ![](RNA_strandedness_scheme.jpg)
 
@@ -69,7 +69,27 @@ Illumina kits: Dual-indexed libraries—Adds **Index 1 (i7)** and **Index 2 (i5
 
 ---
 
-### Pipeline 2
+### Pipeline 2 
 
-- ...
+NEB's recommendation for this kit, to account for UMIs
+
+1. Align reads to the genome to produce a BAM file
+  1.1. We can still use our fastp and hisat2 scripts for this (see below)
+2. Use fgbio AnnotateBamWithUmis to add a "RX" tag containing the UMIs to that BAM file
+3. Run Picard MarkDuplicates to deduplicate the BAM using the UMIs and read positions. 
+
+
+- fastp.sbatch 
+  - Specify UMI in the read index
+  - Use options: 
+    - -U 
+    - --umi_loc=read1
+    - --umi_len=19 
+
+- hisat2_array.sbatch 
+  - Specify the RNA strandedness
+  - Use options: 
+    - --rna-strandedness RF
+  - For single-end reads, use F or R. For paired-end reads, use FR or RF. Where the firststrand corresponds to R and RF, and the secondstrand corresponds to F and FR.
+
 - ... 
