@@ -71,12 +71,7 @@ Illumina kits: Dual-indexed libraries—Adds **Index 1 (i7)** and **Index 2 (i5
 
 ### Pipeline 2 
 
-NEB's recommendation for this kit, to account for UMIs
-
-1. Align reads to the genome to produce a BAM file
-  1.1. We can still use our fastp and hisat2 scripts for this (see below)
-2. Use fgbio AnnotateBamWithUmis to add a "RX" tag containing the UMIs to that BAM file
-3. Run Picard MarkDuplicates to deduplicate the BAM using the UMIs and read positions. 
+**NEB's recommendation for this kit, to account for UMIs:** 1) Align reads to the genome to produce a BAM file (We can still use our fastp and hisat2 scripts for this (see below)). 2) Use fgbio AnnotateBamWithUmis to add a "RX" tag containing the UMIs to that BAM file. 3) Run Picard MarkDuplicates to deduplicate the BAM using the UMIs and read positions. 
 
 
 - fastp.sbatch 
