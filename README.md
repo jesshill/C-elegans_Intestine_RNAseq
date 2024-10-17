@@ -47,7 +47,7 @@ The directionality of this library is:
   - Use options: 
     - -U 
     - --umi_loc=read1
-    - --umi_len=19
+    - --umi_len=11
 
 Illumina kits: Dual-indexed libraries—Adds **Index 1 (i7)** and **Index 2 (i5)** sequences to generate uniquely tagged libraries.
 
@@ -79,7 +79,7 @@ Illumina kits: Dual-indexed libraries—Adds **Index 1 (i7)** and **Index 2 (i5
   - Use options: 
     - -U 
     - --umi_loc=read1
-    - --umi_len=19 
+    - --umi_len=11 
 
 - hisat2_array.sbatch 
   - Specify the RNA strandedness
